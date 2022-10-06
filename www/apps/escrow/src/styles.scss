@@ -9,3 +9,35 @@ body {
   margin: 0;
   padding: 0;
 }
+
+textarea {
+  width: 100%;
+  min-height: 7.5rem;
+}
+
+input[type='reset'] {
+  cursor: pointer;
+  z-index: 1;
+}
+
+input[type='search'],
+input[type='url'],
+select {
+  background-color: rgb(232, 240, 254);
+}
+
+form {
+  position: relative;
+}
+
+h2.title {
+  text-transform: uppercase;
+  @apply text-casper font-bold opacity-25 text-3xl;
+  text-align: center;
+  form & {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 0;
+  }
+}

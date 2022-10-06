@@ -5,23 +5,11 @@ $last: 'seller';
 
 :host {
   display: grid;
-  grid-template-rows: 3.75rem auto 1rem;
+  grid-template-rows: 3.75rem auto;
 }
 
 header {
-  @apply flex flex-row justify-between;
-  box-shadow: rgb(0 0 0 / 12%) 0px 1px 4px;
-}
-
-a {
-  @apply flex py-2 ml-8;
-}
-
-button {
-  @apply font-bold my-2 py-1 px-4 mr-8 rounded bg-casper text-white bg-opacity-75;
-  &:hover {
-    @apply bg-opacity-100;
-  }
+  @apply flex;
 }
 
 main {
@@ -30,32 +18,48 @@ main {
   align-content: center;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: 1fr;
-  grid-column-gap: 2rem;
-  grid-row-gap: 2rem;
-  padding: 2rem;
+  grid-column-gap: 1rem;
+  grid-row-gap: 1rem;
+  padding: 1rem;
   grid-template-areas: '#{$first} #{$second} #{$third} #{$last}';
 }
 
 section {
   @apply py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-black bg-red-400;
+  &:not(.active) {
+    pointer-events: none;
+    opacity: 30%;
+  }
+  &:first-child {
+    @extend .#{$first};
+  }
+  &:nth-child(2) {
+    @extend .#{$second};
+  }
+  &:nth-child(3) {
+    @extend .#{$third};
+  }
+  &:last-child {
+    @extend .#{$last};
+  }
 }
 
 .#{$first} {
   grid-area: #{$first};
-  @apply bg-lime-100;
+  @apply bg-lime-200;
 }
 
 .#{$second} {
   grid-area: #{$second};
-  @apply bg-orange-100;
+  @apply bg-orange-200;
 }
 
 .#{$third} {
   grid-area: #{$third};
-  @apply bg-pink-100;
+  @apply bg-pink-200;
 }
 
 .#{$last} {
   grid-area: #{$last};
-  @apply bg-cyan-100;
+  @apply bg-cyan-200;
 }

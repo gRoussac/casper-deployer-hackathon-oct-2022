@@ -1,23 +1,29 @@
 <header>
-  <a [href]="'/'">
-    <img [src]="'assets/logo-dark.svg'" />
-  </a>
-  <button [hidden]="!window?.casperlabsHelper" (click)="connect()">
-    Connect
-  </button>
+  <casper-escrow-header
+    [isConnected]="isConnected"
+    [activePublicKey]="activePublicKey"
+    [balance]="balance"
+    [role]="user?.role"
+    [isButtonHidden]="!window?.casperlabsHelper"
+    (connect)="connect()"
+  ></casper-escrow-header>
 </header>
 <main>
-  <section class="buyer">
-    <casper-escrow-buyer></casper-escrow-buyer>
+  <!-- <section [ngClass]="{ active: user?.role === Roles.Buyer }">
+    <casper-escrow-buyer [users]="users"></casper-escrow-buyer>
   </section>
-  <section class="seller">
-    <casper-escrow-seller></casper-escrow-seller>
-  </section>
-  <section class="escrow">
+  <section [ngClass]="{ active: user?.role === Roles.Escrow }">
     <casper-escrow-escrow></casper-escrow-escrow>
   </section>
-  <section class="postman">
+  <section [ngClass]="{ active: user?.role === Roles.Postman }">
     <casper-escrow-postman></casper-escrow-postman>
   </section>
+  <section [ngClass]="{ active: user?.role === Roles.Seller }">
+    <casper-escrow-seller [users]="users"></casper-escrow-seller>
+  </section> -->
+  <casper-deployer
+    (connect)="connect()"
+    (refreshPurse)="refreshPurse()"
+    [activePublicKey]="activePublicKey"
+  ></casper-deployer>
 </main>
-<footer></footer>

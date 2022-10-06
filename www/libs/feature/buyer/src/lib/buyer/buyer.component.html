@@ -1,1 +1,22 @@
-<p>buyer works!</p>
+<h2 class="text-2xl font-bold">Buyer</h2>
+
+<fieldset>
+  <legend>Events</legend>
+  <textarea> </textarea>
+</fieldset>
+<hr class="my-5" />
+
+<fieldset title="Create Offer">
+  <legend>Accept Offer</legend>
+  <p>
+    <label>amount</label>
+    <input name="amount" value="25000000000" />
+  </p>
+  <p>
+    <label>to</label>
+    <input name="to" [value]="defaultPublicKey" />
+  </p>
+  <p>
+    <button (click)="send()">sign</button>
+  </p>
+</fieldset>

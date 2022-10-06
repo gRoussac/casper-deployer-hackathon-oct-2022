@@ -1,0 +1,31 @@
+{
+  "name": "deployer",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/feature/deployer/src",
+  "prefix": "casper",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": [
+        "coverage/libs/feature/deployer"
+      ],
+      "options": {
+        "jestConfig": "libs/feature/deployer/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/feature/deployer/**/*.ts",
+          "libs/feature/deployer/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": [
+    "feature deployer"
+  ]
+}

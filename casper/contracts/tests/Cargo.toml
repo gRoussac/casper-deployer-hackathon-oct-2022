@@ -1,0 +1,17 @@
+[package]
+name = "tests"
+version = "0.1.0"
+edition = "2018"
+
+[dev-dependencies]
+casper-contract = { version = "1.4.4", default-features = false, features = ["test-support"] }
+casper-engine-test-support = { version = "2.2.0", features = ["test-support"] }
+casper-execution-engine = "2.0.0"
+casper-types = "1.5.0"
+
+[[bin]]
+name = "integration-tests"
+path = "src/integration_tests.rs"
+bench = false
+doctest = false
+

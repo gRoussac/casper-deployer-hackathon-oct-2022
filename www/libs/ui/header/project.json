@@ -1,0 +1,27 @@
+{
+  "name": "ui-header",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/ui/header/src",
+  "prefix": "casper-escrow",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/ui/header"],
+      "options": {
+        "jestConfig": "libs/ui/header/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/ui/header/**/*.ts",
+          "libs/ui/header/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": ["ui-header"]
+}

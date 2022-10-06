@@ -1,0 +1,28 @@
+<section>
+  <casper-deployer-state-root-hash></casper-deployer-state-root-hash>
+  <casper-deployer-public-key
+    (connect)="connect.emit()"
+    (refreshPurse)="refreshPurse.emit()"
+  ></casper-deployer-public-key>
+  <casper-deployer-transfer
+    (connect)="connect.emit()"
+  ></casper-deployer-transfer>
+  <casper-deployer-get-deploy
+    (refreshPurse)="refreshPurse.emit()"
+  ></casper-deployer-get-deploy>
+</section>
+<section>
+  <casper-deployer-balance></casper-deployer-balance>
+  <casper-deployer-query-global-state
+    (connect)="connect.emit()"
+  ></casper-deployer-query-global-state>
+  <casper-deployer-state-dictionary></casper-deployer-state-dictionary>
+</section>
+<section>
+  <casper-deployer-put-deploy
+    (connect)="connect.emit()"
+  ></casper-deployer-put-deploy>
+</section>
+<section>
+  <casper-deployer-result></casper-deployer-result>
+</section>

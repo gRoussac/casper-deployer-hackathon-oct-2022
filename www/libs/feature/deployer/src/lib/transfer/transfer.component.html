@@ -1,0 +1,82 @@
+<div class="w-full">
+  <form class="bg-white shadow-md rounded p-3 mb-4" (submit)="(false)">
+    <h2 class="title">Transfer</h2>
+    <div class="mb-4">
+      <label
+        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        for="transferFrom"
+      >
+        Transfer from <input type="reset" value="clear" />
+      </label>
+      <div class="mb-2">
+        <input
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          name="transferFrom"
+          #transferFromElt
+          type="search"
+          (change)="(true)"
+          [value]="activePublicKey || ''"
+          placeholder="ex: 0x, uref-0x, empty for active public key"
+        />
+      </div>
+    </div>
+    <div class="mb-4">
+      <label
+        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        for="transferToElt"
+      >
+        Transfer to
+      </label>
+      <div class="mb-2">
+        <input
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          name="transferTo"
+          #transferToElt
+          type="search"
+          (change)="(true)"
+          placeholder="ex: 0x, uref-0x"
+        />
+      </div>
+    </div>
+    <div class="mb-4"></div>
+    <div class="flex items-center justify-between">
+      <label
+        class="self-end flex justify-between text-gray-700 text-sm font-bold mb-2 mr-2"
+        for="amount"
+      >
+        Amount
+      </label>
+      <input
+        class="w-56 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+        name="amount"
+        #amountElt
+        type="search"
+        (change)="(true)"
+        [value]="config['minimumTransfer'] || ''"
+        [placeholder]="'ex: ' + config['minimumTransfer']"
+      />
+      <button
+        class="flex items-end ml-2 flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        type="button"
+        (click)="transfer()"
+        [attr.disabled]="isButtonDisabled ? true : null"
+      >
+        Transfer to
+        <svg
+          class="w-6 h-6 ml-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+          ></path>
+        </svg>
+      </button>
+    </div>
+  </form>
+</div>

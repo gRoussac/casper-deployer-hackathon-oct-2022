@@ -6,7 +6,7 @@
   "prefix": "casper-escrow",
   "targets": {
     "build": {
-      "executor": "@angular-devkit/build-angular:browser",
+      "executor": "@angular-builders/custom-webpack:browser",
       "outputs": [
         "{options.outputPath}"
       ],
@@ -16,15 +16,31 @@
         "main": "apps/escrow/src/main.ts",
         "polyfills": "apps/escrow/src/polyfills.ts",
         "tsConfig": "apps/escrow/tsconfig.app.json",
+        "webWorkerTsConfig": "libs/util/hihlight-webworker/tsconfig.webworker.json",
         "inlineStyleLanguage": "scss",
         "assets": [
           "apps/escrow/src/favicon.ico",
-          "apps/escrow/src/assets"
+          "apps/escrow/src/assets",
+          {
+            "input": "../wasm/pkg",
+            "glob": "escrow_bg.wasm",
+            "output": "assets"
+          }
         ],
         "styles": [
-          "apps/escrow/src/styles.scss"
+          "apps/escrow/src/styles.scss",
+          "./node_modules/highlight.js/styles/lightfair.css"
         ],
-        "scripts": []
+        "scripts": [],
+        "customWebpackConfig": {
+          "path": "custom-webpack.config.js",
+          "mergeRules": {
+            "module": {
+              "rules": "prepend"
+            }
+          },
+          "replaceDuplicatePlugins": true
+        }
       },
       "configurations": {
         "production": {
@@ -32,7 +48,7 @@
             {
               "type": "initial",
               "maximumWarning": "500kb",
-              "maximumError": "1mb"
+              "maximumError": "1.5mb"
             },
             {
               "type": "anyComponentStyle",
@@ -60,10 +76,10 @@
       "defaultConfiguration": "production"
     },
     "serve": {
-      "executor": "@angular-devkit/build-angular:dev-server",
+      "executor": "@angular-builders/custom-webpack:dev-server",
       "configurations": {
         "production": {
-          "browserTarget": "escrow-app:build:production"
+          "browserTarget": "AngularCustomWebpackConfig:build:production"
         },
         "development": {
           "browserTarget": "escrow-app:build:development"
@@ -71,7 +87,8 @@
       },
       "defaultConfiguration": "development",
       "options": {
-        "proxyConfig": "apps/escrow/proxy.conf.json"
+        "proxyConfig": "apps/escrow/proxy.conf.json",
+        "browserTarget": "AngularCustomWebpackConfig:build"
       }
     },
     "extract-i18n": {

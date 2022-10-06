@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "name": "casper-escrow",
+  "builds": [
+    {
+      "src": "dist/apps/api/main.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/**/*",
+      "dest": "/dist/apps/api/main.js"
+    }
+  ]
+}

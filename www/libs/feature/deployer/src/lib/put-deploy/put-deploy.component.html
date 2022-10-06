@@ -1,0 +1,370 @@
+<div class="w-full">
+  <form class="bg-white shadow-md rounded p-3" (submit)="(false)">
+    <h2 class="title">Deploy</h2>
+    <div class="mb-4">
+      <label
+        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        for="apiUrl"
+      >
+        Chain name <input type="reset" value="clear" (click)="(reset)" />
+      </label>
+      <div class="mb-2">
+        <input
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          name="chainName"
+          #chainNameElt
+          type="search"
+          [placeholder]="'ex: ' + config['chainName_test']"
+          [value]="config['chainName_test']"
+        />
+      </div>
+      <div class="mb-2">
+        <select
+          (change)="selectChainName($event)"
+          class="border border-gray-300 text-gray-900 text-sm focus:outline-none rounded focus:shadow-outline block w-full p-2.5"
+        >
+          <optgroup label="default">
+            <option [value]="config['chainName_test']">
+              {{ config['chainName_test'] }}
+            </option>
+            <option [value]="config['chainName_localhost']">
+              {{ config['chainName_localhost'] }}
+            </option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+    <div class="mb-4">
+      <label
+        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        for="publicKey"
+      >
+        Public key hex
+      </label>
+      <div class="mb-2">
+        <input
+          [ngClass]="{
+            'empty:bg-red-200': publicKeyElt.value === ''
+          }"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          name="publicKey"
+          #publicKeyElt
+          type="search"
+          [value]="publicKey || ''"
+          (change)="(true)"
+          placeholder="ex: 0x"
+        />
+      </div>
+    </div>
+    <div class="mb-4 flex justify-between">
+      <div class="mr-1">
+        <label
+          class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+          for="gasFee"
+        >
+          Gas fee max
+        </label>
+        <div class="mb-2">
+          <input
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            name="gasFee"
+            #gasFeeElt
+            type="search"
+            [value]="gasFee || ''"
+            (change)="(true)"
+            [placeholder]="'ex: ' + config['gasFee']"
+          />
+        </div>
+      </div>
+      <div class="ml-1">
+        <label
+          class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+          for="TTL"
+        >
+          TTL
+        </label>
+        <div class="mb-2">
+          <input
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            name="TTL"
+            #TTLElt
+            type="search"
+            [value]="TTL || ''"
+            (change)="(true)"
+            placeholder="ex: 1800000"
+          />
+        </div>
+      </div>
+    </div>
+    <hr class="mb-3" />
+    <div class="mb-4">
+      <label
+        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        for="sessionPath"
+      >
+        Session path (new contract)
+      </label>
+      <div class="mb-2 flex items-center">
+        <input
+          class="hidden"
+          name="sessionPath"
+          #sessionPathElt
+          type="file"
+          id="sessionPathElt"
+          [value]="sessionPath || ''"
+          (change)="onFileSelected($event)"
+          accept=".wasm"
+        />
+        <button
+          class="flex items-end mr-3 bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+          type="button"
+          (click)="sessionPathElt.click()"
+        >
+          Select Wasm
+          <svg
+            *ngIf="!animate"
+            class="w-6 h-6 ml-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+            ></path>
+          </svg>
+          <svg
+            *ngIf="animate"
+            class="animate-spin ml-1 h-6 w-6 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+        </button>
+        <span
+          class="flex items-center"
+          *ngIf="file_name"
+          (click)="resetSessionPathElt()"
+          >{{ file_name }}
+          <svg
+            class="w-6 h-6 ml-1 cursor-pointer"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            ></path>
+          </svg>
+        </span>
+      </div>
+    </div>
+    <hr class="mb-3" />
+    <div class="mb-4">
+      <label
+        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        for="sessionName"
+      >
+        Session or package name (contract already on chain)
+      </label>
+      <div class="mb-2">
+        <input
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-slate-100"
+          name="sessionName"
+          #sessionNameElt
+          type="search"
+          [value]="sessionName || ''"
+          (change)="(true)"
+          placeholder="ex: counter"
+          [attr.disabled]="isSessionNameDisabled ? true : null"
+        />
+      </div>
+    </div>
+    <div class="mb-4">
+      <label
+        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        for="sessionHash"
+      >
+        Session or package hash (contract already on chain)
+      </label>
+      <div class="mb-2">
+        <input
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-slate-100"
+          name="sessionHash"
+          #sessionHashElt
+          type="search"
+          [value]="sessionHash || ''"
+          (change)="(true)"
+          placeholder="ex: contract-0x || hash-0x || 0x"
+          [attr.disabled]="isSessionHashDisabled ? true : null"
+        />
+      </div>
+    </div>
+    <div class="mb-4">
+      <label
+        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        for="entryPointElt"
+      >
+        Entry point (contract on chain)
+      </label>
+      <div class="mb-2">
+        <input
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-slate-100"
+          name="entryPoint"
+          #entryPointElt
+          type="search"
+          [value]="entryPoint || ''"
+          (change)="(true)"
+          placeholder="ex: counter_inc"
+          [attr.disabled]="isEntryPointDisabled ? true : null"
+        />
+      </div>
+    </div>
+    <div class="mb-4">
+      <label
+        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        for="args"
+      >
+        String Args
+      </label>
+      <div class="mb-2">
+        <input
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-slate-100"
+          name="args"
+          #argsElt
+          type="search"
+          [value]="args || ''"
+          (change)="(true)"
+          placeholder="ex: message:string='hello world', ..."
+          [attr.disabled]="isArgsDisabled ? true : null"
+        />
+      </div>
+    </div>
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center flex-start grow">
+        <label
+          class="self-end flex justify-between text-gray-700 text-sm font-bold mb-2 mt-3 mr-2"
+          for="isPackage"
+        >
+          Call Package
+        </label>
+        <input
+          type="checkbox"
+          id="isPackage"
+          name="isPackage"
+          class="mt-1 disabled:bg-slate-100"
+          #isPackageElt
+          [attr.disabled]="isVersionDisabled ? true : null"
+        />
+      </div>
+      <div class="flex ml-3">
+        <label
+          class="self-end flex justify-between text-gray-700 text-sm font-bold mb-2 mr-2"
+          for="amount"
+        >
+          Version
+        </label>
+        <input
+          class="w-60 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-slate-100"
+          name="version"
+          #versionElt
+          type="search"
+          [value]="version || ''"
+          (change)="(true)"
+          placeholder="ex: 1, empty for last version"
+          [attr.disabled]="isVersionDisabled ? true : null"
+        />
+      </div>
+    </div>
+    <div class="flex items-center justify-between mb-2">
+      <button
+        class="flex bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        type="button"
+        (click)="makeDeploy()"
+        [attr.disabled]="isMakeDeployDisabled ? true : null"
+      >
+        Make deploy
+        <svg
+          class="w-6 h-6 ml-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+          ></path>
+        </svg>
+      </button>
+      <!-- TODO Buggy -->
+      <button
+        class="flex bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        type="button"
+        (click)="speculativeDeploy()"
+        [attr.disabled]="true"
+      >
+        Test
+        <svg
+          class="w-6 h-6 ml-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          ></path>
+        </svg>
+      </button>
+      <button
+        class="flex bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        type="button"
+        (click)="signDeploy()"
+        [attr.disabled]="isMakeDeployDisabled ? true : null"
+      >
+        Sign & Send
+        <svg
+          class="w-6 h-6 ml-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"
+          ></path>
+        </svg>
+      </button>
+    </div>
+  </form>
+</div>

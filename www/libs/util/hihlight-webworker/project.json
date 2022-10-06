@@ -1,0 +1,28 @@
+{
+  "projectType": "library",
+  "sourceRoot": "libs/util/hihlight-webworker/src",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": [
+        "coverage/libs/util/hihlight-webworker"
+      ],
+      "options": {
+        "jestConfig": "libs/util/hihlight-webworker/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/util/hihlight-webworker/**/*.ts",
+          "libs/util/hihlight-webworker/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": [
+    "util-highlight-webworker"
+  ]
+}

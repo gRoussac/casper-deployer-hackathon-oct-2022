@@ -1,0 +1,86 @@
+<div class="flex flex-col justify-between grow">
+  <div>
+    <h2 class="title">Output</h2>
+    <div class="flex flex-col items-end">
+      <input
+        class="text-sm font-bold text-casper clear mr-1"
+        type="reset"
+        value="clear"
+        (click)="reset()"
+      />
+      <div class="w-full bg-red-100 rounded p-3 mt-1">
+        <div class="flex justify-between flex-col text-xs">
+          <span class="text-xl text-casper font-bold flex justify-between">
+            <span *ngIf="title" class="flex"
+              >{{ title }}
+              <svg
+                (click)="copy(result)"
+                class="shrink-0 ml-2 w-5 min-w-5 text-gray-500 cursor-pointer"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path
+                  d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                />
+              </svg>
+            </span>
+          </span>
+          <div #resultElt class="mt-2 max-w-sm pre overflow-y">
+            <code [innerHtml]="resultHtml"></code>
+          </div>
+          <div class="flex justify-end">
+            <svg
+              *ngIf="isScrollable"
+              (click)="goToBottom()"
+              class="w-6 h-6 text-casper mt-1 scrollToBottom"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 13l-7 7-7-7m14-8l-7 7-7-7"
+              ></path>
+            </svg>
+            <svg
+              *ngIf="isScrollable"
+              (click)="goToTop()"
+              class="w-6 h-6 text-casper mr-3 scrollToTop"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 11l7-7 7 7M5 19l7-7 7 7"
+              ></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mb-2">
+    <h2 class="title mt-5">Notes</h2>
+    <div class="flex flex-col items-end">
+      <input
+        (click)="emptyNotes()"
+        type="reset"
+        value="clear"
+        class="text-gray-700 text-sm font-bold mb-2 mr-1"
+      />
+      <textarea #NotesElt class="mono text-xs rounded"></textarea>
+    </div>
+  </div>
+</div>

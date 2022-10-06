@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Users } from '@casper-escrow/api-interfaces';
 
 @Component({
   selector: 'casper-escrow-seller',
@@ -9,6 +10,7 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./seller.component.scss'],
 })
 export class SellerComponent implements OnInit {
+  @Input() users!: Users;
   constructor() { }
 
   ngOnInit(): void { }

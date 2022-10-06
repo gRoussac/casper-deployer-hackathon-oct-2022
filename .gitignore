@@ -1,3 +1,7 @@
 .accounts
-casper/contract/target
-casper/tests/target/debug
+casper/contracts/*/target
+casper/*/tests/target/debug
+wasm/target/
+*/target/*
+casper-escrow.code-workspace
+.gitignore

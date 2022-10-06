@@ -2,13 +2,20 @@
   "$schema": "./node_modules/nx/schemas/workspace-schema.json",
   "version": 2,
   "projects": {
+    "api": "apps/api",
+    "api-interfaces": "libs/api-interfaces",
+    "buyer": "libs/feature/buyer",
+    "data-access-deployer": "libs/data-access/deployer",
+    "data-access-users": "libs/data-access/users",
+    "deployer": "libs/feature/deployer",
+    "escrow": "libs/feature/escrow",
     "escrow-app": "apps/escrow",
     "escrow-e2e": "apps/escrow-e2e",
-    "seller": "libs/feature/seller",
-    "buyer": "libs/feature/buyer",
-    "escrow": "libs/feature/escrow",
     "postman": "libs/feature/postman",
-    "api": "apps/api",
-    "api-interfaces": "libs/api-interfaces"
+    "seller": "libs/feature/seller",
+    "ui-header": "libs/ui/header",
+    "util-hihlight-webworker": "libs/util/hihlight-webworker",
+    "util-services-wasm": "libs/util/services/wasm",
+    "util-tokens": "libs/util/tokens"
   }
 }

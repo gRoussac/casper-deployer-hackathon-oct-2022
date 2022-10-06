@@ -1,0 +1,116 @@
+<div class="w-full">
+  <form class="bg-white shadow-md rounded p-3 mb-4" (submit)="(false)">
+    <h2 class="title">Config</h2>
+    <div class="mb-4">
+      <label
+        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        for="stateRootHash"
+      >
+        State root hash <input type="reset" value="clear" (click)="reset()" />
+      </label>
+      <div class="mb-2">
+        <input
+          [ngClass]="{
+            'empty:bg-red-200': stateRootHashElt.value === ''
+          }"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          name="stateRootHash"
+          #stateRootHashElt
+          type="search"
+          (change)="(true)"
+          (keyup.enter)="getPurseURef()"
+        />
+      </div>
+    </div>
+    <div class="mb-4">
+      <label
+        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        for="activePublicKey"
+      >
+        Public key hex
+      </label>
+      <div class="mb-2">
+        <input
+          [ngClass]="{
+            'empty:bg-red-200': activePublicKeyElt.value === ''
+          }"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          name="activePublicKey"
+          #activePublicKeyElt
+          type="search"
+          [value]="activePublicKey || ''"
+          (change)="(true)"
+          (keyup.enter)="getPurseURef()"
+          placeholder="ex: 0x"
+        />
+      </div>
+    </div>
+    <div class="flex items-center justify-between">
+      <button
+        class="flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        type="button"
+        (click)="onConnect()"
+      >
+        Set public key
+        <svg
+          class="w-6 h-6 ml-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+          ></path>
+        </svg>
+      </button>
+      <button
+        class="flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        type="button"
+        (click)="getPurseURef()"
+        [attr.disabled]="isPurseButtonDisabled ? true : null"
+      >
+        Purse URef
+        <svg
+          class="w-6 h-6 ml-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+          ></path>
+        </svg>
+      </button>
+      <button
+        class="flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        type="button"
+        (click)="balanceOfByPublicKey()"
+        [attr.disabled]="!activePublicKey ? true : null"
+      >
+        Balance
+        <svg
+          class="w-6 h-6 ml-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
+          ></path>
+        </svg>
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,15 +1,27 @@
-import { Controller, Get } from '@nestjs/common';
-
-import { Message } from '@casper-escrow/api-interfaces';
-
+import { Purse, Error, Users } from '@casper-escrow/api-interfaces';
+import { Controller, Get, Query } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) { }
 
-  @Get('hello')
-  getData(): Message {
-    return this.appService.getData();
+  @Get('users')
+  getKeys(): Users {
+    return this.appService.getUsers();
   }
+
+  @Get('purse')
+  async getPurse(
+    @Query('publicKey') publicKey: string,
+    @Query('apiUrl') apiUrl?: string
+  ): Promise<Purse | Error> {
+    try {
+      return await this.appService.getPurse(publicKey, apiUrl);
+    } catch (error) {
+      return { name: error.toString(), message: error };
+    }
+  }
+
+
 }

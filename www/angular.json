@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json",
+  "version": 2,
+  "projects": {
+    "escrow-app": "apps/escrow",
+    "escrow-e2e": "apps/escrow-e2e",
+    "seller": "libs/feature/seller",
+    "buyer": "libs/feature/buyer",
+    "escrow": "libs/feature/escrow",
+    "postman": "libs/feature/postman",
+    "api": "apps/api",
+    "api-interfaces": "libs/api-interfaces"
+  }
+}

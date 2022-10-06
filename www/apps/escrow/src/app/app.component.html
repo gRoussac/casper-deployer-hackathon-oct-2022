@@ -1,0 +1,23 @@
+<header>
+  <a [href]="'/'">
+    <img [src]="'assets/logo-dark.svg'" />
+  </a>
+  <button [hidden]="!window?.casperlabsHelper" (click)="connect()">
+    Connect
+  </button>
+</header>
+<main>
+  <section class="buyer">
+    <casper-escrow-buyer></casper-escrow-buyer>
+  </section>
+  <section class="seller">
+    <casper-escrow-seller></casper-escrow-seller>
+  </section>
+  <section class="escrow">
+    <casper-escrow-escrow></casper-escrow-escrow>
+  </section>
+  <section class="postman">
+    <casper-escrow-postman></casper-escrow-postman>
+  </section>
+</main>
+<footer></footer>

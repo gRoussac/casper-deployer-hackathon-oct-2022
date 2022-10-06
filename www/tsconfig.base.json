@@ -1,0 +1,26 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2017", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@casper-escrow/seller": ["libs/feature/seller/src/index.ts"],
+      "@casper-escrow/buyer": ["libs/feature/buyer/src/index.ts"],
+      "@casper-escrow/escrow": ["libs/feature/escrow/src/index.ts"],
+      "@casper-escrow/postman": ["libs/feature/postman/src/index.ts"],
+      "@casper-escrow/api-interfaces": ["libs/api-interfaces/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

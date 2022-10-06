@@ -1,0 +1,11 @@
+@use 'tailwindcss/base';
+@use 'tailwindcss/components';
+@use 'tailwindcss/utilities';
+
+html,
+body {
+  display: grid;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}

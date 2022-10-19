@@ -8,12 +8,20 @@
     {
       "src": "./www/dist/apps/api/main.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "./www/dist/server.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
       "dest": "./www/dist/apps/api/main.js"
+    },
+    {
+      "src": "/",
+      "dest": "./www/dist/server.js"
     }
   ]
 }

@@ -8,8 +8,8 @@ import { PublicKeyComponent } from '../public-key/public-key.component';
 import { BalanceComponent } from '../balance/balance.component';
 import { ResultComponent } from '../result/result.component';
 import { ResultService } from '../result/result.service';
-import { UtilHihlightWebworkerModule } from '@casper-escrow/util-hightlight-webworker';
-import { DeployerService } from '@casper-escrow/data-access-deployer';
+import { UtilHihlightWebworkerModule } from '@casper-util/hightlight-webworker';
+import { DeployerService } from '@casper-data/data-access-deployer';
 import { TransferComponent } from '../transfer/transfer.component';
 import { DictionaryComponent } from '../dictionary/dictionary.component';
 

@@ -1,7 +1,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { config, ENV_CONFIG } from '@casper-deployer/config';
-import { HIGHLIGHT_WEBWORKER_FACTORY } from '@casper-escrow/util-hightlight-webworker';
+import { config, ENV_CONFIG } from '@casper-util/config';
+import { HIGHLIGHT_WEBWORKER_FACTORY } from '@casper-util/hightlight-webworker';
 import { ResultComponent } from './result.component';
 import { ResultService } from './result.service';
 

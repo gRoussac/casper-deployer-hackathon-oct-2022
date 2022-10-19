@@ -1,4 +1,4 @@
-import { Users, Roles } from "@casper-escrow/api-interfaces";
+import { Users, Roles } from "@casper-api/api-interfaces";
 
 const users: Users = [
   {

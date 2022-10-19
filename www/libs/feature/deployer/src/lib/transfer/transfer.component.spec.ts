@@ -1,8 +1,8 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { config, ENV_CONFIG } from '@casper-deployer/config';
-import { HIGHLIGHT_WEBWORKER_FACTORY } from '@casper-escrow/util-hightlight-webworker';
+import { config, ENV_CONFIG } from '@casper-util/config';
+import { HIGHLIGHT_WEBWORKER_FACTORY } from '@casper-util/hightlight-webworker';
 import { ResultService } from '../result/result.service';
 
 import { TransferComponent } from './transfer.component';

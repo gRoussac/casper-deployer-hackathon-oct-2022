@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Roles, User, Users } from '@casper-escrow/api-interfaces';
+import { Roles, User, Users } from '@casper-api/api-interfaces';
 
 @Component({
   selector: 'casper-escrow-buyer',

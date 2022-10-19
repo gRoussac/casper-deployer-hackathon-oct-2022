@@ -1,10 +1,10 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { api_interface, DeployReturn, Peer, State } from '@casper-escrow/api-interfaces';
+import { api_interface, DeployReturn, Peer, State } from '@casper-api/api-interfaces';
 import { map, Observable, Subject, timeout } from 'rxjs';
 import { DeployUtil, GetDeployResult } from 'casper-js-sdk';
 import { StoredValue } from 'casper-js-sdk/dist/lib/StoredValue';
-import { EnvironmentConfig, ENV_CONFIG } from '@casper-deployer/config';
+import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 
 @Injectable({
   providedIn: 'root'

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { HighlightService, HIGHLIGHT_WEBWORKER_FACTORY } from '@casper-escrow/util-hightlight-webworker';
+import { HighlightService, HIGHLIGHT_WEBWORKER_FACTORY } from '@casper-util/hightlight-webworker';
 
 import { ResultService } from './result.service';
 

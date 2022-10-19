@@ -7,14 +7,14 @@ import { SellerComponent } from '@casper-escrow/seller';
 import { BuyerComponent } from '@casper-escrow/buyer';
 import { EscrowComponent } from '@casper-escrow/escrow';
 import { PostmanComponent } from '@casper-escrow/postman';
-import { HeaderComponent } from '@casper-escrow/ui-header';
-import { UsersService } from '@casper-escrow/data-access-users';
-import { Users, User, Roles, Purse } from '@casper-escrow/api-interfaces';
-import { ESCROW_TOKEN } from '@casper-escrow/util-wasm';
+import { HeaderComponent } from '@casper-ui/header';
+import { UsersService } from '@casper-data/data-access-users';
+import { Users, User, Roles, Purse } from '@casper-api/api-interfaces';
+import { ESCROW_TOKEN } from '@casper-util/wasm';
 import { Escrow } from "escrow";
 
 import { CasperLabsHelper } from 'casper-js-sdk/dist/@types/casperlabsSigner';
-import { DeployerComponent } from '@casper-escrow/deployer';
+import { DeployerComponent } from '@casper-deployer/deployer';
 
 declare global {
   interface Window {

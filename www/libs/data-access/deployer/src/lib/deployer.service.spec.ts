@@ -1,6 +1,6 @@
 import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { ENV_CONFIG, config } from '@casper-deployer/config';
+import { ENV_CONFIG, config } from '@casper-util/config';
 
 import { DeployerService } from './deployer.service';
 

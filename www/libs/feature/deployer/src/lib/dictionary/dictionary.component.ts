@@ -1,9 +1,9 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { DeployerService } from '@casper-escrow/data-access-deployer';
+import { DeployerService } from '@casper-data/data-access-deployer';
 import { ResultService } from '../result/result.service';
-import { State } from '@casper-escrow/api-interfaces';
+import { State } from '@casper-api/api-interfaces';
 import { StoredValue } from 'casper-js-sdk/dist/lib/StoredValue';
 
 @Component({

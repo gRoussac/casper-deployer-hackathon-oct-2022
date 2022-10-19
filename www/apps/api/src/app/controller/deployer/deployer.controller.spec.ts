@@ -1,4 +1,4 @@
-import { Peer } from '@casper-escrow/api-interfaces';
+import { Peer } from '@casper-api/api-interfaces';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppService } from '../../app.service';
 import { DeployerController } from './deployer.controller';

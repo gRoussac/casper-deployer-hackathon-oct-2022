@@ -62,7 +62,8 @@ export class AppComponent implements OnInit, OnDestroy {
     @Inject(ESCROW_TOKEN) private readonly escrow: Escrow,
     private readonly usersService: UsersService,
     private readonly changeDetectorRef: ChangeDetectorRef
-  ) { }
+  ) {
+  }
 
   async ngOnInit(): Promise<void> {
     this.setUsersSubscription();

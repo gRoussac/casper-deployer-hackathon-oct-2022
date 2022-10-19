@@ -1,7 +1,7 @@
 /* eslint-disable */
 export default {
   displayName: 'postman',
-  preset: '../../../../jest.preset.js',
+  preset: '../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {
     'ts-jest': {

@@ -19,31 +19,32 @@ export class AppService {
     return environment.users;
   }
 
-  async getPurse(publicKey: string, apiUrl?: string): Promise<Purse> {
-    const balance = (await this.getAccountBalance(publicKey, apiUrl)).toString();
-    return { balance };
-  }
-
-  async getStateRootHash(apiUrl?: string, stringify = false) {
-    const stateRootHash = await this.service.getService(apiUrl).getStateRootHash(); if (stringify) {
-      return JSON.stringify(stateRootHash);
-    }
-    return stateRootHash;
-  }
-
-  async getPeers(apiUrl?: string): Promise<Peer[]> {
-    return (await this.service.getService(apiUrl).getPeers()).peers.map(peer => {
+  async getPeers(apiUrl: string): Promise<Peer[]> {
+    return (await this.service.getService(apiUrl).getPeers()).peers?.map(peer => {
       const address = peer.address.split(':');
       peer.address = ['http://', address.shift(), ':', '7777'].join('');
       return peer;
     });
   }
 
-  async getStatus(apiUrl?: string): Promise<string> {
+  async getStateRootHash(apiUrl: string, stringify = false): Promise<string> {
+    const stateRootHash = await this.service.getService(apiUrl).getStateRootHash();
+    if (stringify) {
+      return JSON.stringify(stateRootHash);
+    }
+    return stateRootHash;
+  }
+
+  async getStatus(apiUrl: string): Promise<string> {
     return JSON.stringify((await this.service.getService(apiUrl).getStatus()).api_version && 'status');
   }
 
-  async getPurseURef(stateRootHash: string, publicKey: string, apiUrl?: string, stringify = false): Promise<string> {
+  async getPurse(publicKey: string, apiUrl: string): Promise<Purse> {
+    const balance = (await this.getAccountBalance(publicKey, apiUrl)).toString();
+    return { balance };
+  }
+
+  async getPurseURef(stateRootHash: string, publicKey: string, apiUrl: string, stringify = false): Promise<string> {
     const purse_uref = await this.service.getService(apiUrl).getAccountBalanceUrefByPublicKey(stateRootHash, CLPublicKey.fromHex(publicKey));
     if (stringify) {
       return JSON.stringify(purse_uref);
@@ -51,12 +52,12 @@ export class AppService {
     return purse_uref;
   }
 
-  async getBlockState(stateRootHash: string, key: string, path: string[] = [], apiUrl?: string): Promise<StoredValue> {
+  async getBlockState(stateRootHash: string, key: string, path: string[] = [], apiUrl: string): Promise<StoredValue> {
     const storedValue = await this.service.getService(apiUrl).getBlockState(stateRootHash, key, path);
     return storedValue;
   }
 
-  async getBalance(stateRootHash: string, purseURef: string, apiUrl?: string, stringify = false): Promise<BigNumber | string> {
+  async getBalance(stateRootHash: string, purseURef: string, apiUrl: string, stringify = false): Promise<BigNumber | string> {
     if (!stateRootHash) {
       stateRootHash = await this.getStateRootHash(apiUrl);
     }
@@ -68,11 +69,11 @@ export class AppService {
     return balanceBN;
   }
 
-  async getDeploy(deployHash: string, apiUrl?: string): Promise<GetDeployResult> {
+  async getDeploy(deployHash: string, apiUrl: string): Promise<GetDeployResult> {
     return await this.service.getService(apiUrl).getDeployInfo(deployHash);
   }
 
-  async putDeploy(signedDeploy: DeployUtil.Deploy, speculative?: boolean, apiUrl?: string): Promise<DeployReturn> {
+  async putDeploy(signedDeploy: DeployUtil.Deploy, speculative = false, apiUrl: string): Promise<DeployReturn> {
     if (signedDeploy && !DeployUtil.validateDeploy(signedDeploy)) {
       console.error(signedDeploy);
       return;
@@ -87,19 +88,19 @@ export class AppService {
   }
 
   // TODO returns void ???
-  async checkDeploySize(deploy: DeployUtil.Deploy, apiUrl?: string): Promise<void> {
+  async checkDeploySize(deploy: DeployUtil.Deploy, apiUrl: string): Promise<void> {
     return await this.service.getService(apiUrl).checkDeploySize(deploy);
   }
 
-  async getDictionaryItemByURef(stateRootHash: string, dictionaryItemKey: string, seedUref: string, rawData?: boolean, apiUrl?: string): Promise<StoredValue> {
+  async getDictionaryItemByURef(stateRootHash: string, dictionaryItemKey: string, seedUref: string, rawData = false, apiUrl: string): Promise<StoredValue> {
     return await this.service.getService(apiUrl).getDictionaryItemByURef(stateRootHash, dictionaryItemKey, seedUref, { rawData });
   }
 
-  async getDictionaryItemByName(stateRootHash: string, contractHash: string, dictionaryName: string, dictionaryItemKey: string, rawData?: boolean, apiUrl?: string): Promise<StoredValue> {
+  async getDictionaryItemByName(stateRootHash: string, contractHash: string, dictionaryName: string, dictionaryItemKey: string, rawData = false, apiUrl: string): Promise<StoredValue> {
     return await this.service.getService(apiUrl).getDictionaryItemByName(stateRootHash, contractHash, dictionaryName, dictionaryItemKey, { rawData });
   }
 
-  async getBalanceOfByPublicKey(publicKey: string, apiUrl?: string, stringify = false): Promise<BigNumber | string> {
+  async getBalanceOfByPublicKey(publicKey: string, apiUrl: string, stringify = false): Promise<BigNumber | string> {
     const balanceBN = await this.client.getClient(apiUrl).balanceOfByPublicKey(CLPublicKey.fromHex(publicKey));
     if (stringify) {
       const balance = balanceBN.toString();
@@ -108,11 +109,11 @@ export class AppService {
     return balanceBN;
   }
 
-  private async getAccountBalance(publicKey: string, apiUrl?: string): Promise<BigNumber> {
+  private async getAccountBalance(publicKey: string, apiUrl: string): Promise<BigNumber> {
     if (!publicKey) { return; }
     const casperService = this.service.getService(apiUrl);
     const stateRootHash = await this.getStateRootHash(apiUrl);
     const purseURef = await casperService.getAccountBalanceUrefByPublicKey(stateRootHash, CLPublicKey.fromHex(publicKey));
-    return await this.getBalance(stateRootHash, purseURef) as BigNumber;
+    return await this.getBalance(stateRootHash, purseURef, apiUrl) as BigNumber;
   }
 }

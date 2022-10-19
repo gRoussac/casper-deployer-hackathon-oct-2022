@@ -1,19 +1,44 @@
-import { Component } from '@angular/core';
-import { TestBed, async } from '@angular/core/testing';
-import { HttpClientModule } from '@angular/common/http';
+import { TestBed } from '@angular/core/testing';
+import { ESCROW_TOKEN } from '@casper-escrow/util-wasm';
 import { AppComponent } from './app.component';
+import { UsersService } from '@casper-escrow/data-access-users';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+import { ENV_CONFIG, config } from '@casper-deployer/config';
 
 describe('AppComponent', () => {
-  beforeEach(async(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [AppComponent],
-      imports: [HttpClientModule],
+      declarations: [],
+      imports: [AppComponent, HttpClientModule],
+      providers: [
+        UsersService,
+        {
+          provide: ESCROW_TOKEN, useValue: {
+            hello: jest.fn()
+          },
+        },
+        {
+          provide: ENV_CONFIG, useValue: config
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-  }));
+  });
 
   it('should create the app', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
+  });
+
+  xit('should ngOnInit', () => {
+    // TODO
+  });
+  xit('should connect', () => {
+    //
+  });
+  xit('should refreshPurse', () => {
+    //
   });
 });

@@ -16,10 +16,6 @@ export type Error = {
   message: string;
 };
 
-export type EnvironmentConfig = {
-  [key: string]: string;
-};
-
 export type Peer = {
   node_id: string;
   address: string;

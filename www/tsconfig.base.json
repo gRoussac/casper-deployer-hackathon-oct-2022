@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@casper-deployer/config": ["libs/util/config/src/index.ts"],
       "@casper-escrow/api-interfaces": ["libs/api-interfaces/src/index.ts"],
       "@casper-escrow/buyer": ["libs/feature/buyer/src/index.ts"],
       "@casper-escrow/data-access-deployer": [

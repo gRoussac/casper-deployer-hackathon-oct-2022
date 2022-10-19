@@ -1,11 +1,11 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, Input, OnDestroy, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { EnvironmentConfig, State } from '@casper-escrow/api-interfaces';
+import { State } from '@casper-escrow/api-interfaces';
 import { DeployerService } from '@casper-escrow/data-access-deployer';
 import { Subscription } from 'rxjs';
-import { ENV_CONFIG } from '@casper-escrow/util-tokens';
 import { ResultService } from '../result/result.service';
 import { StoredValue } from 'casper-js-sdk/dist/lib/StoredValue';
+import { EnvironmentConfig, ENV_CONFIG } from '@casper-deployer/config';
 
 @Component({
   selector: 'casper-deployer-query-global-state',

@@ -7,9 +7,7 @@
   "targets": {
     "build": {
       "executor": "@angular-builders/custom-webpack:browser",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/escrow",
         "index": "apps/escrow/src/index.html",
@@ -100,17 +98,12 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": [
-          "apps/escrow/**/*.ts",
-          "apps/escrow/**/*.html"
-        ]
+        "lintFilePatterns": ["apps/escrow/**/*.ts", "apps/escrow/**/*.html"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/apps/escrow"
-      ],
+      "outputs": ["coverage/apps/escrow"],
       "options": {
         "jestConfig": "apps/escrow/jest.config.ts",
         "passWithNoTests": true

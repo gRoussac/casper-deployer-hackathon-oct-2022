@@ -14,6 +14,7 @@
     "postman": "libs/feature/postman",
     "seller": "libs/feature/seller",
     "ui-header": "libs/ui/header",
+    "util-config": "libs/util/config",
     "util-hihlight-webworker": "libs/util/hihlight-webworker",
     "util-services-wasm": "libs/util/services/wasm",
     "util-tokens": "libs/util/tokens"

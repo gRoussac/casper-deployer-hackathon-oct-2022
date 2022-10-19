@@ -1,4 +1,6 @@
-import { EnvironmentConfig } from "@casper-escrow/api-interfaces";
+export type EnvironmentConfig = {
+  [key: string]: string;
+};
 
 export const config: EnvironmentConfig = {
   api_prefix: "/api/",

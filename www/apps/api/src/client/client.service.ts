@@ -12,13 +12,13 @@ export class ClientService {
     private readonly urlService: UrlService
   ) { }
 
-  getClient(apiUrl?: string) {
+  getClient(apiUrl: string) {
     if (apiUrl && this._apiUrl === apiUrl) {
       return this.casperClient;
     }
     apiUrl = this.urlService.shortUrl(apiUrl);
-    if (apiUrl && !this.urlService.isValidHttpUrl(apiUrl)) {
-      throw ('url seems invalid');
+    if (!apiUrl || !this.urlService.isValidHttpUrl(apiUrl)) {
+      throw TypeError('url seems invalid');
     }
     this._apiUrl = apiUrl;
     this.casperClient = new CasperClient(apiUrl);

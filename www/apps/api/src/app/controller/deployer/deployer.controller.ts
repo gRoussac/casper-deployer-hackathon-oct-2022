@@ -20,7 +20,7 @@ export class DeployerController {
   }
 
   @Get(api_interface.Peers)
-  async getPeers(@Query('apiUrl') apiUrl?: string): Promise<Peer[] | Error> {
+  async getPeers(@Query('apiUrl') apiUrl: string): Promise<Peer[] | Error> {
     try {
       return await this.appService.getPeers(apiUrl);
     } catch (error) {

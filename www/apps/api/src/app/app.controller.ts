@@ -7,7 +7,7 @@ export class AppController {
   constructor(private readonly appService: AppService) { }
 
   @Get('users')
-  getKeys(): Users {
+  getUsers(): Users {
     return this.appService.getUsers();
   }
 
@@ -22,6 +22,4 @@ export class AppController {
       return { name: error.toString(), message: error };
     }
   }
-
-
 }

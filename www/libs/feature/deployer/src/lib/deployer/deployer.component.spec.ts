@@ -1,8 +1,8 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ENV_CONFIG, config } from '@casper-deployer/config';
-import { DeployerService } from '@casper-escrow/data-access-deployer';
+import { ENV_CONFIG, config } from '@casper-util/config';
+import { DeployerService } from '@casper-data/data-access-deployer';
 import { of } from 'rxjs';
 import { DeployerComponent } from './deployer.component';
 

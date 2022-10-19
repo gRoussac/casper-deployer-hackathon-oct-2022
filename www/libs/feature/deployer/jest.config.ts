@@ -13,7 +13,7 @@ export default {
       astTransformers: {
         before: [
           {
-            path: '<rootDir>/../../../node_modules/ts-jest-mock-import-meta',
+            path: 'ts-jest-mock-import-meta',
             options: { metaObjectReplacement: { url: 'https://www.url.com' } }
           }
         ],

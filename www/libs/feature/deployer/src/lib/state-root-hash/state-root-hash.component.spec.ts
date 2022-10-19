@@ -1,8 +1,8 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ENV_CONFIG, config } from '@casper-deployer/config';
-import { HighlightService, HIGHLIGHT_WEBWORKER_FACTORY } from '@casper-escrow/util-hightlight-webworker';
+import { ENV_CONFIG, config } from '@casper-util/config';
+import { HighlightService, HIGHLIGHT_WEBWORKER_FACTORY } from '@casper-util/hightlight-webworker';
 import { ResultService } from '../result/result.service';
 import { StateRootHashComponent } from './state-root-hash.component';
 

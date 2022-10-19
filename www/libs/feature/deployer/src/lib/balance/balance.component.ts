@@ -1,10 +1,10 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { State } from '@casper-escrow/api-interfaces';
-import { DeployerService } from '@casper-escrow/data-access-deployer';
+import { State } from '@casper-api/api-interfaces';
+import { DeployerService } from '@casper-data/data-access-deployer';
 import { Subscription } from 'rxjs';
 import { ResultService } from '../result/result.service';
-import { EnvironmentConfig, ENV_CONFIG } from '@casper-deployer/config';
+import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 
 @Component({
   selector: 'casper-deployer-balance',

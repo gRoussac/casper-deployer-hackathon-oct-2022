@@ -2,8 +2,8 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { GetDeployResult } from 'casper-js-sdk';
-import { DeployerService } from '@casper-escrow/data-access-deployer';
-import { State } from '@casper-escrow/api-interfaces';
+import { DeployerService } from '@casper-data/data-access-deployer';
+import { State } from '@casper-api/api-interfaces';
 import { ResultService } from '../result/result.service';
 
 @Component({

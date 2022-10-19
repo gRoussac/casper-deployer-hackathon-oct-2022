@@ -15,25 +15,23 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@casper-deployer/config": ["libs/util/config/src/index.ts"],
-      "@casper-escrow/api-interfaces": ["libs/api-interfaces/src/index.ts"],
+      "@casper-util/config": ["libs/util/config/src/index.ts"],
+      "@casper-api/api-interfaces": ["libs/api-interfaces/src/index.ts"],
       "@casper-escrow/buyer": ["libs/feature/buyer/src/index.ts"],
-      "@casper-escrow/data-access-deployer": [
+      "@casper-data/data-access-deployer": [
         "libs/data-access/deployer/src/index.ts"
       ],
-      "@casper-escrow/data-access-users": [
-        "libs/data-access/users/src/index.ts"
-      ],
-      "@casper-escrow/deployer": ["libs/feature/deployer/src/index.ts"],
+      "@casper-data/data-access-users": ["libs/data-access/users/src/index.ts"],
+      "@casper-deployer/deployer": ["libs/feature/deployer/src/index.ts"],
       "@casper-escrow/escrow": ["libs/feature/escrow/src/index.ts"],
       "@casper-escrow/postman": ["libs/feature/postman/src/index.ts"],
       "@casper-escrow/seller": ["libs/feature/seller/src/index.ts"],
-      "@casper-escrow/ui-header": ["libs/ui/header/src/index.ts"],
-      "@casper-escrow/util-hightlight-webworker": [
+      "@casper-ui/header": ["libs/ui/header/src/index.ts"],
+      "@casper-util/hightlight-webworker": [
         "libs/util/hihlight-webworker/src/index.ts"
       ],
-      "@casper-escrow/util-tokens": ["libs/util/tokens/src/index.ts"],
-      "@casper-escrow/util-wasm": ["libs/util/services/wasm/src/index.ts"]
+      "@casper-util/tokens": ["libs/util/tokens/src/index.ts"],
+      "@casper-util/wasm": ["libs/util/services/wasm/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

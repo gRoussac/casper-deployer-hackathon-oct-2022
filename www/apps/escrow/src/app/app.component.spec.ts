@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { ESCROW_TOKEN } from '@casper-escrow/util-wasm';
+import { ESCROW_TOKEN } from '@casper-util/wasm';
 import { AppComponent } from './app.component';
-import { UsersService } from '@casper-escrow/data-access-users';
+import { UsersService } from '@casper-data/data-access-users';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
-import { ENV_CONFIG, config } from '@casper-deployer/config';
+import { ENV_CONFIG, config } from '@casper-util/config';
 
 describe('AppComponent', () => {
   beforeEach(() => {

@@ -1,4 +1,4 @@
-import { Purse } from '@casper-escrow/api-interfaces';
+import { Purse } from '@casper-api/api-interfaces';
 import { Test, TestingModule } from '@nestjs/testing';
 import { environment } from '../environments/environment';
 import { AppController } from './app.controller';

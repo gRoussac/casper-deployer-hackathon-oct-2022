@@ -1,4 +1,4 @@
-import { api_interface, DeployReturn, Peer } from '@casper-escrow/api-interfaces';
+import { api_interface, DeployReturn, Peer } from '@casper-api/api-interfaces';
 import { Controller, Get, Post, Query, Body } from '@nestjs/common';
 import { DeployUtil, GetDeployResult } from 'casper-js-sdk';
 import { StoredValue } from 'casper-js-sdk/dist/lib/StoredValue';

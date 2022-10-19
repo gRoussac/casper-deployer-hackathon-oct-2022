@@ -1,10 +1,10 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Peer } from '@casper-escrow/api-interfaces';
-import { DeployerService } from '@casper-escrow/data-access-deployer';
+import { Peer } from '@casper-api/api-interfaces';
+import { DeployerService } from '@casper-data/data-access-deployer';
 import { Subscription } from 'rxjs';
 import { ResultService } from '../result/result.service';
-import { EnvironmentConfig, ENV_CONFIG } from '@casper-deployer/config';
+import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 
 @Component({
   selector: 'casper-deployer-state-root-hash',

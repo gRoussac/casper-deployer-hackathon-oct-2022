@@ -5,7 +5,7 @@ import { UrlService } from '../util/url/url.service';
 import { environment } from '../environments/environment';
 import { AppService } from './app.service';
 import { GetPeersResult } from 'casper-js-sdk';
-import { Peer } from '@casper-escrow/api-interfaces';
+import { Peer } from '@casper-api/api-interfaces';
 
 describe('AppService', () => {
   let service: AppService;

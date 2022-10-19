@@ -2,11 +2,15 @@
   "version": 2,
   "name": "casper-escrow",
   "installCommand": "npm install",
-  "buildCommand": "npm run build:prod",
-  "outputDirectory": "dist/apps/escrow/",
+  "buildCommand": "npm run build",
+  "outputDirectory": "./www/dist/apps/",
   "builds": [
     {
       "src": "./www/dist/apps/api/main.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "./www/dist/server.js",
       "use": "@vercel/node"
     }
   ],
@@ -14,6 +18,10 @@
     {
       "src": "/api/(.*)",
       "dest": "./www/dist/apps/api/main.js"
+    },
+    {
+      "src": "/",
+      "dest": "./www/dist/server.js"
     }
   ]
 }

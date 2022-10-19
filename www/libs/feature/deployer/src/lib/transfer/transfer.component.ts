@@ -2,12 +2,12 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { DeployerService } from '@casper-escrow/data-access-deployer';
 import { ResultService } from '../result/result.service';
-import { DeployReturn, EnvironmentConfig, State } from '@casper-escrow/api-interfaces';
+import { DeployReturn, State } from '@casper-escrow/api-interfaces';
 import { Subscription } from 'rxjs';
 import { CLPublicKey, CLURef, DeployUtil } from 'casper-js-sdk';
 import { DeployParams } from 'casper-js-sdk/dist/lib/DeployUtil';
-import { ENV_CONFIG } from '@casper-escrow/util-tokens';
 import { Result } from 'ts-results';
+import { EnvironmentConfig, ENV_CONFIG } from '@casper-deployer/config';
 
 @Component({
   selector: 'casper-deployer-transfer',

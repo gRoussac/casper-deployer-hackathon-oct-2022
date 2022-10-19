@@ -16,10 +16,9 @@ export class ServiceService {
     if (apiUrl && this._apiUrl === apiUrl) {
       return this.casperService;
     }
-
     apiUrl = this.urlService.shortUrl(apiUrl);
-    if (apiUrl && !this.urlService.isValidHttpUrl(apiUrl)) {
-      throw ('url seems invalid');
+    if (!apiUrl || !this.urlService.isValidHttpUrl(apiUrl)) {
+      throw TypeError('url seems invalid');
     }
     this._apiUrl = apiUrl;
     this.casperService = new CasperServiceByJsonRPC(apiUrl);

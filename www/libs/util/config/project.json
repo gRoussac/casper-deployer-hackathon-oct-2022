@@ -1,0 +1,19 @@
+{
+  "name": "util-config",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/util/config/src",
+  "prefix": "www",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/util/config/**/*.ts",
+          "libs/util/config/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": ["util config"]
+}

@@ -1,2 +1,2 @@
 pub mod js_fetch;
-use js_fetch::fetch_item;
+pub mod js_log;

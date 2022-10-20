@@ -11,7 +11,9 @@
     "build": "nx run-many --target=build --projects=api,frontend --parallel=2",
     "test": "nx run-many --target=test --projects=api,frontend --parallel=2",
     "serve:api": "node dist/apps/api/main.js",
-    "serve": "node dist/server.js & node dist/apps/api/main.js"
+    "serve": "node dist/server.js & node dist/apps/api/main.js",
+    "e2e": "nx run-many --target=e2e --projects=frontend-e2e,api --parallel=2",
+    "cypress": "cypress open --e2e -b chrome -P apps/frontend-e2e"
   },
   "private": true,
   "dependencies": {
@@ -64,10 +66,10 @@
     "@typescript-eslint/parser": "^5.36.1",
     "arraybuffer-loader": "^1.0.8",
     "autoprefixer": "^10.4.12",
-    "cypress": "^10.7.0",
+    "cypress": "^10.10.0",
     "eslint": "~8.15.0",
     "eslint-config-prettier": "8.1.0",
-    "eslint-plugin-cypress": "^2.10.3",
+    "eslint-plugin-cypress": "^2.12.1",
     "jest": "28.1.1",
     "jest-environment-jsdom": "28.1.1",
     "jest-preset-angular": "~12.2.2",

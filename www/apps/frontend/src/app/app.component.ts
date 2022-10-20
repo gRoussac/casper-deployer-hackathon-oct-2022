@@ -32,7 +32,8 @@ const imports = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports,
   providers: [
-    UsersService
+    UsersService,
+    RouteurHubService
   ],
 })
 export class AppComponent implements OnInit, OnDestroy {

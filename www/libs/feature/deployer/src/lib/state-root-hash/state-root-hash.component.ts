@@ -10,7 +10,6 @@ import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
   selector: 'casper-deployer-state-root-hash',
   standalone: true,
   imports: [CommonModule],
-  providers: [ResultService],
   templateUrl: './state-root-hash.component.html',
   styleUrls: ['./state-root-hash.component.scss'],
 })

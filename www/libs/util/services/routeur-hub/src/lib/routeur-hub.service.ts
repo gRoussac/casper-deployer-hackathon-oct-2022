@@ -3,7 +3,7 @@ import { State } from '@casper-api/api-interfaces';
 import { BehaviorSubject, Subject } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: null
 })
 export class RouteurHubService {
 

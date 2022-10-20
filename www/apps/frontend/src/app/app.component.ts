@@ -126,7 +126,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private setActiveUser() {
     this.user = this.users?.find((user: User) => user.activePublicKey == this.activePublicKey) as User;
-    console.log(this.user);
     this.routeurHubService.setState({ user: this.user });
   }
 

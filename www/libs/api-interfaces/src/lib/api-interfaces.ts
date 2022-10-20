@@ -2,7 +2,7 @@ import { Roles } from "./api-enums";
 
 export type User = {
   role: Roles;
-  PublicKey: string;
+  activePublicKey: string;
 };
 
 export type Users = User[];
@@ -25,8 +25,8 @@ export type State = {
   apiUrl?: string;
   stateRootHash?: string;
   status?: string;
-  activePublicKey?: string;
   deploy_hash?: string;
+  user?: User;
 };
 
 export type DeployReturn = {

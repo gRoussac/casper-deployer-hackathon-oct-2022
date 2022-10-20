@@ -40,8 +40,8 @@ export class TransferComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.getStateSubscription = this.deployerService.getState().subscribe((state: State) => {
-      if (state.activePublicKey) {
-        this.activePublicKey = state.activePublicKey;
+      if (state.user?.activePublicKey) {
+        this.activePublicKey = state.user.activePublicKey;
       }
       state.apiUrl && (this.apiUrl = state.apiUrl);
       this.changeDetectorRef.markForCheck();

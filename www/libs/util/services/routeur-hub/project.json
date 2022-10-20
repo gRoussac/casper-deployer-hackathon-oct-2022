@@ -1,0 +1,31 @@
+{
+  "name": "util-services-routeur-hub",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/util/services/routeur-hub/src",
+  "prefix": "casper",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": [
+        "coverage/libs/util/services/routeur-hub"
+      ],
+      "options": {
+        "jestConfig": "libs/util/services/routeur-hub/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/util/services/routeur-hub/**/*.ts",
+          "libs/util/services/routeur-hub/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": [
+    "routeur-hub"
+  ]
+}

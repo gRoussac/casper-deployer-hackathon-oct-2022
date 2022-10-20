@@ -41,8 +41,8 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
       if (state.status !== undefined) {
         this.status = state.status;
       }
-      if (state.activePublicKey) {
-        this.activePublicKey = state.activePublicKey;
+      if (state.user?.activePublicKey) {
+        this.activePublicKey = state.user.activePublicKey;
       }
       this.changeDetectorRef.markForCheck();
     });

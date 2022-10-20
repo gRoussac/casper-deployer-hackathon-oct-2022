@@ -48,10 +48,10 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
     this.getStateSubscription = this.deployerService.getState().subscribe((state: State) => {
       state.stateRootHash && (this.stateRootHashElt.nativeElement.value = state.stateRootHash);
       state.apiUrl && (this.apiUrl = state.apiUrl);
-      state.activePublicKey && (
+      state.user?.activePublicKey && (
         this.activePublicKey =
         this.activePublicKeyElt.nativeElement.value =
-        state.activePublicKey
+        state.user.activePublicKey
       );
       this.changeDetectorRef.markForCheck();
     });

@@ -3,7 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/util/config/src",
-  "prefix": "www",
+  "prefix": "casper",
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
@@ -15,5 +15,7 @@
       }
     }
   },
-  "tags": ["util config"]
+  "tags": [
+    "util config"
+  ]
 }

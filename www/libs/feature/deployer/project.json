@@ -7,9 +7,7 @@
   "targets": {
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/libs/feature/deployer"
-      ],
+      "outputs": ["coverage/libs/feature/deployer"],
       "options": {
         "jestConfig": "libs/feature/deployer/jest.config.ts",
         "passWithNoTests": true
@@ -25,7 +23,5 @@
       }
     }
   },
-  "tags": [
-    "feature deployer"
-  ]
+  "tags": ["feature deployer"]
 }

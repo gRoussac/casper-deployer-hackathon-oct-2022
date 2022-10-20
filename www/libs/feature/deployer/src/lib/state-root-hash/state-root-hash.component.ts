@@ -1,15 +1,16 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { EnvironmentConfig, Peer } from '@casper-escrow/api-interfaces';
-import { ENV_CONFIG } from '@casper-escrow/util-tokens';
-import { DeployerService } from '@casper-escrow/data-access-deployer';
+import { Peer } from '@casper-api/api-interfaces';
+import { DeployerService } from '@casper-data/data-access-deployer';
 import { Subscription } from 'rxjs';
 import { ResultService } from '../result/result.service';
+import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 
 @Component({
   selector: 'casper-deployer-state-root-hash',
   standalone: true,
   imports: [CommonModule],
+  providers: [ResultService],
   templateUrl: './state-root-hash.component.html',
   styleUrls: ['./state-root-hash.component.scss'],
 })
@@ -43,14 +44,14 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
   }
 
   setPeersSubscription(): void {
-    this.getPeersSubscription = this.deployerService.getPeers(this.apiUrl).subscribe(peersResult => {
+    this.apiUrl && (this.getPeersSubscription = this.deployerService.getPeers(this.apiUrl).subscribe(peersResult => {
       this.peers = peersResult as Peer[];
       this.getStatus();
       this.getStateRootHash();
       this.loaded = true;
       this.getPeersSubscription.unsubscribe();
       this.changeDetectorRef.markForCheck();
-    });
+    }));
   }
 
   selectApiUrl(event: Event): void {

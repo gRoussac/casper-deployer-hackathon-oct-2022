@@ -1,10 +1,10 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { EnvironmentConfig, State } from '@casper-escrow/api-interfaces';
-import { DeployerService } from '@casper-escrow/data-access-deployer';
+import { State } from '@casper-api/api-interfaces';
+import { DeployerService } from '@casper-data/data-access-deployer';
 import { Subscription } from 'rxjs';
-import { ENV_CONFIG } from '@casper-escrow/util-tokens';
 import { ResultService } from '../result/result.service';
+import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 
 @Component({
   selector: 'casper-deployer-public-key',
@@ -48,10 +48,10 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
     this.getStateSubscription = this.deployerService.getState().subscribe((state: State) => {
       state.stateRootHash && (this.stateRootHashElt.nativeElement.value = state.stateRootHash);
       state.apiUrl && (this.apiUrl = state.apiUrl);
-      state.activePublicKey && (
+      state.user?.activePublicKey && (
         this.activePublicKey =
         this.activePublicKeyElt.nativeElement.value =
-        state.activePublicKey
+        state.user.activePublicKey
       );
       this.changeDetectorRef.markForCheck();
     });

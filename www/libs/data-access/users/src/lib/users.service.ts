@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@angular/core';
-import { api_interface, EnvironmentConfig, Error, Purse, Users } from '@casper-escrow/api-interfaces';
+import { api_interface, Error, Purse, Users } from '@casper-api/api-interfaces';
 import { map, Observable } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { ENV_CONFIG } from '@casper-escrow/util-tokens';
+import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 
 @Injectable({
   providedIn: null

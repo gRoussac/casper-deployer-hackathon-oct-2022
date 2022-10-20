@@ -3,7 +3,6 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/data-access/deployer/src",
-  "prefix": "casper-escrow",
   "targets": {
     "test": {
       "executor": "@nrwl/jest:jest",

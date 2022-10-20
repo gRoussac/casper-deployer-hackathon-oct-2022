@@ -1,4 +1,4 @@
-import { Purse, Error, Users } from '@casper-escrow/api-interfaces';
+import { Purse, Error, Users } from '@casper-api/api-interfaces';
 import { Controller, Get, Query } from '@nestjs/common';
 import { AppService } from './app.service';
 
@@ -7,7 +7,7 @@ export class AppController {
   constructor(private readonly appService: AppService) { }
 
   @Get('users')
-  getKeys(): Users {
+  getUsers(): Users {
     return this.appService.getUsers();
   }
 
@@ -22,6 +22,4 @@ export class AppController {
       return { name: error.toString(), message: error };
     }
   }
-
-
 }

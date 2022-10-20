@@ -1,13 +1,13 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
-import { ENV_CONFIG } from '@casper-escrow/util-tokens';
-import { DeployReturn, EnvironmentConfig, State } from '@casper-escrow/api-interfaces';
+import { DeployReturn, State } from '@casper-api/api-interfaces';
 import { CLPublicKey, CLValueBuilder, DeployUtil, RuntimeArgs, Contracts } from 'casper-js-sdk';
 import { DeployParams } from 'casper-js-sdk/dist/lib/DeployUtil';
 import { ResultService } from '../result/result.service';
 import { Subscription } from 'rxjs';
-import { DeployerService } from '@casper-escrow/data-access-deployer';
+import { DeployerService } from '@casper-data/data-access-deployer';
 import { Result } from 'ts-results';
+import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 
 @Component({
   selector: 'casper-deployer-put-deploy',
@@ -61,8 +61,8 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.getStateSubscription = this.deployerService.getState().subscribe((state: State) => {
-      if (state.activePublicKey) {
-        this.activePublicKey = state.activePublicKey;
+      if (state.user?.activePublicKey) {
+        this.activePublicKey = state.user.activePublicKey;
         this.publicKey = this.activePublicKey;
         this.publicKeyElt.nativeElement.value = this.publicKey;
       }

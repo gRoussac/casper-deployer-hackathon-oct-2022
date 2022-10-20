@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Users } from '@casper-escrow/api-interfaces';
+import { Users } from '@casper-api/api-interfaces';
 
 @Component({
-  selector: 'casper-escrow-escrow',
+  selector: 'casper-escrow',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './escrow.component.html',

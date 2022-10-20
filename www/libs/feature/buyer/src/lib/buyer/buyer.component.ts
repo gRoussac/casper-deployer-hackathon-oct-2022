@@ -1,6 +1,5 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Roles, User, Users } from '@casper-escrow/api-interfaces';
 
 @Component({
   selector: 'casper-escrow-buyer',
@@ -11,26 +10,6 @@ import { Roles, User, Users } from '@casper-escrow/api-interfaces';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BuyerComponent {
-
-  @Input()
-  set users(value: Users) {
-    this._users = value;
-    this._users && this.updatedefaultPublicKey();
-  }
-  get users(): Users {
-    return this._users;
-  }
-
-  defaultPublicKey!: string;
-
-  private _users!: Users;
-  private readonly Roles = Roles;
-
-  updatedefaultPublicKey() {
-    this.defaultPublicKey = this._users && this.users?.find(
-      (user: User) => user.role === this.Roles.Seller
-    )?.PublicKey as string;
-  }
 
   send() {
 

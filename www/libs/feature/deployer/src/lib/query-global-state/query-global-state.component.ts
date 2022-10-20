@@ -1,11 +1,11 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, Input, OnDestroy, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { EnvironmentConfig, State } from '@casper-escrow/api-interfaces';
-import { DeployerService } from '@casper-escrow/data-access-deployer';
+import { State } from '@casper-api/api-interfaces';
+import { DeployerService } from '@casper-data/data-access-deployer';
 import { Subscription } from 'rxjs';
-import { ENV_CONFIG } from '@casper-escrow/util-tokens';
 import { ResultService } from '../result/result.service';
 import { StoredValue } from 'casper-js-sdk/dist/lib/StoredValue';
+import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 
 @Component({
   selector: 'casper-deployer-query-global-state',
@@ -41,8 +41,8 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
       if (state.status !== undefined) {
         this.status = state.status;
       }
-      if (state.activePublicKey) {
-        this.activePublicKey = state.activePublicKey;
+      if (state.user?.activePublicKey) {
+        this.activePublicKey = state.user.activePublicKey;
       }
       this.changeDetectorRef.markForCheck();
     });

@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Roles } from '@casper-escrow/api-interfaces';
+import { Roles } from '@casper-api/api-interfaces';
 
 @Component({
-  selector: 'casper-escrow-header',
+  selector: 'casper-ui-header',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './header.component.html',

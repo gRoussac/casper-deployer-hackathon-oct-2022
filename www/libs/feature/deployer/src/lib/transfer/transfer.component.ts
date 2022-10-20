@@ -1,13 +1,13 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
-import { DeployerService } from '@casper-escrow/data-access-deployer';
+import { DeployerService } from '@casper-data/data-access-deployer';
 import { ResultService } from '../result/result.service';
-import { DeployReturn, EnvironmentConfig, State } from '@casper-escrow/api-interfaces';
+import { DeployReturn, State } from '@casper-api/api-interfaces';
 import { Subscription } from 'rxjs';
 import { CLPublicKey, CLURef, DeployUtil } from 'casper-js-sdk';
 import { DeployParams } from 'casper-js-sdk/dist/lib/DeployUtil';
-import { ENV_CONFIG } from '@casper-escrow/util-tokens';
 import { Result } from 'ts-results';
+import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 
 @Component({
   selector: 'casper-deployer-transfer',
@@ -40,8 +40,8 @@ export class TransferComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.getStateSubscription = this.deployerService.getState().subscribe((state: State) => {
-      if (state.activePublicKey) {
-        this.activePublicKey = state.activePublicKey;
+      if (state.user?.activePublicKey) {
+        this.activePublicKey = state.user.activePublicKey;
       }
       state.apiUrl && (this.apiUrl = state.apiUrl);
       this.changeDetectorRef.markForCheck();

@@ -1,0 +1,13 @@
+<header>
+  <casper-ui-header
+    [isConnected]="isConnected"
+    [activePublicKey]="activePublicKey"
+    [balance]="balance"
+    [role]="user?.role"
+    [isButtonHidden]="!window?.casperlabsHelper"
+    (connect)="connect()"
+  ></casper-ui-header>
+</header>
+<main>
+  <router-outlet class="contents"></router-outlet>
+</main>

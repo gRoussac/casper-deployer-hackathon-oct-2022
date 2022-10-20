@@ -1,14 +1,17 @@
 {
-  "name": "data-access-deployer",
+  "name": "escrower",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
-  "sourceRoot": "libs/data-access/deployer/src",
+  "sourceRoot": "libs/feature/escrower/src",
+  "prefix": "casper",
   "targets": {
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/data-access/deployer"],
+      "outputs": [
+        "coverage/libs/feature/escrower"
+      ],
       "options": {
-        "jestConfig": "libs/data-access/deployer/jest.config.ts",
+        "jestConfig": "libs/feature/escrower/jest.config.ts",
         "passWithNoTests": true
       }
     },
@@ -16,11 +19,13 @@
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "libs/data-access/deployer/**/*.ts",
-          "libs/data-access/deployer/**/*.html"
+          "libs/feature/escrower/**/*.ts",
+          "libs/feature/escrower/**/*.html"
         ]
       }
     }
   },
-  "tags": ["data-access-deployer"]
+  "tags": [
+    "feature escrower"
+  ]
 }

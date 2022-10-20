@@ -3,11 +3,13 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/util/tokens/src",
-  "prefix": "www",
+  "prefix": "casper",
   "targets": {
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/util/tokens"],
+      "outputs": [
+        "coverage/libs/util/tokens"
+      ],
       "options": {
         "jestConfig": "libs/util/tokens/jest.config.ts",
         "passWithNoTests": true
@@ -23,5 +25,7 @@
       }
     }
   },
-  "tags": ["util-tokens"]
+  "tags": [
+    "util-tokens"
+  ]
 }

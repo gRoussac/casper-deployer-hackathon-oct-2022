@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StateRootHashComponent } from '../state-root-hash/state-root-hash.component';
 import { QueryGlobalStateComponent } from '../query-global-state/query-global-state.component';
@@ -12,6 +12,9 @@ import { UtilHihlightWebworkerModule } from '@casper-util/hightlight-webworker';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { TransferComponent } from '../transfer/transfer.component';
 import { DictionaryComponent } from '../dictionary/dictionary.component';
+import { RouteurHubService } from '@casper-util/routeur-hub';
+import { State } from '@casper-api/api-interfaces';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'casper-deployer',
@@ -34,16 +37,37 @@ import { DictionaryComponent } from '../dictionary/dictionary.component';
   styleUrls: ['./deployer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DeployerComponent {
-  @Input() set activePublicKey(activePublicKey: string) {
-    this.deployerService.setState({
-      activePublicKey
-    });
-  };
-  @Output() connect: EventEmitter<void> = new EventEmitter<void>();
-  @Output() refreshPurse: EventEmitter<void> = new EventEmitter<void>();
+export class DeployerComponent implements OnInit, OnDestroy {
+  private routeurHubSubscription!: Subscription;
 
   constructor(
-    private readonly deployerService: DeployerService
+    private readonly deployerService: DeployerService,
+    private readonly routeurHubService: RouteurHubService
   ) { }
+
+  ngOnInit(): void {
+    this.setRouteurHubSubscription();
+  }
+
+  ngOnDestroy() {
+    this.routeurHubSubscription && this.routeurHubSubscription.unsubscribe();
+  }
+
+  private setRouteurHubSubscription() {
+    this.routeurHubSubscription = this.routeurHubService.getState().subscribe((state: State) => {
+      if (state.user) {
+        this.deployerService.setState({
+          user: state.user
+        });
+      }
+    });
+  }
+
+  connect() {
+    this.routeurHubService.connect();
+  }
+
+  refreshPurse() {
+    this.routeurHubService.refreshPurse();
+  }
 }

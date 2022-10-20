@@ -1,0 +1,12 @@
+<section [ngClass]="{ active: role === Roles.Buyer }">
+  <casper-escrow-buyer></casper-escrow-buyer>
+</section>
+<section [ngClass]="{ active: role === Roles.Escrow }">
+  <casper-escrow></casper-escrow>
+</section>
+<section [ngClass]="{ active: role === Roles.Postman }">
+  <casper-escrow-postman></casper-escrow-postman>
+</section>
+<section [ngClass]="{ active: role === Roles.Seller }">
+  <casper-escrow-seller></casper-escrow-seller>
+</section>

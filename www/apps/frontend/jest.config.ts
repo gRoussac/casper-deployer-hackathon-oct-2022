@@ -1,7 +1,7 @@
 /* eslint-disable */
 export default {
-  displayName: 'deployer',
-  preset: '../../../jest.preset.js',
+  displayName: 'frontend',
+  preset: '../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {
     'ts-jest': {
@@ -20,7 +20,7 @@ export default {
       }
     },
   },
-  coverageDirectory: '../../../coverage/libs/feature/deployer',
+  coverageDirectory: '../../coverage/apps/frontend',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': 'jest-preset-angular',
   },

@@ -9,13 +9,15 @@
     "data-access-users": "libs/data-access/users",
     "deployer": "libs/feature/deployer",
     "escrow": "libs/feature/escrow",
-    "escrow-app": "apps/escrow",
-    "escrow-e2e": "apps/escrow-e2e",
+    "escrower": "libs/feature/escrower",
+    "frontend": "apps/frontend",
+    "frontend-e2e": "apps/frontend-e2e",
     "postman": "libs/feature/postman",
     "seller": "libs/feature/seller",
     "ui-header": "libs/ui/header",
     "util-config": "libs/util/config",
     "util-hihlight-webworker": "libs/util/hihlight-webworker",
+    "util-services-routeur-hub": "libs/util/services/routeur-hub",
     "util-services-wasm": "libs/util/services/wasm",
     "util-tokens": "libs/util/tokens"
   }

@@ -61,8 +61,8 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.getStateSubscription = this.deployerService.getState().subscribe((state: State) => {
-      if (state.activePublicKey) {
-        this.activePublicKey = state.activePublicKey;
+      if (state.user?.activePublicKey) {
+        this.activePublicKey = state.user.activePublicKey;
         this.publicKey = this.activePublicKey;
         this.publicKeyElt.nativeElement.value = this.publicKey;
       }

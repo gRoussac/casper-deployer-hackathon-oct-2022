@@ -3,18 +3,14 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, 
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Subscription, map } from 'rxjs';
 
-import { SellerComponent } from '@casper-escrow/seller';
-import { BuyerComponent } from '@casper-escrow/buyer';
-import { EscrowComponent } from '@casper-escrow/escrow';
-import { PostmanComponent } from '@casper-escrow/postman';
 import { HeaderComponent } from '@casper-ui/header';
 import { UsersService } from '@casper-data/data-access-users';
 import { Users, User, Roles, Purse } from '@casper-api/api-interfaces';
 import { ESCROW_TOKEN } from '@casper-util/wasm';
 import { Escrow } from "escrow";
-
 import { CasperLabsHelper } from 'casper-js-sdk/dist/@types/casperlabsSigner';
-import { DeployerComponent } from '@casper-deployer/deployer';
+import { RouterModule } from '@angular/router';
+import { RouteurHubService } from '@casper-util/routeur-hub';
 
 declare global {
   interface Window {
@@ -24,16 +20,12 @@ declare global {
 
 const imports = [
   CommonModule,
-  HeaderComponent,
-  SellerComponent,
-  BuyerComponent,
-  EscrowComponent,
-  PostmanComponent,
-  DeployerComponent
+  RouterModule,
+  HeaderComponent
 ];
 
 @Component({
-  selector: 'casper-escrow-root',
+  selector: 'casper-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   standalone: true,
@@ -55,17 +47,21 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private usersSubscription!: Subscription;
   private accountInformationSubscription!: Subscription;
+  subscriptions: Subscription[] = [];
+
   private _activePublicKey!: string; // memoize activePublicKey
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
     @Inject(ESCROW_TOKEN) private readonly escrow: Escrow,
     private readonly usersService: UsersService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly routeurHubService: RouteurHubService
   ) {
   }
 
   async ngOnInit(): Promise<void> {
+    this.setRouteurHubSubscriptions();
     this.setUsersSubscription();
     await this.refreshData();
     this.window?.addEventListener('signer:unlocked', async () => await this.refreshData());
@@ -74,8 +70,9 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.usersSubscription && this.usersSubscription.unsubscribe();
-    this.accountInformationSubscription && this.accountInformationSubscription.unsubscribe();
+    this.subscriptions.forEach(subscription => {
+      subscription && subscription.unsubscribe();
+    });
   }
 
   async connect() {
@@ -85,8 +82,17 @@ export class AppComponent implements OnInit, OnDestroy {
     } catch (error) { console.error(error); }
   }
 
-  refreshPurse() {
+  private refreshPurse() {
     this.setAccountInformationSubscription();
+  }
+
+  private setRouteurHubSubscriptions() {
+    this.subscriptions.push(this.routeurHubService.connect$.subscribe(async () => {
+      this.connect();
+    }));
+    this.subscriptions.push(this.routeurHubService.refreshPurse$.subscribe(async () => {
+      this.refreshPurse();
+    }));
   }
 
   private setUsersSubscription() {
@@ -119,7 +125,9 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private setActiveUser() {
-    this.user = this.users?.find((user: User) => user.PublicKey == this.activePublicKey) as User;
+    this.user = this.users?.find((user: User) => user.activePublicKey == this.activePublicKey) as User;
+    console.log(this.user);
+    this.routeurHubService.setState({ user: this.user });
   }
 
   private setPurse() {
@@ -137,7 +145,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private setAccountInformationSubscription() {
-    this.activePublicKey && (this.usersSubscription = this.usersService.getPurse(this.activePublicKey)
+    this.activePublicKey && (this.accountInformationSubscription = this.usersService.getPurse(this.activePublicKey)
       .pipe(
         map((purse: Purse | Error) =>
           purse as Purse
@@ -146,7 +154,7 @@ export class AppComponent implements OnInit, OnDestroy {
         (purse => {
           this.balance = this.getBalance(purse);
           this.changeDetectorRef.markForCheck();
-          this.usersSubscription.unsubscribe();
+          this.accountInformationSubscription.unsubscribe();
         })
       ));
   }

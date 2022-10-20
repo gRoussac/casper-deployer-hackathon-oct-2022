@@ -1,26 +1,15 @@
 /* eslint-disable */
 export default {
-  displayName: 'escrow',
-  preset: '../../jest.preset.js',
+  displayName: 'util-services-routeur-hub',
+  preset: '../../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {
     'ts-jest': {
       tsconfig: '<rootDir>/tsconfig.spec.json',
       stringifyContentPathRegex: '\\.(html|svg)$',
-      diagnostics: {
-        ignoreCodes: [1343]
-      },
-      astTransformers: {
-        before: [
-          {
-            path: 'ts-jest-mock-import-meta',
-            options: { metaObjectReplacement: { url: 'https://www.url.com' } }
-          }
-        ],
-      }
     },
   },
-  coverageDirectory: '../../coverage/apps/escrow',
+  coverageDirectory: '../../../../coverage/libs/util/services/routeur-hub',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': 'jest-preset-angular',
   },

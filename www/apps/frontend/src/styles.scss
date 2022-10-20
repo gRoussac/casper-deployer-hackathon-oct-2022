@@ -36,6 +36,6 @@ h2.title {
   text-align: center;
   form & {
     position: absolute;
-    inset: 0;
+    inset: 0 0 auto 0;
   }
 }

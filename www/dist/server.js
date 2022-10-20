@@ -5,7 +5,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 // sendFile will go here
-app.get('/', function(req, res) {
+app.all('/escrow', function(req, res) {
   res.sendFile(path.join(__dirname, '/apps/frontend/index.html'));
 });
 

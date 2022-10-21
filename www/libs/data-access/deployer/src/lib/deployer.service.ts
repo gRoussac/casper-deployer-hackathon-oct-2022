@@ -7,7 +7,7 @@ import { StoredValue } from 'casper-js-sdk/dist/lib/StoredValue';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: null
 })
 export class DeployerService {
 

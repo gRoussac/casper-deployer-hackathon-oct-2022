@@ -32,7 +32,7 @@ import { Subscription } from 'rxjs';
     ResultComponent,
     DictionaryComponent
   ],
-  providers: [ResultService],
+  providers: [DeployerService, ResultService],
   templateUrl: './deployer.component.html',
   styleUrls: ['./deployer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

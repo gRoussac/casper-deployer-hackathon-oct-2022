@@ -1,11 +1,19 @@
-:host {
-  display: contents;
-}
-
 $first: 'buyer';
 $second: 'escrow';
 $third: 'postman';
 $last: 'seller';
+
+:host {
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 1fr;
+  grid-column-gap: 1rem;
+  grid-row-gap: 1rem;
+  padding: 1rem;
+  grid-template-areas: '#{$first} #{$second} #{$third} #{$last}';
+}
 
 section {
   @apply py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-black bg-red-400;

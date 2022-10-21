@@ -1,15 +1,14 @@
 describe('escrow', () => {
 
   before(() => {
-    cy.visit('/');
-  });
-
-  it('should call api', () => {
     cy.intercept('/api/users').as('getUsers');
     cy.intercept(/\/api\/deployer\/status\?apiUrl=http:\/\/.+\/rpc/).as('getStatus');
     cy.intercept(/\/api\/deployer\/peers\?apiUrl=http:\/\/.+\/rpc/).as('getPeers');
     cy.intercept(/\/api\/deployer\/getStateRootHash\?apiUrl=http:\/\/.+\/rpc/).as('getStateRootHash');
+    cy.visit('/');
+  });
 
+  it('should call api', () => {
     cy.wait(['@getUsers', '@getStatus', '@getPeers', '@getStateRootHash']);
     cy.contains('Network');
   });

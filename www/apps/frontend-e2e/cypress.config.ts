@@ -6,6 +6,7 @@ export default defineConfig({
     ...nxE2EPreset(__dirname),
     baseUrl: 'http://localhost:4200',
     viewportHeight: 1000,
-    viewportWidth: 1920
+    viewportWidth: 1920,
+    video: false
   },
 });

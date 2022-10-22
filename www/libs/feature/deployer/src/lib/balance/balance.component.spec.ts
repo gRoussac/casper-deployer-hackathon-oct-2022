@@ -1,6 +1,7 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DeployerService } from '@casper-data/data-access-deployer';
 import { ENV_CONFIG, config } from '@casper-util/config';
 import { HIGHLIGHT_WEBWORKER_FACTORY } from '@casper-util/hightlight-webworker';
 import { ResultService } from '../result/result.service';
@@ -14,6 +15,7 @@ describe('BalanceComponent', () => {
     await TestBed.configureTestingModule({
       imports: [BalanceComponent, HttpClientModule],
       providers: [
+        DeployerService,
         ResultService,
         {
           provide: ENV_CONFIG, useValue: config

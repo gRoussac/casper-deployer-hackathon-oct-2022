@@ -12,8 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install modules
-        run: yarn
+        run: npm install
       - name: Run tests and collect coverage
-        run: yarn test --collectCoverage
+        run: npm run test --collectCoverage
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v3

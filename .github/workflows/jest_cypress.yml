@@ -1,11 +1,11 @@
-name: Unit Tests workflow
+name: Unit and E2E Tests workflow
 
 on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Jest tests
+    name: Jest and Cypress tests
     defaults:
       run:
         working-directory: ./www

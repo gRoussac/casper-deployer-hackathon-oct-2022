@@ -1,4 +1,4 @@
-name: Test workflow
+name: Unit Tests workflow
 
 on: [push, pull_request]
 
@@ -11,9 +11,9 @@ jobs:
         working-directory: ./www
     steps:
       - uses: actions/checkout@v2
-      - name: Install modules
+      - name: 🏗 Install modules
         run: npm install
-      - name: Run tests and collect coverage
-        run: npm run test --collectCoverage
-      - name: Upload coverage reports to Codecov with GitHub Action
+      - name: 💻 Run tests and collect coverage
+        run: npm run test && npm run e2e
+      - name: ✅ Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v3

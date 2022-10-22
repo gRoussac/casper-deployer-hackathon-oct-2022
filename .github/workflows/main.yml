@@ -10,11 +10,10 @@ jobs:
       run:
         working-directory: ./www
     steps:
-    - uses: actions/checkout@v2
-    - name: Run tests and collect coverage
-    - name: Install modules
-      run: yarn
-    - name: Run tests
-      run: yarn test --collectCoverage
-    - name: Upload coverage reports to Codecov with GitHub Action
-      uses: codecov/codecov-action@v3
+      - uses: actions/checkout@v2
+      - name: Install modules
+        run: yarn
+      - name: Run tests and collect coverage
+        run: yarn test --collectCoverage
+      - name: Upload coverage reports to Codecov with GitHub Action
+        uses: codecov/codecov-action@v3

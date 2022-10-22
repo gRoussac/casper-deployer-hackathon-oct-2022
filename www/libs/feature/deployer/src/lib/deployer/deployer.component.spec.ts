@@ -5,6 +5,7 @@ import { ENV_CONFIG, config } from '@casper-util/config';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { of } from 'rxjs';
 import { DeployerComponent } from './deployer.component';
+import { RouteurHubService } from '@casper-util/routeur-hub';
 
 describe('DeployerComponent', () => {
   let component: DeployerComponent;
@@ -15,6 +16,7 @@ describe('DeployerComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DeployerComponent, HttpClientModule],
       providers: [
+        RouteurHubService,
         {
           provide: ENV_CONFIG, useValue: config
         },

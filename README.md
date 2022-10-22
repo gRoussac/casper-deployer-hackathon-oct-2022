@@ -1,30 +1,28 @@
 <h1 style="text-align: center;"><a href="https://casperlabs.io/"><img src="https://raw.githubusercontent.com/gRoussac/casper-deployer-hackathon-oct-2022/dev/www/apps/frontend/src/assets/logo-dark.svg" width="120" style="position: relative; top:5px" alt="Casper"></a> <b>Deployer</b> - Information and How-To Guides</h1>
 <br>
 
-# Welcome to **Project Casper Deployer**! **[CasperLabs](https://casperlabs.io/)** Hackaton October 2022 👻 🎃🕯️
+# Welcome to **Project Casper Deployer**!
 
-<br>
+# **[CasperLabs](https://casperlabs.io/)** Hackaton October 2022 👻 🎃🕯️
 
 ## **Project built with 😘♥💕❤ for Casper Blockchain** [![codecov](https://codecov.io/gh/gRoussac/casper-deployer-hackathon-oct-2022/branch/master/graph/badge.svg?token=3KWLVN3DPV)](https://codecov.io/gh/gRoussac/casper-deployer-hackathon-oct-2022/)
 
-<br>
-
 ### 🏰 Deployed on [Render](https://render.com/) at [https://casper.onrender.com/ ](casper.onrender) ( beta 🏚️🕸️🕷️)
 
-<hr><br />
+<hr>
 
 # 📔 **Project**
 
-### This projects aims to ease interactions with <a href="https://casperlabs.io/"><img  style="position: relative; top:3px" alt="Casper" src="https://user-images.githubusercontent.com/3099551/197350250-b9d5852b-44a6-45bb-a227-e12d6d4166c9.jpg" height="20" width="20" alt="Casper"/> Casper Blockchain</a> during smart contracts development and for regular querys done with the [Casper Client CLI](https://github.com/casper-ecosystem/casper-client-rs)
+#### This projects aims to ease interactions with <a href="https://casperlabs.io/"><img  style="position: relative; top:3px" alt="Casper" src="https://user-images.githubusercontent.com/3099551/197350250-b9d5852b-44a6-45bb-a227-e12d6d4166c9.jpg" height="20" width="20" alt="Casper"/> Casper Blockchain</a> during smart contracts development and for regular querys done with the [Casper Client CLI](https://github.com/casper-ecosystem/casper-client-rs)
 
-### This project relies on [casper-js-sdk](https://github.com/casper-ecosystem/casper-js-sdk) to help with onboarding developers on the Casper Network and also users by providing better insights on Casper Bloackchains concepts (URef, Dictionnaries etc..) and with giving the ability to deploy a smart contract signed with the [Capser Signer](https://docs.casperlabs.io/workflow/signer-guide/).
+#### This project relies on [casper-js-sdk](https://github.com/casper-ecosystem/casper-js-sdk) to help with onboarding developers on the Casper Network and also users by providing better insights on Casper Bloackchains concepts (URef, Dictionnaries etc..) and with giving the ability to deploy a smart contract signed with the [Capser Signer](https://docs.casperlabs.io/workflow/signer-guide/).
 
 <br />
 <img alt="image" src="https://user-images.githubusercontent.com/3099551/197349529-ab5a899b-964f-4089-a6ad-84f059b9e50f.png">
 
 <hr><br />
 
-# ✍️**Casper Signer**
+# ✍️ **Casper Signer**
 
 > Using Chrome or a Chromium-based browser like Brave ? visit the Chrome Web Store, then download and install [CasperLabs Signer extension](https://chrome.google.com/webstore/detail/casper-signer/djhndpllfiibmcdbnmaaahkhchcoijce)
 
@@ -271,7 +269,7 @@ docker container run -t -i --rm -h casper-deployer -p 4200:4200 casper-deployer
 cd ./www
 ```
 
-Run `npm install` to install an application.
+Run `npm install` to install the application.
 
 ```shell
 npm install

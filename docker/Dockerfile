@@ -1,23 +1,18 @@
 # syntax=docker/dockerfile:1
 
-FROM node:18.7.0-alpine3.16
-RUN apk update && apk add unzip
-WORKDIR /app
-ENV PORT=4200
-ENV API_URL=http://localhost
-ARG USER=1000
-ARG FILE="master.zip"
-ARG TMP="./tmp"
-ARG CSPR="casper-deployer-hackathon-oct-2022-master"
-ARG WWW="www"
-
+FROM debian:10.9-slim
+RUN apt-get update && apt-get install -y unzip wget
+SHELL ["/bin/bash", "--login", "-c"]
+RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+RUN . ~/.bashrc
+RUN nvm install v18.7.0 > /dev/null
 RUN npm install -g npm@8.19.2
-
-ADD https://github.com/gRoussac/casper-deployer-hackathon-oct-2022/archive/refs/heads/${FILE} .
-RUN unzip ${FILE} -d ${TMP}
-RUN ls -al ${TMP}
-RUN mv ${TMP}/*/${WWW}/* ./
-RUN npm install --loglevel=error
-RUN npm run build --loglevel=error && npm run serve
-
-# # USER ${USER}
+WORKDIR /app
+ADD https://github.com/gRoussac/casper-deployer-hackathon-oct-2022/archive/refs/heads/master.zip .
+ARG TMP="./tmp"
+RUN unzip -q ./*.zip -d ${TMP}
+RUN mv ${TMP}/*/w* ./ && rm -rf ${TMP} *.zip
+WORKDIR /app/www
+ENV PORT=4200
+RUN npm install --loglevel=error && npm run build --loglevel=error
+CMD npm run serve

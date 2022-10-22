@@ -1,0 +1,21 @@
+version: "3"
+services:
+  casper-deployer:
+    container_name: casper-deployer
+    image: gregoshop/casper-deployer:latest
+    ports:
+      - "4200:4200"
+    environment:
+      - PORT=4200
+
+# Build and run image with Dockerfile
+# docker build -t casper-deployer . --force-rm
+# docker container run -t -i --rm -h casper-deployer -p 4200:4200 casper-deployer
+
+# OR
+
+# Pull and run image from https://hub.docker.com/r/gregoshop/casper-deployer
+# docker pull gregoshop/casper-deployer
+# docker container run -t -i --rm -h casper-deployer -p 4200:4200 gregoshop/casper-deployer
+
+# Visit http://localhost:4200/

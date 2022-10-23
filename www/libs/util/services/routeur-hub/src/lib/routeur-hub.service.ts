@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { State } from '@casper-api/api-interfaces';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { ReplaySubject, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: null
@@ -11,7 +11,7 @@ export class RouteurHubService {
   private readonly refreshPurseSource = new Subject<void>;
   connect$ = this.connectSource.asObservable();
   refreshPurse$ = this.refreshPurseSource.asObservable();
-  private readonly state = new BehaviorSubject<State>({});
+  private readonly state = new ReplaySubject<State>;
 
   connect() {
     this.connectSource.next();
@@ -21,11 +21,11 @@ export class RouteurHubService {
     this.refreshPurseSource.next();
   }
 
-  setState(state: State) {
+  setHubState(state: State) {
     this.state.next(state);
   }
 
-  getState() {
+  getHubState() {
     return this.state.asObservable();
   }
 

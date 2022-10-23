@@ -43,7 +43,7 @@ export class EscrowerComponent implements OnDestroy, AfterViewInit {
 
   private setRouteurHubSubscription() {
 
-    this.routeurHubSubscription = this.routeurHubService.getState().subscribe((state: State) => {
+    this.routeurHubSubscription = this.routeurHubService.getHubState().subscribe((state: State) => {
       if (state.user?.role) {
         this.role = state.user.role;
         this.changeDetectorRef.markForCheck();

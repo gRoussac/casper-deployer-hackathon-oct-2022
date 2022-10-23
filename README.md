@@ -172,7 +172,7 @@ Smart contracts are implemented in [Rust](https://www.rust-lang.org/) + [Casper 
 
 # 🛣️ Roadmap / Todo / Tofix
 
-- [ ] Add Dictionnary implementation to test smart contracts
+- [✓] Add Dictionnary implementation to test smart contracts
 - [ ] Add casper-client into wasm client side ?
 - [ ] Add Events watchers
 - [ ] Whitelist Signer on casper.onrender.com

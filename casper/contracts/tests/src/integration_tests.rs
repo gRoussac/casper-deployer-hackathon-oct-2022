@@ -19,6 +19,7 @@ mod tests {
     const KEY: &str = "my-key-name";
     const VALUE: &str = "hello world";
     const RUNTIME_ARG_NAME: &str = "message";
+    const DICT_NAME: &str = "my-dict-name";
     const CONTRACT_WASM: &str = "contract-test.wasm";
 
     #[test]
@@ -78,6 +79,7 @@ mod tests {
         builder.exec(execute_request).commit().expect_success();
 
         // make assertions
+        // On Named value
         let result_of_query = builder
             .query(None, Key::Account(account_addr), &[KEY.to_string()])
             .expect("should be stored value.")
@@ -88,6 +90,28 @@ mod tests {
             .expect("should be string.");
 
         assert_eq!(result_of_query, VALUE);
+
+        // On dictionary Named value DICT_NAME into URef
+        let result_of_query_uref = builder
+            .query(None, Key::Account(account_addr), &[DICT_NAME.to_string()])
+            .expect("should be stored value.")
+            .as_cl_value()
+            .expect("should be cl value.")
+            .clone()
+            .into_t::<casper_types::URef>()
+            .expect("should be URef.");
+
+        // On dictionary value for KEY from URef
+        let result_of_query_value = builder
+            .query_dictionary_item(None, result_of_query_uref, KEY)
+            .expect("should be stored value.")
+            .as_cl_value()
+            .expect("should be cl value.")
+            .clone()
+            .into_t::<String>()
+            .expect("should be String");
+
+        assert_eq!(result_of_query_value, VALUE);
     }
 
     #[test]

@@ -1,7 +1,7 @@
 import { Roles } from "./api-enums";
 
 export type User = {
-  role: Roles;
+  role?: Roles;
   activePublicKey: string;
 };
 

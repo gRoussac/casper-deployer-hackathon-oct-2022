@@ -64,10 +64,10 @@ export class AppComponent implements OnInit, OnDestroy {
   async ngOnInit(): Promise<void> {
     this.setRouteurHubSubscriptions();
     this.setUsersSubscription();
-    await this.refreshData();
     this.window?.addEventListener('signer:unlocked', async () => await this.refreshData());
     this.window?.addEventListener('signer:activeKeyChanged', async () => await this.refreshData());
     this.escrow.hello();
+    await this.refreshData();
   }
 
   ngOnDestroy() {
@@ -127,7 +127,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private setActiveUser() {
     this.user = this.users?.find((user: User) => user.activePublicKey == this.activePublicKey) as User;
-    this.routeurHubService.setState({ user: this.user });
+    !this.user && this.activePublicKey && (this.user = { activePublicKey: this.activePublicKey });
+    this.routeurHubService.setHubState({ user: this.user });
   }
 
   private setPurse() {

@@ -54,7 +54,7 @@ export class DeployerComponent implements OnInit, OnDestroy {
   }
 
   private setRouteurHubSubscription() {
-    this.routeurHubSubscription = this.routeurHubService.getState().subscribe((state: State) => {
+    this.routeurHubSubscription = this.routeurHubService.getHubState().subscribe((state: State) => {
       if (state.user) {
         this.deployerService.setState({
           user: state.user

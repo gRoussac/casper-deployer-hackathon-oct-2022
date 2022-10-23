@@ -92,7 +92,6 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
 
   onConnect(): void {
     this.connect.emit();
-    this.activePublicKey && (this.activePublicKeyElt.nativeElement.value = this.activePublicKey);
   };
 
   reset() {

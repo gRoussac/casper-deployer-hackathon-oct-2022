@@ -15,7 +15,7 @@
 
 #### This projects aims to ease interactions with <a href="https://casperlabs.io/"><img  style="position: relative; top:3px" alt="Casper" src="https://user-images.githubusercontent.com/3099551/197350250-b9d5852b-44a6-45bb-a227-e12d6d4166c9.jpg" height="20" width="20" alt="Casper"/> Casper Blockchain</a> during smart contracts development and for regular querys done with the [Casper Client CLI](https://github.com/casper-ecosystem/casper-client-rs)
 
-#### This project relies on [casper-js-sdk](https://github.com/casper-ecosystem/casper-js-sdk) to help with onboarding developers on the Casper Network and also users by providing better insights on Casper Bloackchains concepts (URef, Dictionnaries etc..) and with giving the ability to deploy a smart contract signed with the [Capser Signer](https://docs.casperlabs.io/workflow/signer-guide/).
+#### This project relies on [casper-js-sdk](https://github.com/casper-ecosystem/casper-js-sdk) to help with onboarding developers on the Casper Network and also users by providing better insights on Casper Blockchain concepts (URef, Dictionnaries etc..) and with giving the ability to deploy a smart contract signed with the [Capser Signer](https://docs.casperlabs.io/workflow/signer-guide/).
 
 <br />
 <img alt="image" src="https://user-images.githubusercontent.com/3099551/197349529-ab5a899b-964f-4089-a6ad-84f059b9e50f.png">

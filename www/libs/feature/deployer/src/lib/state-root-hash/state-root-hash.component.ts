@@ -98,7 +98,6 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
     this.resultService.copyClipboard(value);
   }
 
-  trackByFn = (index: number, item: Peer): string => {
-    return item.node_id;
-  };
+  trackByFn = (index: number, item: Peer): string => item.node_id;
+
 }

@@ -20,6 +20,7 @@ import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 export class PutDeployComponent implements AfterViewInit, OnDestroy {
   @Output() connect: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('chainNameElt') chainNameElt!: ElementRef;
+  @ViewChild('chainNameSelectElt') chainNameSelectElt!: ElementRef;
   @ViewChild('versionElt') versionElt!: ElementRef;
   @ViewChild('gasFeeElt') gasFeeElt!: ElementRef;
   @ViewChild('TTLElt') TTLElt!: ElementRef;
@@ -66,17 +67,36 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
         this.publicKey = this.activePublicKey;
         this.publicKeyElt.nativeElement.value = this.publicKey;
       }
-      state.apiUrl && (this.apiUrl = state.apiUrl);
+      if (state.apiUrl) {
+        this.apiUrl = state.apiUrl;
+        const apiUrl_localhost = this.config['apiUrl_localhost'];
+        const select = (this.chainNameSelectElt.nativeElement as HTMLSelectElement);
+        let chainName: string;
+        if (this.apiUrl.includes(apiUrl_localhost)) {
+          chainName = this.config['chainName_localhost'];
+        } else {
+          chainName = this.config['chainName_test'];
+        }
+        chainName && Array.prototype.slice.call(select.options).find((option, index) => {
+          const match = option.value.includes(chainName);
+          if (match) {
+            select.selectedIndex = index;
+            this.setChainName(chainName);
+          }
+          return match;
+        });
+      }
+
       this.changeDetectorRef.markForCheck();
     });
-  };
+  }
 
   ngOnDestroy() {
     this.getStateSubscription && this.getStateSubscription.unsubscribe();
   }
 
   selectChainName($event: Event) {
-    this.chainNameElt.nativeElement.value = ($event.target as HTMLInputElement).value;
+    this.setChainName(($event.target as HTMLSelectElement).value);
   }
 
   // TODO Refacto into service
@@ -230,5 +250,9 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
         this.sessionNameElt?.nativeElement.value ||
         this.sessionHashElt?.nativeElement.value;
     return firstCondition && secondCondition;
+  }
+
+  private setChainName(value: string) {
+    this.chainNameElt.nativeElement.value = value;
   }
 }

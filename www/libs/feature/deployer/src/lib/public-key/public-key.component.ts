@@ -36,7 +36,7 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.setStateSubscription();
-  };
+  }
 
   ngOnDestroy(): void {
     this.getStateSubscription && this.getStateSubscription.unsubscribe();
@@ -88,11 +88,11 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
 
   copy(value: string): void {
     this.resultService.copyClipboard(value);
-  };
+  }
 
   onConnect(): void {
     this.connect.emit();
-  };
+  }
 
   reset() {
     this.activePublicKeyElt.nativeElement.value = '';

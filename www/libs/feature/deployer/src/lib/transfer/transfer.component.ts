@@ -46,7 +46,7 @@ export class TransferComponent implements AfterViewInit, OnDestroy {
       state.apiUrl && (this.apiUrl = state.apiUrl);
       this.changeDetectorRef.markForCheck();
     });
-  };
+  }
 
   ngOnDestroy() {
     this.getStateSubscription && this.getStateSubscription.unsubscribe();

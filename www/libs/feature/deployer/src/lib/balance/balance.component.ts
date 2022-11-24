@@ -42,7 +42,7 @@ export class BalanceComponent implements AfterViewInit, OnDestroy {
       }
       this.changeDetectorRef.markForCheck();
     });
-  };
+  }
 
   ngOnDestroy() {
     this.getStateSubscription && this.getStateSubscription.unsubscribe();

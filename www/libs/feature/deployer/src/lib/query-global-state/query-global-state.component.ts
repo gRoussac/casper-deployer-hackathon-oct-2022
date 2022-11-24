@@ -46,7 +46,7 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
       }
       this.changeDetectorRef.markForCheck();
     });
-  };
+  }
 
   ngOnDestroy() {
     this.getStateSubscription && this.getStateSubscription.unsubscribe();

@@ -5,6 +5,7 @@ import { DeployerService } from '@casper-data/data-access-deployer';
 import { Subscription } from 'rxjs';
 import { ResultService } from '../result/result.service';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
+import { RouteurHubService } from '@casper-util/routeur-hub';
 
 @Component({
   selector: 'casper-deployer-state-root-hash',
@@ -18,6 +19,7 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
   private getStateRootHashSubscription!: Subscription;
   private getPeersSubscription!: Subscription;
   private getStatusSubscription!: Subscription;
+
   peers!: Peer[];
   status = '';
   loaded!: boolean;
@@ -28,6 +30,7 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
     @Inject(ENV_CONFIG) public readonly config: EnvironmentConfig,
     private readonly deployerService: DeployerService,
     private readonly resultService: ResultService,
+    private readonly routeurHubService: RouteurHubService,
     private readonly changeDetectorRef: ChangeDetectorRef
   ) {
   }
@@ -55,6 +58,10 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
 
   selectApiUrl(event: Event): void {
     this.apiUrlElt.nativeElement.value = (event.target as HTMLInputElement).value;
+    this.routeurHubService.setHubState({
+      apiUrl: this.apiUrl
+    });
+    this.routeurHubService.refreshPurse();
   }
 
   get apiUrl(): string {

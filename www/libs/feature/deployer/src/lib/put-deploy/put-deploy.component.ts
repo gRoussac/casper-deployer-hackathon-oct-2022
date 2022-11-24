@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { DeployReturn, State } from '@casper-api/api-interfaces';
-import { CLPublicKey, CLValueBuilder, DeployUtil, RuntimeArgs, Contracts } from 'casper-js-sdk';
+import { CLPublicKey, CLValueBuilder, DeployUtil, RuntimeArgs, Contracts, decodeBase16, CLByteArray } from 'casper-js-sdk';
 import { DeployParams } from 'casper-js-sdk/dist/lib/DeployUtil';
 import { ResultService } from '../result/result.service';
 import { Subscription } from 'rxjs';
@@ -127,12 +127,29 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
       argsValue: string = this.argsElt?.nativeElement.value as string,
       argsValues = !!argsValue && (argsValue as string).split(','),
       args: RuntimeArgs = RuntimeArgs.fromNamedArgs([]);
+    const allowed_builder_functions = Object.keys(CLValueBuilder);
     argsValues && argsValues.forEach(arg => {
-      const argKeyValue = arg.split('='),
-        key = argKeyValue[0].trim().split(':').shift() as string,
-        CLValue = argKeyValue.length > 1 &&
-          CLValueBuilder.string(argKeyValue[1].trim().replace(this.quoteRegex, ''));
-      CLValue && args.insert(key, CLValue);
+      const argKeyValue = arg.split('=');
+      const [key, type] = argKeyValue[0].trim().split(':');
+      let value: string | CLByteArray = argKeyValue[1].trim().replace(this.quoteRegex, '');
+      const fn = type ? type : 'string';
+      if (!key || !value || !allowed_builder_functions.includes(fn)) {
+        return;
+      }
+      try {
+        const caster_fn: unknown = CLValueBuilder[fn as keyof CLValueBuilder];
+        if (type === 'key') {
+          value = CLValueBuilder.byteArray(
+            decodeBase16(value)
+          );
+        }
+        // TODO Fix any type
+        const CLValue = (caster_fn as any)(value);
+        CLValue && args.insert(key, CLValue);
+      } catch (err) {
+        console.error('Error with arg', key, type, value, err);
+      }
+
     });
     let session = sessionPath && this.wasm && DeployUtil.ExecutableDeployItem.newModuleBytes(this.wasm as Uint8Array, args);
     if (!isPackageElt) {

@@ -4,6 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { ENV_CONFIG, config } from '@casper-util/config';
 import { HighlightService, HIGHLIGHT_WEBWORKER_FACTORY } from '@casper-util/hightlight-webworker';
+import { RouteurHubService } from '@casper-util/routeur-hub';
 import { ResultService } from '../result/result.service';
 import { StateRootHashComponent } from './state-root-hash.component';
 
@@ -26,6 +27,7 @@ describe('StateRootHashComponent', () => {
             HIGHLIGHT_WEBWORKER_FACTORY
           }
         },
+        RouteurHubService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();

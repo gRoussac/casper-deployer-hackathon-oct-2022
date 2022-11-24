@@ -13,7 +13,7 @@
 
 # 📔 **Project**
 
-#### This projects aims to ease interactions with <a href="https://casperlabs.io/"><img  style="position: relative; top:3px" alt="Casper" src="https://user-images.githubusercontent.com/3099551/197350250-b9d5852b-44a6-45bb-a227-e12d6d4166c9.jpg" height="20" width="20" alt="Casper"/> Casper Blockchain</a> during smart contracts development and for regular querys done with the [Casper Client CLI](https://github.com/casper-ecosystem/casper-client-rs)
+#### This projects aims to ease interactions with <a href="https://casperlabs.io/"><img  style="position: relative; top:3px" alt="Casper" src="https://user-images.githubusercontent.com/3099551/197350250-b9d5852b-44a6-45bb-a227-e12d6d4166c9.jpg" height="20" width="20" alt="Casper"/> Casper Blockchain</a> during smart contracts development and for regular queries done with the [Casper Client CLI](https://github.com/casper-ecosystem/casper-client-rs)
 
 #### This project relies on [casper-js-sdk](https://github.com/casper-ecosystem/casper-js-sdk) to help with onboarding developers on the Casper Network and also users by providing better insights on Casper Blockchain concepts (URef, Dictionnaries etc..) and with giving the ability to deploy a smart contract signed with the [Capser Signer](https://docs.casperlabs.io/workflow/signer-guide/).
 
@@ -293,7 +293,7 @@ npm run start:prod
 
 ## Build
 
-Run `npm run build` to launch Jest test the project. The build artifacts will be stored in the `dist/` directory.
+Run `npm run build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
 ```shell
 npm run build
@@ -330,7 +330,7 @@ Default settings are
   "api_prefix": "/api/",
   "api_suffix": "/rpc",
   "apiUrl_localhost": "http://localhost:11101",
-  "apiUrl_default": "http://65.21.231.29:7777",
+  "apiUrl_default": "http://3.136.227.9:7777",
   "chainName_test": "casper-test",
   "chainName_localhost": "casper-net-1",
   "path_sep": "/",

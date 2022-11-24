@@ -43,6 +43,7 @@ export class AppComponent implements OnInit, OnDestroy {
   users!: Users;
   user?: User;
   balance!: string;
+  apiUrl!: string;
 
   readonly Roles = Roles;
 
@@ -94,6 +95,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscriptions.push(this.routeurHubService.refreshPurse$.subscribe(async () => {
       this.refreshPurse();
     }));
+    this.subscriptions.push(this.routeurHubService.getHubState().subscribe(async (state) =>
+      state.apiUrl && (this.apiUrl = state.apiUrl)
+    ));
   }
 
   private setUsersSubscription() {
@@ -146,7 +150,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private setAccountInformationSubscription() {
-    this.activePublicKey && (this.accountInformationSubscription = this.usersService.getPurse(this.activePublicKey)
+    this.activePublicKey && (this.accountInformationSubscription = this.usersService.getPurse(this.activePublicKey, this.apiUrl)
       .pipe(
         map((purse: Purse | Error) =>
           purse as Purse

@@ -45,7 +45,7 @@ export class GetDeployComponent implements OnDestroy, AfterViewInit {
       }
       this.changeDetectorRef.markForCheck();
     });
-  };
+  }
 
   getDeploy() {
     const deploy_hash = this.getDeployElt.nativeElement.value;

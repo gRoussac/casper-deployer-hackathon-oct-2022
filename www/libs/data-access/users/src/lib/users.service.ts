@@ -18,9 +18,10 @@ export class UsersService {
     return this.http.get<Users>(`${this.config['api_prefix']}${api_interface.Users}`);
   }
 
-  getPurse(publicKey: string): Observable<Purse | Error> {
+  getPurse(publicKey: string, apiUrl?: string): Observable<Purse | Error> {
     let params = new HttpParams();
     params = params.append('publicKey', publicKey);
+    apiUrl && (params = params.append('apiUrl', apiUrl));
     return this.http
       .get<Purse | Error>(`${this.config['api_prefix']}${api_interface.Purse}`, { params })
       .pipe(

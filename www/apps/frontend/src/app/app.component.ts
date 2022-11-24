@@ -166,9 +166,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private getBalance(purse: Purse) {
     if (!purse?.balance) {
-      return (0).toString();
+      return BigInt(0).toLocaleString();
     }
-    return (+purse?.balance / 1e+10).toLocaleString();
+    // TODO Fix with motesToCSPR
+    return (BigInt(purse.balance) / BigInt(1e+10)).toLocaleString();
   }
 
 }

@@ -60,10 +60,11 @@
     <div class="mb-4 flex justify-between">
       <div class="mr-1">
         <label
-          class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+          class="flex justify-between items-end text-gray-700 text-sm font-bold mb-2"
           for="gasFee"
         >
           Gas fee max
+          <small class="mr-1 text-xs">{{ +gasFeeElt.value / 1e10 }} CSPR</small>
         </label>
         <div class="mb-2">
           <input

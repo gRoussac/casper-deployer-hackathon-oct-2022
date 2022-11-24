@@ -93,7 +93,7 @@
         class="flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
         type="button"
         (click)="balanceOfByPublicKey()"
-        [attr.disabled]="!activePublicKey ? true : null"
+        [attr.disabled]="isPurseButtonDisabled ? true : null"
       >
         Balance
         <svg

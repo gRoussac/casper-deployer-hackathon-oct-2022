@@ -11,11 +11,11 @@
       <div class="mb-2">
         <input
           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          name="purse_uref"
           #getDeployElt
           type="search"
           (change)="(true)"
           [value]="deploy_hash || ''"
+          placeholder="ex: 0x"
           (keyup.enter)="getDeploy()"
         />
       </div>

@@ -7,9 +7,7 @@
   "targets": {
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/libs/util/services/routeur-hub"
-      ],
+      "outputs": ["coverage/libs/util/services/routeur-hub"],
       "options": {
         "jestConfig": "libs/util/services/routeur-hub/jest.config.ts",
         "passWithNoTests": true
@@ -25,7 +23,5 @@
       }
     }
   },
-  "tags": [
-    "routeur-hub"
-  ]
+  "tags": ["routeur-hub"]
 }

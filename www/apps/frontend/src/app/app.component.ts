@@ -11,6 +11,7 @@ import { Escrow } from "escrow";
 import { CasperLabsHelper } from 'casper-js-sdk/dist/@types/casperlabsSigner';
 import { RouterModule } from '@angular/router';
 import { RouteurHubService } from '@casper-util/routeur-hub';
+import { StorageService } from '@casper-escrow/storage';
 
 declare global {
   interface Window {
@@ -33,7 +34,8 @@ const imports = [
   imports,
   providers: [
     UsersService,
-    RouteurHubService
+    RouteurHubService,
+    StorageService
   ],
 })
 export class AppComponent implements OnInit, OnDestroy {
@@ -58,7 +60,8 @@ export class AppComponent implements OnInit, OnDestroy {
     @Inject(ESCROW_TOKEN) private readonly escrow: Escrow,
     private readonly usersService: UsersService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly routeurHubService: RouteurHubService
+    private readonly routeurHubService: RouteurHubService,
+    private readonly storageService: StorageService
   ) {
   }
 
@@ -95,8 +98,12 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscriptions.push(this.routeurHubService.refreshPurse$.subscribe(async () => {
       this.refreshPurse();
     }));
-    this.subscriptions.push(this.routeurHubService.getHubState().subscribe(async (state) =>
-      state.apiUrl && (this.apiUrl = state.apiUrl)
+    this.subscriptions.push(this.routeurHubService.getHubState().subscribe(async (state) => {
+      if (state.apiUrl) {
+        this.apiUrl = state.apiUrl;
+        this.storageService.setState(state);
+      }
+    }
     ));
   }
 

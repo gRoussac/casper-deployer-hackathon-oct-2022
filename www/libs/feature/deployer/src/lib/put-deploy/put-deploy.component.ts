@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { DeployReturn, State } from '@casper-api/api-interfaces';
-import { CLPublicKey, CLValueBuilder, DeployUtil, RuntimeArgs, Contracts, decodeBase16, CLByteArray } from 'casper-js-sdk';
+import { CLPublicKey, CLValueBuilder, DeployUtil, RuntimeArgs, Contracts, decodeBase16, CLByteArray, CLPublicKeyTag } from 'casper-js-sdk';
 import { DeployParams } from 'casper-js-sdk/dist/lib/DeployUtil';
 import { ResultService } from '../result/result.service';
 import { Subscription } from 'rxjs';
@@ -67,24 +67,15 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
         this.publicKey = this.activePublicKey;
         this.publicKeyElt.nativeElement.value = this.publicKey;
       }
-      if (state.apiUrl) {
+      if (state.apiUrl && this.apiUrl !== state.apiUrl) {
         this.apiUrl = state.apiUrl;
-        const apiUrl_localhost = this.config['apiUrl_localhost'];
-        const select = (this.chainNameSelectElt.nativeElement as HTMLSelectElement);
         let chainName: string;
-        if (this.apiUrl.includes(apiUrl_localhost)) {
+        if (this.apiUrl.includes(this.config['apiUrl_localhost'])) {
           chainName = this.config['chainName_localhost'];
         } else {
           chainName = this.config['chainName_test'];
         }
-        chainName && Array.prototype.slice.call(select.options).find((option, index) => {
-          const match = option.value.includes(chainName);
-          if (match) {
-            select.selectedIndex = index;
-            this.setChainName(chainName);
-          }
-          return match;
-        });
+        this.selectChainNameOption(chainName);
       }
 
       this.changeDetectorRef.markForCheck();
@@ -130,7 +121,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     const allowed_builder_functions = Object.keys(CLValueBuilder);
     argsValues && argsValues.forEach(arg => {
       const argKeyValue = arg.split('=');
-      const [key, type] = argKeyValue[0].trim().split(':');
+      let [key, type] = argKeyValue[0].trim().split(':');
       let value: string | CLByteArray = argKeyValue[1].trim().replace(this.quoteRegex, '');
       const fn = type ? type : 'string';
       if (!key || !value || !allowed_builder_functions.includes(fn)) {
@@ -138,9 +129,16 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
       }
       try {
         const caster_fn: unknown = CLValueBuilder[fn as keyof CLValueBuilder];
-        if (type === 'key') {
-          value = CLValueBuilder.byteArray(
-            decodeBase16(value)
+        if (['key', 'publicKey'].includes(type)) {
+          // value = CLValueBuilder.byteArray(
+          //   decodeBase16(value)
+          // );
+          type = 'publicKey';
+          const public_key = decodeBase16(value);
+          const type_key = public_key.slice(0, 1).toString();
+          value = CLValueBuilder.publicKey(
+            public_key.slice(1),
+            +type_key as CLPublicKeyTag
           );
         }
         // TODO Fix any type
@@ -271,5 +269,17 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
 
   private setChainName(value: string) {
     this.chainNameElt.nativeElement.value = value;
+  }
+
+  private selectChainNameOption(chainName: string) {
+    const select = (this.chainNameSelectElt.nativeElement as HTMLSelectElement);
+    chainName && Array.prototype.slice.call(select.options).find((option, index) => {
+      const match = option.value.includes(chainName);
+      if (match) {
+        select.selectedIndex = index;
+        this.setChainName(chainName);
+      }
+      return match;
+    });
   }
 }

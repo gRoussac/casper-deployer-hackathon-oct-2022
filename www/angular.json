@@ -19,6 +19,7 @@
     "util-hihlight-webworker": "libs/util/hihlight-webworker",
     "util-services-routeur-hub": "libs/util/services/routeur-hub",
     "util-services-wasm": "libs/util/services/wasm",
-    "util-tokens": "libs/util/tokens"
+    "util-tokens": "libs/util/tokens",
+    "util-storage": "libs/util/storage"
   }
 }

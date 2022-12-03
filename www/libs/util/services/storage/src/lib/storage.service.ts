@@ -23,6 +23,6 @@ export class StorageService {
   // }
 
   get(key: string) {
-    return (JSON.parse(this.window?.localStorage.getItem(this.prefix) || '') || {})[key];
+    return (JSON.parse(this.window?.localStorage.getItem(this.prefix) || '{}') || {})[key];
   }
 }

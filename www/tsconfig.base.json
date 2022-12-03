@@ -26,7 +26,6 @@
       "@casper-escrow/escrower": ["libs/feature/escrower/src/index.ts"],
       "@casper-escrow/postman": ["libs/feature/postman/src/index.ts"],
       "@casper-escrow/seller": ["libs/feature/seller/src/index.ts"],
-      "@casper-escrow/storage": ["libs/util/storage/src/index.ts"],
       "@casper-ui/header": ["libs/ui/header/src/index.ts"],
       "@casper-util/config": ["libs/util/config/src/index.ts"],
       "@casper-util/hightlight-webworker": [
@@ -35,8 +34,11 @@
       "@casper-util/routeur-hub": [
         "libs/util/services/routeur-hub/src/index.ts"
       ],
+      "@casper-util/storage": ["libs/util/services/storage/src/index.ts"],
+      "@casper-util/toaster": ["libs/util/services/toaster/src/index.ts"],
       "@casper-util/tokens": ["libs/util/tokens/src/index.ts"],
-      "@casper-util/wasm": ["libs/util/services/wasm/src/index.ts"]
+      "@casper-util/wasm": ["libs/util/services/wasm/src/index.ts"],
+      "@casper-util/watcher": ["libs/util/services/watcher/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

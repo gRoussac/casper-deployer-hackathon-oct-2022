@@ -37,6 +37,7 @@
     "promise-worker": "^2.0.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "~7.5.0",
+    "toastr": "^2.1.4",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"
   },

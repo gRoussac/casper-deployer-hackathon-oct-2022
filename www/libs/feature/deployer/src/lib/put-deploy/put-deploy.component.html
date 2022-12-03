@@ -6,7 +6,8 @@
         class="flex justify-between text-gray-700 text-sm font-bold mb-2"
         for="apiUrl"
       >
-        Chain name <input type="reset" value="clear" (click)="(reset)" />
+        Chain name
+        <input type="reset" value="clear" (click)="resetFirstForm($event)" />
       </label>
       <div class="mb-2">
         <input
@@ -104,7 +105,7 @@
         class="flex justify-between text-gray-700 text-sm font-bold mb-2"
         for="sessionPath"
       >
-        Session path (new contract)
+        Session code path
       </label>
       <div class="mb-2 flex items-center">
         <input
@@ -188,7 +189,8 @@
         class="flex justify-between text-gray-700 text-sm font-bold mb-2"
         for="sessionName"
       >
-        Session or package name (contract already on chain)
+        Contract or package name
+        <input type="reset" value="clear" (click)="resetSecondForm($event)" />
       </label>
       <div class="mb-2">
         <input
@@ -208,7 +210,7 @@
         class="flex justify-between text-gray-700 text-sm font-bold mb-2"
         for="sessionHash"
       >
-        Session or package hash (contract already on chain)
+        Contract or package hash
       </label>
       <div class="mb-2">
         <input
@@ -248,7 +250,7 @@
         class="flex justify-between text-gray-700 text-sm font-bold mb-2"
         for="args"
       >
-        String Args
+        Args
       </label>
       <div class="mb-2">
         <input

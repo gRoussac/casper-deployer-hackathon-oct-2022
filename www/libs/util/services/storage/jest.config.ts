@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
-  displayName: 'util-tokens',
+  displayName: 'util-services-storage',
   preset: '../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {
@@ -9,7 +9,7 @@ export default {
       stringifyContentPathRegex: '\\.(html|svg)$',
     },
   },
-  coverageDirectory: '../../../coverage/libs/util/tokens',
+  coverageDirectory: '../../../coverage/libs/util/services/storage',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': 'jest-preset-angular',
   },

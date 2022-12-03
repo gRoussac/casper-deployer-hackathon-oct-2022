@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Subscription, map } from 'rxjs';
@@ -11,7 +11,7 @@ import { Escrow } from "escrow";
 import { CasperLabsHelper } from 'casper-js-sdk/dist/@types/casperlabsSigner';
 import { RouterModule } from '@angular/router';
 import { RouteurHubService } from '@casper-util/routeur-hub';
-import { StorageService } from '@casper-escrow/storage';
+import { StorageService } from '@casper-util/storage';
 
 declare global {
   interface Window {
@@ -38,7 +38,7 @@ const imports = [
     StorageService
   ],
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   readonly window = this.document.defaultView;
   isConnected!: boolean;
   activePublicKey!: string;
@@ -71,7 +71,14 @@ export class AppComponent implements OnInit, OnDestroy {
     this.window?.addEventListener('signer:unlocked', async () => await this.refreshData());
     this.window?.addEventListener('signer:activeKeyChanged', async () => await this.refreshData());
     this.escrow.hello();
-    await this.refreshData();
+  }
+
+  ngAfterViewInit() {
+    this.apiUrl = this.storageService.get('apiUrl');
+    // Bug on the Signer, activePublicKey rejected on first quick load
+    setTimeout(async () => {
+      await this.refreshData();
+    }, 150);
   }
 
   ngOnDestroy() {
@@ -127,8 +134,8 @@ export class AppComponent implements OnInit, OnDestroy {
     const promises = await Promise.allSettled([isConnected$, activePublicKey$])
       .catch(error => console.error(error));
     const results = promises?.filter(
-      ({ status }) => status === 'fulfilled')
-      .map(result => (result as PromiseFulfilledResult<string | boolean>).value);
+      ({ status }) => status === 'fulfilled'
+    ).map(result => (result as PromiseFulfilledResult<string | boolean>).value);
     let isConnected, activePublicKey;
     results && ([isConnected, activePublicKey] = results);
     activePublicKey = activePublicKey as string;

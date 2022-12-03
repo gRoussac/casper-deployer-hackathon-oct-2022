@@ -7,6 +7,8 @@ import { WasmModule } from '@casper-util/wasm';
 import { AppComponent } from './app/app.component';
 import { environment } from './environments/environment';
 import { RouterModule, Routes } from '@angular/router';
+import { Toaster, TOASTER_TOKEN } from '@casper-util/toaster';
+declare const toastr: Toaster;
 
 if (environment.production) {
   enableProdMode();
@@ -37,6 +39,11 @@ const providers: Array<Provider | ImportedNgModuleProviders> = [
 providers.push({
   provide: ENV_CONFIG,
   useValue: config
+});
+
+providers.push({
+  provide: TOASTER_TOKEN,
+  useValue: toastr
 });
 
 bootstrapApplication(AppComponent, { providers })

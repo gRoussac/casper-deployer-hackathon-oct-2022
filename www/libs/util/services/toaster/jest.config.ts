@@ -1,7 +1,7 @@
 /* eslint-disable */
 export default {
-  displayName: 'util-tokens',
-  preset: '../../../jest.preset.js',
+  displayName: 'util-services-toaster',
+  preset: '../../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {
     'ts-jest': {
@@ -9,7 +9,7 @@ export default {
       stringifyContentPathRegex: '\\.(html|svg)$',
     },
   },
-  coverageDirectory: '../../../coverage/libs/util/tokens',
+  coverageDirectory: '../../../../coverage/libs/util/services/toaster',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': 'jest-preset-angular',
   },

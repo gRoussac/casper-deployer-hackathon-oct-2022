@@ -48,8 +48,8 @@ export class GetDeployComponent implements OnDestroy, AfterViewInit {
   }
 
   getDeploy() {
-    const deploy_hash = this.getDeployElt.nativeElement.value;
-    deploy_hash && (this.getDeploySubscription = this.deployerService.getDeploy(deploy_hash, this.apiUrl).subscribe(async deploy => {
+    const deploy_hash = this.getDeployElt.nativeElement.value.replace('deploy-', '');
+    deploy_hash && (this.getDeploySubscription = this.deployerService.getDeploy(deploy_hash, this.apiUrl).subscribe(deploy => {
       deploy && this.resultService.setResult<GetDeployResult>('Deploy info', deploy as GetDeployResult);
       this.refreshPurse.emit();
       this.getDeploySubscription.unsubscribe();

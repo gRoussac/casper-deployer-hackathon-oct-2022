@@ -1,4 +1,4 @@
-import { Purse, Error, Users } from '@casper-api/api-interfaces';
+import { Purse, Error, Users, api_interface } from '@casper-api/api-interfaces';
 import { Controller, Get, Query } from '@nestjs/common';
 import { AppService } from './app.service';
 
@@ -6,12 +6,12 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) { }
 
-  @Get('users')
+  @Get(api_interface.Users)
   getUsers(): Users {
     return this.appService.getUsers();
   }
 
-  @Get('purse')
+  @Get(api_interface.Purse)
   async getPurse(
     @Query('publicKey') publicKey: string,
     @Query('apiUrl') apiUrl?: string

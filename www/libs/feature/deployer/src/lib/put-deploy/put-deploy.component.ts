@@ -1,18 +1,20 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { DeployReturn, State } from '@casper-api/api-interfaces';
-import { CLPublicKey, CLValueBuilder, DeployUtil, RuntimeArgs, Contracts, decodeBase16, CLByteArray } from 'casper-js-sdk';
-import { DeployParams } from 'casper-js-sdk/dist/lib/DeployUtil';
+import { CLPublicKey, CLValueBuilder, DeployUtil, RuntimeArgs, Contracts, decodeBase16, CLByteArray, CLPublicKeyTag } from 'casper-js-sdk';
 import { ResultService } from '../result/result.service';
 import { Subscription } from 'rxjs';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { Result } from 'ts-results';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
+import { Toaster, TOASTER_TOKEN } from '@casper-util/toaster';
+import { WatcherService } from '@casper-util/watcher';
 
 @Component({
   selector: 'casper-deployer-put-deploy',
   standalone: true,
   imports: [CommonModule],
+  providers: [WatcherService],
   templateUrl: './put-deploy.component.html',
   styleUrls: ['./put-deploy.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,7 +57,9 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
   constructor(
     @Inject(DOCUMENT) private document: Document,
     @Inject(ENV_CONFIG) public readonly config: EnvironmentConfig,
+    @Inject(TOASTER_TOKEN) private readonly toastr: Toaster,
     private readonly deployerService: DeployerService,
+    private readonly watcherService: WatcherService,
     private readonly resultService: ResultService,
     private readonly changeDetectorRef: ChangeDetectorRef
   ) { }
@@ -67,26 +71,16 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
         this.publicKey = this.activePublicKey;
         this.publicKeyElt.nativeElement.value = this.publicKey;
       }
-      if (state.apiUrl) {
+      if (state.apiUrl && this.apiUrl !== state.apiUrl) {
         this.apiUrl = state.apiUrl;
-        const apiUrl_localhost = this.config['apiUrl_localhost'];
-        const select = (this.chainNameSelectElt.nativeElement as HTMLSelectElement);
         let chainName: string;
-        if (this.apiUrl.includes(apiUrl_localhost)) {
+        if (this.apiUrl.includes(this.config['apiUrl_localhost'])) {
           chainName = this.config['chainName_localhost'];
         } else {
           chainName = this.config['chainName_test'];
         }
-        chainName && Array.prototype.slice.call(select.options).find((option, index) => {
-          const match = option.value.includes(chainName);
-          if (match) {
-            select.selectedIndex = index;
-            this.setChainName(chainName);
-          }
-          return match;
-        });
+        this.selectChainNameOption(chainName);
       }
-
       this.changeDetectorRef.markForCheck();
     });
   }
@@ -117,7 +111,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
       ttl = +this.TTLElt?.nativeElement.value,
       isPackageElt = this.isPackageElt?.nativeElement.checked,
       dependencies: Uint8Array[] = [],
-      deployParams: DeployParams = new DeployUtil.DeployParams(
+      deployParams: DeployUtil.DeployParams = new DeployUtil.DeployParams(
         publicKey,
         chainName,
         +this.config['gasPrice'],
@@ -130,7 +124,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     const allowed_builder_functions = Object.keys(CLValueBuilder);
     argsValues && argsValues.forEach(arg => {
       const argKeyValue = arg.split('=');
-      const [key, type] = argKeyValue[0].trim().split(':');
+      let [key, type] = argKeyValue[0].trim().split(':');
       let value: string | CLByteArray = argKeyValue[1].trim().replace(this.quoteRegex, '');
       const fn = type ? type : 'string';
       if (!key || !value || !allowed_builder_functions.includes(fn)) {
@@ -138,9 +132,16 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
       }
       try {
         const caster_fn: unknown = CLValueBuilder[fn as keyof CLValueBuilder];
-        if (type === 'key') {
-          value = CLValueBuilder.byteArray(
-            decodeBase16(value)
+        if (['key', 'publicKey'].includes(type)) {
+          // value = CLValueBuilder.byteArray(
+          //   decodeBase16(value)
+          // );
+          type = 'publicKey';
+          const public_key = decodeBase16(value);
+          const type_key = public_key.slice(0, 1).toString();
+          value = CLValueBuilder.publicKey(
+            public_key.slice(1),
+            +type_key as CLPublicKeyTag
           );
         }
         // TODO Fix any type
@@ -148,8 +149,8 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
         CLValue && args.insert(key, CLValue);
       } catch (err) {
         console.error('Error with arg', key, type, value, err);
+        this.toastr.error([key, type, value, err].join(' '), 'Error with arg');
       }
-
     });
     let session = sessionPath && this.wasm && DeployUtil.ExecutableDeployItem.newModuleBytes(this.wasm as Uint8Array, args);
     if (!isPackageElt) {
@@ -161,6 +162,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     }
     if (!session) {
       console.error(deployParams, session);
+      this.toastr.error('', 'Error with deployParams');
       return;
     }
     const payment = DeployUtil.standardPayment(gasFee);
@@ -168,6 +170,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     this.deploy && this.resultService.setResult<DeployUtil.Deploy>('Deploy', DeployUtil.deployToJson(this.deploy));
     if (!DeployUtil.validateDeploy(this.deploy)) {
       console.error(this.deploy);
+      this.toastr.error('', 'Error with invalid deploy');
     }
   }
 
@@ -182,12 +185,21 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
       DeployUtil.deployToJson(this.deploy),
       publicKey
     );
+    // TODO Bug is signer
+    if (!signedDeployToJson) {
+      console.error(this.window?.casperlabsHelper.sign, publicKey);
+      this.toastr.error(publicKey, 'Error with signer deploy');
+      this.connect.emit();
+      return;
+    }
     const signedDeploy: Result<DeployUtil.Deploy, Error> = DeployUtil.deployFromJson(signedDeployToJson);
     if (signedDeploy.err) {
+      this.toastr.error(signedDeploy.val.message, 'Error with signedDeploy');
       console.error(signedDeploy.val.message);
       return;
     }
     if (this.deploy && !DeployUtil.validateDeploy(this.deploy)) {
+      this.toastr.error(this.deploy.hash.toString(), 'Error with validateDeploy');
       console.error(this.deploy);
       return;
     }
@@ -196,8 +208,9 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     }
     this.deployerService.putDeploy(signedDeploy.val, this.apiUrl).subscribe(deploy => {
       const deploy_hash = (deploy as DeployReturn).deploy_hash;
-      deploy && this.resultService.setResult<DeployUtil.Deploy>('Deploy Hash', deploy_hash);
+      deploy && this.resultService.setResult<DeployUtil.Deploy>('Deploy Hash', deploy_hash || deploy);
       this.deployerService.setState({ deploy_hash });
+      deploy_hash && this.watcherService.watchDeploy(deploy_hash, this.window?.location.href);
     });
   }
 
@@ -210,8 +223,19 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     }));
   }
 
-  reset() {
-    this.resetSessionPathElt();
+  resetFirstForm($event: Event) {
+    $event.preventDefault();
+    this.publicKeyElt.nativeElement.value = '';
+    this.gasFeeElt.nativeElement.value = '';
+    this.TTLElt.nativeElement.value = '';
+  }
+
+  resetSecondForm($event?: Event) {
+    $event?.preventDefault();
+    this.sessionNameElt.nativeElement.value = '';
+    this.sessionHashElt.nativeElement.value = '';
+    this.entryPointElt.nativeElement.value = '';
+    this.argsElt.nativeElement.value = '';
   }
 
   resetSessionPathElt() {
@@ -255,6 +279,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     const file = (event.target as HTMLInputElement).files?.item(0), buffer = await file?.arrayBuffer();
     this.wasm = buffer && new Uint8Array(buffer);
     this.animate = false;
+    this.resetSecondForm();
     this.changeDetectorRef.markForCheck();
   }
 
@@ -271,5 +296,17 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
 
   private setChainName(value: string) {
     this.chainNameElt.nativeElement.value = value;
+  }
+
+  private selectChainNameOption(chainName: string) {
+    const select = (this.chainNameSelectElt.nativeElement as HTMLSelectElement);
+    chainName && Array.prototype.slice.call(select.options).find((option, index) => {
+      const match = option.value.includes(chainName);
+      if (match) {
+        select.selectedIndex = index;
+        this.setChainName(chainName);
+      }
+      return match;
+    });
   }
 }

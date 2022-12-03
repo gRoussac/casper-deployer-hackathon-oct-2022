@@ -94,7 +94,8 @@ export class PublicKeyComponent implements AfterViewInit, OnDestroy {
     this.connect.emit();
   }
 
-  reset() {
+  reset($event: Event) {
+    $event.preventDefault();
     this.activePublicKeyElt.nativeElement.value = '';
     this.stateRootHashElt.nativeElement.value = '';
   }

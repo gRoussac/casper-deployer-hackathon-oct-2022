@@ -39,3 +39,24 @@ h2.title {
     inset: 0 0 auto 0;
   }
 }
+
+.toast-error {
+  background-color: #ff756e !important;
+  opacity: 1 !important;
+}
+
+.toast-info {
+  background-color: rgb(241, 245, 249) !important;
+  color: black !important;
+  opacity: 1 !important;
+}
+
+#toast-container > div {
+  opacity: 1 !important;
+  width: 458px !important;
+}
+
+.toast-top-right {
+  top: 220px !important;
+  right: 17px !important;
+}

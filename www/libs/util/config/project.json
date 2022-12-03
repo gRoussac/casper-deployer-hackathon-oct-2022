@@ -15,7 +15,5 @@
       }
     }
   },
-  "tags": [
-    "util config"
-  ]
+  "tags": ["util config"]
 }

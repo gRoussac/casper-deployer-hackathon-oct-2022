@@ -7,9 +7,7 @@
   "targets": {
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/libs/feature/escrower"
-      ],
+      "outputs": ["coverage/libs/feature/escrower"],
       "options": {
         "jestConfig": "libs/feature/escrower/jest.config.ts",
         "passWithNoTests": true
@@ -25,7 +23,5 @@
       }
     }
   },
-  "tags": [
-    "feature escrower"
-  ]
+  "tags": ["feature escrower"]
 }

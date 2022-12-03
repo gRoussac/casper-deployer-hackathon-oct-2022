@@ -1,13 +1,18 @@
 <div class="w-full">
   <form class="bg-white shadow-md rounded p-3 mb-4" (submit)="(false)">
-    <h2 class="title">State</h2>
+    <h2 class="title">Keys</h2>
     <div class="mb-4">
       <label
         class="flex justify-between text-gray-700 text-sm font-bold mb-2"
         for="key"
       >
         Global Key
-        <input type="reset" value="clear" />
+        <span class="z-index">
+          <span *ngIf="activePublicKey" class="mr-3" (click)="setAccountHash()"
+            >account-hash↓</span
+          >
+          <input type="reset" value="clear" />
+        </span>
       </label>
       <div class="mb-2">
         <input
@@ -15,7 +20,7 @@
           name="key"
           #keyElt
           type="search"
-          placeholder="ex: uref-0x || hash-0x || deploy-0x || account-hash-0x"
+          placeholder="ex: uref-0x || hash-0x || account-hash-0x"
           (change)="(true)"
           (keyup.enter)="getBlockState()"
         />

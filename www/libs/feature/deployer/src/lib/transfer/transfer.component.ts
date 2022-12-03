@@ -5,7 +5,6 @@ import { ResultService } from '../result/result.service';
 import { DeployReturn, State } from '@casper-api/api-interfaces';
 import { Subscription } from 'rxjs';
 import { CLPublicKey, CLURef, DeployUtil } from 'casper-js-sdk';
-import { DeployParams } from 'casper-js-sdk/dist/lib/DeployUtil';
 import { Result } from 'ts-results';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 
@@ -79,9 +78,9 @@ export class TransferComponent implements AfterViewInit, OnDestroy {
     } else {
       transferFromPublicKey = CLPublicKey.fromHex(transferFrom); // This seems to be buggy if transferFrom is not active public key, produces error in signer "Active key changed during signing"
     }
-    const deployParams: DeployParams = new DeployUtil.DeployParams(
+    const deployParams: DeployUtil.DeployParams = new DeployUtil.DeployParams(
       transferFromPublicKey ? transferFromPublicKey : publicKey,
-      this.apiUrl?.includes('localhost') ? this.config['chainName_localhost'] : this.config['chainName_test'],
+      this.apiUrl?.includes(this.config['localhost']) ? this.config['chainName_localhost'] : this.config['chainName_test'],
       +this.config['gasPrice'],
       +this.config['TTL'],
       []

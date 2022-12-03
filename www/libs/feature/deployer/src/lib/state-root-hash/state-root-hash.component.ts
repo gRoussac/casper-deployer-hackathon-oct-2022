@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { ResultService } from '../result/result.service';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 import { RouteurHubService } from '@casper-util/routeur-hub';
+import { StorageService } from '@casper-util/storage';
 
 @Component({
   selector: 'casper-deployer-state-root-hash',
@@ -23,6 +24,7 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
   peers!: Peer[];
   status = '';
   loaded!: boolean;
+  storageApiUrl!: string;
   @ViewChild('apiUrlElt') apiUrlElt!: ElementRef;
   @ViewChild('apiSuffixElt') apiSuffixElt!: ElementRef;
 
@@ -31,12 +33,19 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
     private readonly deployerService: DeployerService,
     private readonly resultService: ResultService,
     private readonly routeurHubService: RouteurHubService,
-    private readonly changeDetectorRef: ChangeDetectorRef
-  ) {
-  }
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly storageService: StorageService
+  ) { }
 
   ngAfterViewInit(): void {
     this.setPeersSubscription();
+    setTimeout(() => {
+      const apiUrl = this.storageService.get('apiUrl');
+      if (apiUrl) {
+        this.deployerService.setState({ apiUrl });
+        this.storageApiUrl = apiUrl.replace(this.config['api_suffix'], '');
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -58,6 +67,9 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
 
   selectApiUrl(event: Event): void {
     this.apiUrlElt.nativeElement.value = (event.target as HTMLInputElement).value;
+    this.deployerService.setState({
+      apiUrl: this.apiUrl
+    });
     this.routeurHubService.setHubState({
       apiUrl: this.apiUrl
     });

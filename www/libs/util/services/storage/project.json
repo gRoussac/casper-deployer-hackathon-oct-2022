@@ -1,17 +1,15 @@
 {
-  "name": "util-tokens",
+  "name": "util-services-storage",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
-  "sourceRoot": "libs/util/tokens/src",
-  "prefix": "casper",
+  "sourceRoot": "libs/util/services/storage/src",
+  "prefix": "www",
   "targets": {
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/libs/util/tokens"
-      ],
+      "outputs": ["coverage/libs/util/services/storage"],
       "options": {
-        "jestConfig": "libs/util/tokens/jest.config.ts",
+        "jestConfig": "libs/util/services/storage/jest.config.ts",
         "passWithNoTests": true
       }
     },
@@ -19,13 +17,11 @@
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "libs/util/tokens/**/*.ts",
-          "libs/util/tokens/**/*.html"
+          "libs/util/services/storage/**/*.ts",
+          "libs/util/services/storage/**/*.html"
         ]
       }
     }
   },
-  "tags": [
-    "util-tokens"
-  ]
+  "tags": ["utils storage"]
 }

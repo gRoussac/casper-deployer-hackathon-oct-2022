@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { ResultService } from '../result/result.service';
 import { StoredValue } from 'casper-js-sdk/dist/lib/StoredValue';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
+import { CLPublicKey } from 'casper-js-sdk';
 
 @Component({
   selector: 'casper-deployer-query-global-state',
@@ -31,7 +32,7 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
     private readonly deployerService: DeployerService,
     private readonly resultService: ResultService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    @Inject(ENV_CONFIG) public readonly config: EnvironmentConfig,
+    @Inject(ENV_CONFIG) public readonly config: EnvironmentConfig
   ) { }
 
   ngAfterViewInit(): void {
@@ -70,6 +71,14 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
   get isBlockStateDisabled() {
     return !this.stateRootHash ||
       !this.keyElt?.nativeElement.value;
+  }
+
+  setAccountHash() {
+    if (!this.activePublicKey) {
+      return;
+    }
+    (this.keyElt?.nativeElement as HTMLInputElement).value = CLPublicKey.fromHex(this.activePublicKey).toAccountHashStr();
+    return CLPublicKey.fromHex(this.activePublicKey).toAccountHashStr();
   }
 
   copy(value: string): void {

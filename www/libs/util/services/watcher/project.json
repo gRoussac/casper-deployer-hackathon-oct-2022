@@ -1,0 +1,27 @@
+{
+  "name": "util-services-watcher",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/util/services/watcher/src",
+  "prefix": "www",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/util/services/watcher"],
+      "options": {
+        "jestConfig": "libs/util/services/watcher/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/util/services/watcher/**/*.ts",
+          "libs/util/services/watcher/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": ["util watcher"]
+}

@@ -151,7 +151,6 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
         console.error('Error with arg', key, type, value, err);
         this.toastr.error([key, type, value, err].join(' '), 'Error with arg');
       }
-
     });
     let session = sessionPath && this.wasm && DeployUtil.ExecutableDeployItem.newModuleBytes(this.wasm as Uint8Array, args);
     if (!isPackageElt) {

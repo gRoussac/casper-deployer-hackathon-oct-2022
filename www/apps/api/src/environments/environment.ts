@@ -18,6 +18,7 @@ const users: Users = [
 export const environment = {
   production: false,
   users,
-  apiUrl: 'http://3.136.227.9:7777/rpc'
+  apiUrl: 'http://3.136.227.9:7777/rpc',
+  sseUrl: 'http://3.136.227.9:9999'
   // apiUrl: 'http://localhost:11101/rpc'
 };

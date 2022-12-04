@@ -210,7 +210,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
       const deploy_hash = (deploy as DeployReturn).deploy_hash;
       deploy && this.resultService.setResult<DeployUtil.Deploy>('Deploy Hash', deploy_hash || deploy);
       this.deployerService.setState({ deploy_hash });
-      deploy_hash && this.watcherService.watchDeploy(deploy_hash, this.window?.location.href);
+      deploy_hash && this.watcherService.watchDeploy(deploy_hash, this.apiUrl);
     });
   }
 

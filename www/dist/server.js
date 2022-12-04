@@ -14,8 +14,5 @@ app.use('/', express.static(path.join(__dirname, 'apps/frontend/')));
 const apiProxy = proxy.createProxyMiddleware('/api', { target: 'http://localhost:3333' });
 app.get('/api/*', apiProxy);
 
-const eventsProxy = proxy.createProxyMiddleware('/events', { target: 'http://localhost:3333' });
-app.get('/events/*', eventsProxy);
-
 app.listen(port);
 console.log('Server started at http://localhost:' + port);

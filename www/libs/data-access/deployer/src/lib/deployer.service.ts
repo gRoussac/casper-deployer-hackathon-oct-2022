@@ -143,9 +143,9 @@ export class DeployerService {
     let params = new HttpParams();
     params = params.append('stateRootHash', stateRootHash);
     params = params.append('contractHash', contractHash);
-    params = params.append('dictionaryName', dictionaryName);
-    params = params.append('dictionaryItemKey', dictionaryItemKey);
-    params = params.append('seedUref', seedUref);
+    dictionaryName && (params = params.append('dictionaryName', dictionaryName));
+    dictionaryItemKey && (params = params.append('dictionaryItemKey', dictionaryItemKey));
+    seedUref && (params = params.append('seedUref', seedUref));
     params = params.append('rawData', false);
     apiUrl && (params = params.append('apiUrl', apiUrl));
 

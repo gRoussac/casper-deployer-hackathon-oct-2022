@@ -9,6 +9,7 @@ import { Result } from 'ts-results';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 import { Toaster, TOASTER_TOKEN } from '@casper-util/toaster';
 import { WatcherService } from '@casper-util/watcher';
+import { StorageService } from '@casper-util/storage';
 
 @Component({
   selector: 'casper-deployer-put-deploy',
@@ -61,7 +62,8 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     private readonly deployerService: DeployerService,
     private readonly watcherService: WatcherService,
     private readonly resultService: ResultService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly storageService: StorageService
   ) { }
 
   ngAfterViewInit(): void {
@@ -211,6 +213,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
       deploy && this.resultService.setResult<DeployUtil.Deploy>('Deploy Hash', deploy_hash || deploy);
       this.deployerService.setState({ deploy_hash });
       deploy_hash && this.watcherService.watchDeploy(deploy_hash, this.apiUrl);
+      this.storageService.setState({ apiUrl: this.apiUrl, deploy_hash });
     });
   }
 

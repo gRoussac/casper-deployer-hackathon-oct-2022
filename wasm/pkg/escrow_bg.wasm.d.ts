@@ -5,6 +5,7 @@ export function __wbg_escrow_free(a: number): void;
 export function escrow_new(): number;
 export function escrow_hello(a: number, b: number): void;
 export function escrow_get_wasm(a: number, b: number, c: number): number;
+export function escrow_account_hash_to_base64_encode(a: number, b: number, c: number): number;
 export function __wbindgen_malloc(a: number): number;
 export function __wbindgen_realloc(a: number, b: number, c: number): number;
 export const __wbindgen_export_2: WebAssembly.Table;

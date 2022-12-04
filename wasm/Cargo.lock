@@ -229,6 +229,7 @@ dependencies = [
 name = "escrow"
 version = "0.1.0"
 dependencies = [
+ "base64",
  "casper-contract",
  "casper-types",
  "js-sys",

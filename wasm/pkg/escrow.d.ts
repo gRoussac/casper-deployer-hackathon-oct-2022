@@ -17,6 +17,11 @@ export class Escrow {
 * @returns {Promise<Uint8Array>}
 */
   get_wasm(_item: string): Promise<Uint8Array>;
+/**
+* @param {string} _account_hash
+* @returns {string}
+*/
+  account_hash_to_base64_encode(_account_hash: string): string;
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -27,6 +32,7 @@ export interface InitOutput {
   readonly escrow_new: () => number;
   readonly escrow_hello: (a: number, b: number) => void;
   readonly escrow_get_wasm: (a: number, b: number, c: number) => number;
+  readonly escrow_account_hash_to_base64_encode: (a: number, b: number, c: number) => number;
   readonly __wbindgen_malloc: (a: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;
   readonly __wbindgen_export_2: WebAssembly.Table;

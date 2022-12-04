@@ -7,11 +7,13 @@ import { Subscription } from 'rxjs';
 import { CLPublicKey, CLURef, DeployUtil } from 'casper-js-sdk';
 import { Result } from 'ts-results';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
+import { WatcherService } from '@casper-util/watcher';
 
 @Component({
   selector: 'casper-deployer-transfer',
   standalone: true,
   imports: [CommonModule],
+  providers: [WatcherService],
   templateUrl: './transfer.component.html',
   styleUrls: ['./transfer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,7 +36,8 @@ export class TransferComponent implements AfterViewInit, OnDestroy {
     private readonly deployerService: DeployerService,
     private readonly resultService: ResultService,
     @Inject(ENV_CONFIG) public readonly config: EnvironmentConfig,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly watcherService: WatcherService
   ) { }
 
   ngAfterViewInit(): void {
@@ -108,6 +111,7 @@ export class TransferComponent implements AfterViewInit, OnDestroy {
       const deploy_hash = (deploy as DeployReturn).deploy_hash;
       deploy && this.resultService.setResult<DeployUtil.Deploy>('Deploy Hash', deploy_hash);
       this.deployerService.setState({ deploy_hash });
+      deploy_hash && this.watcherService.watchDeploy(deploy_hash, this.apiUrl);
     });
   }
 

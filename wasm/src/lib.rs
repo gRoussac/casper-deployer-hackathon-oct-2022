@@ -1,10 +1,12 @@
 mod utils;
 
 use crate::utils::js_fetch::fetch_item;
+use casper_types::account::AccountHash;
+use casper_types::bytesrepr::ToBytes;
+use casper_types::Key;
+use js_sys::Uint8Array;
 use utils::js_log::atob;
 use utils::js_log::log;
-
-use js_sys::Uint8Array;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -29,10 +31,26 @@ impl Escrow {
         let buffer = fetch_item(_item).await;
         Uint8Array::new(&buffer)
     }
+
+    pub fn account_hash_to_base64_encode(&mut self, _account_hash: &str) -> js_sys::JsString {
+        _account_hash.as_base64().into()
+    }
 }
 
 impl Default for Escrow {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+pub trait ToBase64 {
+    fn as_base64(&self) -> String;
+}
+
+impl ToBase64 for &str {
+    fn as_base64(&self) -> String {
+        let account_hash = AccountHash::from_formatted_str(self).unwrap();
+        let key = Key::from(account_hash).to_bytes().unwrap();
+        base64::encode(key)
     }
 }

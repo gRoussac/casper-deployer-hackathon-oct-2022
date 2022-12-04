@@ -7,7 +7,8 @@
         class="flex justify-between text-gray-700 text-sm font-bold mb-2"
         for="activePublicKey"
       >
-        URef of the dictionary <input type="reset" value="clear" />
+        URef of the dictionary
+        <input type="reset" value="clear" (click)="reset()" />
       </label>
       <div class="mb-2">
         <input
@@ -35,7 +36,7 @@
           #contractHashElt
           type="search"
           (change)="(true)"
-          placeholder="ex: contract-0x || 0x"
+          placeholder="ex: hash-0x"
           [attr.disabled]="isDictionaryNameorHashDisabled ? true : null"
         />
       </div>
@@ -64,7 +65,19 @@
         class="flex justify-between text-gray-700 text-sm font-bold mb-2"
         for="activePublicKey"
       >
-        Dictionary item key
+        <span>Dictionary item key</span>
+        <span
+          *ngIf="activePublicKey"
+          class="mr-2 ml-auto cursor-pointer"
+          (click)="setAccountHash()"
+          >account-hash↓</span
+        >
+        <span
+          *ngIf="activePublicKey"
+          class="cursor-pointer"
+          (click)="setAccountBase64()"
+          >account-base64↓</span
+        >
       </label>
       <div class="mb-2">
         <input

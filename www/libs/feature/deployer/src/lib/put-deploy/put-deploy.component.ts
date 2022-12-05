@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { DeployReturn, State } from '@casper-api/api-interfaces';
-import { CLPublicKey, CLValueBuilder, DeployUtil, RuntimeArgs, Contracts, decodeBase16, CLByteArray, CLPublicKeyTag } from 'casper-js-sdk';
+import { CLPublicKey, CLValueBuilder, DeployUtil, RuntimeArgs, Contracts, decodeBase16, CLByteArray, CLPublicKeyTag, CLURef } from 'casper-js-sdk';
 import { ResultService } from '../result/result.service';
 import { Subscription } from 'rxjs';
 import { DeployerService } from '@casper-data/data-access-deployer';
@@ -127,7 +127,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     argsValues && argsValues.forEach(arg => {
       const argKeyValue = arg.split('=');
       let [key, type] = argKeyValue[0].trim().split(':');
-      let value: string | CLByteArray = argKeyValue[1].trim().replace(this.quoteRegex, '');
+      let value: string | CLByteArray | CLURef = argKeyValue[1].trim().replace(this.quoteRegex, '');
       const fn = type ? type : 'string';
       if (!key || !value || !allowed_builder_functions.includes(fn)) {
         return;
@@ -146,9 +146,16 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
             +type_key as CLPublicKeyTag
           );
         }
-        // TODO Fix any type
-        const CLValue = (caster_fn as any)(value);
-        CLValue && args.insert(key, CLValue);
+        else if (['uref'].includes(type)) {
+          value = CLURef.fromFormattedStr(value);
+        }
+        if (typeof value === 'object') {
+          value && args.insert(key, value);
+        } else {
+          // TODO Fix any type
+          const CLValue = (caster_fn as any)(value);
+          CLValue && args.insert(key, CLValue);
+        }
       } catch (err) {
         console.error('Error with arg', key, type, value, err);
         this.toastr.error([key, type, value, err].join(' '), 'Error with arg');

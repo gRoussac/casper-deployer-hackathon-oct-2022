@@ -5,6 +5,7 @@ import { DeployerService } from '@casper-data/data-access-deployer';
 import { ENV_CONFIG, config } from '@casper-util/config';
 import { HighlightService, HIGHLIGHT_WEBWORKER_FACTORY } from '@casper-util/hightlight-webworker';
 import { RouteurHubService } from '@casper-util/routeur-hub';
+import { TOASTER_TOKEN } from '@casper-util/toaster';
 import { ResultService } from '../result/result.service';
 import { StateRootHashComponent } from './state-root-hash.component';
 
@@ -26,6 +27,9 @@ describe('StateRootHashComponent', () => {
           provide: HIGHLIGHT_WEBWORKER_FACTORY, useValue: {
             HIGHLIGHT_WEBWORKER_FACTORY
           }
+        },
+        {
+          provide: TOASTER_TOKEN, useValue: {},
         },
         RouteurHubService
       ],

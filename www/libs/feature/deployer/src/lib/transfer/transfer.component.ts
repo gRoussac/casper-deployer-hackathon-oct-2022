@@ -78,7 +78,7 @@ export class TransferComponent implements AfterViewInit, OnDestroy {
       // This seems to be buggy, produces error in signer "Active key changed during signing"
       // can not retrieve publicKey from pure URef here
       // and sourcePurse can not be CLPublicKey ?
-    } else {
+    } else if (transferFrom) {
       transferFromPublicKey = CLPublicKey.fromHex(transferFrom); // This seems to be buggy if transferFrom is not active public key, produces error in signer "Active key changed during signing"
     }
     const deployParams: DeployUtil.DeployParams = new DeployUtil.DeployParams(
@@ -107,10 +107,10 @@ export class TransferComponent implements AfterViewInit, OnDestroy {
       console.error(signedDeploy.val.message);
       return;
     }
-    this.deployerService.putDeploy(signedDeploy.val).subscribe(deploy => {
+    this.deployerService.putDeploy(signedDeploy.val, this.apiUrl).subscribe(deploy => {
       const deploy_hash = (deploy as DeployReturn).deploy_hash;
-      deploy && this.resultService.setResult<DeployUtil.Deploy>('Deploy Hash', deploy_hash);
-      this.deployerService.setState({ deploy_hash });
+      deploy_hash && this.resultService.setResult<DeployUtil.Deploy>('Deploy Hash', deploy_hash);
+      deploy_hash && this.deployerService.setState({ deploy_hash });
       deploy_hash && this.watcherService.watchDeploy(deploy_hash, this.apiUrl);
     });
   }

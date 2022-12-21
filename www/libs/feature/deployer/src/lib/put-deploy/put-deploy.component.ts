@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { DeployReturn, State } from '@casper-api/api-interfaces';
-import { CLPublicKey, CLValueBuilder, DeployUtil, RuntimeArgs, Contracts, decodeBase16, CLByteArray, CLPublicKeyTag, CLURef, CLAccountHash, CLKey } from 'casper-js-sdk';
+import { CLPublicKey, CLValueBuilder, DeployUtil, RuntimeArgs, Contracts, decodeBase16, CLPublicKeyTag, CLURef, CLKey } from 'casper-js-sdk';
 import { ResultService } from '../result/result.service';
 import { Subscription } from 'rxjs';
 import { DeployerService } from '@casper-data/data-access-deployer';
@@ -126,7 +126,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     const allowed_builder_functions = Object.keys(CLValueBuilder);
     argsValues && argsValues.forEach(arg => {
       const argKeyValue = arg.split('=');
-      let [key, type] = argKeyValue[0].trim().split(':');
+      const [key, type] = argKeyValue[0].trim().split(':');
       let value: string | CLKey | CLURef | CLPublicKey = argKeyValue[1].trim().replace(this.quoteRegex, '');
       const fn = type ? type : 'string';
       if (!key || !value || !allowed_builder_functions.includes(fn)) {

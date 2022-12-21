@@ -77,7 +77,7 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
     if (!this.activePublicKey) {
       return;
     }
-    (this.keyElt?.nativeElement as HTMLInputElement).value = CLPublicKey.fromHex(this.activePublicKey).toAccountHashStr();
+    this.keyElt.nativeElement.value = CLPublicKey.fromHex(this.activePublicKey).toAccountHashStr();
   }
 
   copy(value: string): void {

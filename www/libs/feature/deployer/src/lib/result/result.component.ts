@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, ViewChild, } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, Renderer2, ViewChild, } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ResultService } from './result.service';
 import { Result } from './result';
@@ -25,6 +25,7 @@ export class ResultComponent implements AfterViewInit, OnDestroy {
   constructor(
     private readonly resultService: ResultService,
     private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly renderer: Renderer2
   ) { }
 
   ngAfterViewInit() {
@@ -63,7 +64,7 @@ export class ResultComponent implements AfterViewInit, OnDestroy {
   }
 
   emptyNotes() {
-    this.NotesElt.nativeElement.value = '';
+    (this.NotesElt.nativeElement as HTMLTextAreaElement).value = '';
   }
 
 }

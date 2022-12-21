@@ -5,6 +5,7 @@ import { GetDeployResult } from 'casper-js-sdk';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { State } from '@casper-api/api-interfaces';
 import { ResultService } from '../result/result.service';
+import { StorageService } from '@casper-util/storage';
 
 @Component({
   selector: 'casper-deployer-get-deploy',
@@ -26,7 +27,8 @@ export class GetDeployComponent implements OnDestroy, AfterViewInit {
   constructor(
     private readonly deployerService: DeployerService,
     private readonly resultService: ResultService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly storageService: StorageService
   ) { }
 
   ngOnDestroy() {
@@ -45,6 +47,7 @@ export class GetDeployComponent implements OnDestroy, AfterViewInit {
       }
       this.changeDetectorRef.markForCheck();
     });
+    this.deploy_hash = this.storageService.get('deploy_hash');
   }
 
   getDeploy() {
@@ -62,5 +65,10 @@ export class GetDeployComponent implements OnDestroy, AfterViewInit {
 
   get isGetDeployDisabled() {
     return !this.getDeployElt?.nativeElement.value;
+  }
+
+  reset() {
+    (this.getDeployElt?.nativeElement as HTMLInputElement).value = '';
+    this.storageService.setState({ apiUrl: this.apiUrl, deploy_hash: '' });
   }
 }

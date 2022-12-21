@@ -1,10 +1,13 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { ResultService } from '../result/result.service';
 import { State } from '@casper-api/api-interfaces';
 import { StoredValue } from 'casper-js-sdk/dist/lib/StoredValue';
+import { Escrow } from 'escrow';
+import { ESCROW_TOKEN } from '@casper-util/wasm';
+import { CLPublicKey } from 'casper-js-sdk';
 
 @Component({
   selector: 'casper-deployer-state-dictionary',
@@ -22,6 +25,7 @@ export class DictionaryComponent implements AfterViewInit, OnDestroy {
 
   apiUrl?: string;
   stateRootHash?: string;
+  activePublicKey = '';
 
   private getStateSubscription!: Subscription;
   private getDictionarySubscription!: Subscription;
@@ -29,12 +33,18 @@ export class DictionaryComponent implements AfterViewInit, OnDestroy {
   constructor(
     private readonly deployerService: DeployerService,
     private readonly resultService: ResultService,
+    @Inject(ESCROW_TOKEN) private readonly escrow: Escrow,
+    private readonly changeDetectorRef: ChangeDetectorRef
   ) { }
 
   ngAfterViewInit(): void {
     this.getStateSubscription = this.deployerService.getState().subscribe((state: State) => {
       state.stateRootHash && (this.stateRootHash = state.stateRootHash);
       state.apiUrl && (this.apiUrl = state.apiUrl);
+      if (state.user?.activePublicKey) {
+        this.activePublicKey = state.user.activePublicKey;
+      }
+      this.changeDetectorRef.markForCheck();
     });
   }
 
@@ -51,7 +61,7 @@ export class DictionaryComponent implements AfterViewInit, OnDestroy {
   }
 
   get contractHash(): string {
-    return this.contractHashElt?.nativeElement?.value.split('-').pop();
+    return this.contractHashElt?.nativeElement?.value;
   }
 
   get dictionaryName(): string {
@@ -78,5 +88,24 @@ export class DictionaryComponent implements AfterViewInit, OnDestroy {
 
   get isDictionaryNameorHashDisabled(): boolean {
     return !!this.seedUref;
+  }
+
+  setAccountBase64() {
+    const base64 = this.escrow.account_hash_to_base64_encode(CLPublicKey.fromHex(this.activePublicKey).toAccountHashStr());
+    base64 && ((this.dictionaryItemKeyElt?.nativeElement as HTMLInputElement).value = base64);
+  }
+
+  setAccountHash() {
+    if (!this.activePublicKey) {
+      return;
+    }
+    (this.dictionaryItemKeyElt?.nativeElement as HTMLInputElement).value = (CLPublicKey.fromHex(this.activePublicKey).toAccountHashStr()).split('-').pop() || '';
+  }
+
+  reset() {
+    (this.seedUrefElt?.nativeElement as HTMLInputElement).value = '';
+    (this.contractHashElt?.nativeElement as HTMLInputElement).value = '';
+    (this.dictionaryNameElt?.nativeElement as HTMLInputElement).value = '';
+    (this.dictionaryItemKeyElt?.nativeElement as HTMLInputElement).value = '';
   }
 }

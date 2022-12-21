@@ -15,7 +15,8 @@ textarea {
   min-height: 7.5rem;
 }
 
-input[type='reset'] {
+input[type='reset'],
+.cursor-pointer {
   cursor: pointer;
   z-index: 1;
 }

@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { DeployReturn, State } from '@casper-api/api-interfaces';
-import { CLPublicKey, CLValueBuilder, DeployUtil, RuntimeArgs, Contracts, decodeBase16, CLByteArray, CLPublicKeyTag } from 'casper-js-sdk';
+import { CLPublicKey, CLValueBuilder, DeployUtil, RuntimeArgs, Contracts, decodeBase16, CLByteArray, CLPublicKeyTag, CLURef, CLAccountHash, CLKey } from 'casper-js-sdk';
 import { ResultService } from '../result/result.service';
 import { Subscription } from 'rxjs';
 import { DeployerService } from '@casper-data/data-access-deployer';
@@ -9,6 +9,7 @@ import { Result } from 'ts-results';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 import { Toaster, TOASTER_TOKEN } from '@casper-util/toaster';
 import { WatcherService } from '@casper-util/watcher';
+import { StorageService } from '@casper-util/storage';
 
 @Component({
   selector: 'casper-deployer-put-deploy',
@@ -61,7 +62,8 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     private readonly deployerService: DeployerService,
     private readonly watcherService: WatcherService,
     private readonly resultService: ResultService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly storageService: StorageService
   ) { }
 
   ngAfterViewInit(): void {
@@ -125,28 +127,34 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     argsValues && argsValues.forEach(arg => {
       const argKeyValue = arg.split('=');
       let [key, type] = argKeyValue[0].trim().split(':');
-      let value: string | CLByteArray = argKeyValue[1].trim().replace(this.quoteRegex, '');
+      let value: string | CLKey | CLURef | CLPublicKey = argKeyValue[1].trim().replace(this.quoteRegex, '');
       const fn = type ? type : 'string';
       if (!key || !value || !allowed_builder_functions.includes(fn)) {
         return;
       }
       try {
         const caster_fn: unknown = CLValueBuilder[fn as keyof CLValueBuilder];
-        if (['key', 'publicKey'].includes(type)) {
-          // value = CLValueBuilder.byteArray(
-          //   decodeBase16(value)
-          // );
-          type = 'publicKey';
-          const public_key = decodeBase16(value);
-          const type_key = public_key.slice(0, 1).toString();
-          value = CLValueBuilder.publicKey(
-            public_key.slice(1),
+        if (['publickey', 'key'].includes(type)) {
+          const public_key_as_array = decodeBase16(value);
+          const type_key = public_key_as_array.slice(0, 1).toString();
+          const public_key = CLValueBuilder.publicKey(
+            public_key_as_array.slice(1),
             +type_key as CLPublicKeyTag
           );
+          value = type === 'publickey' ? public_key : CLValueBuilder.key(
+            public_key
+          );
         }
-        // TODO Fix any type
-        const CLValue = (caster_fn as any)(value);
-        CLValue && args.insert(key, CLValue);
+        else if (['uref'].includes(type)) {
+          value = CLURef.fromFormattedStr(value);
+        }
+        if (typeof value === 'object') {
+          value && args.insert(key, value);
+        } else {
+          // TODO Fix any type
+          const CLValue = (caster_fn as any)(value);
+          CLValue && args.insert(key, CLValue);
+        }
       } catch (err) {
         console.error('Error with arg', key, type, value, err);
         this.toastr.error([key, type, value, err].join(' '), 'Error with arg');
@@ -210,7 +218,8 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
       const deploy_hash = (deploy as DeployReturn).deploy_hash;
       deploy && this.resultService.setResult<DeployUtil.Deploy>('Deploy Hash', deploy_hash || deploy);
       this.deployerService.setState({ deploy_hash });
-      deploy_hash && this.watcherService.watchDeploy(deploy_hash, this.window?.location.href);
+      deploy_hash && this.watcherService.watchDeploy(deploy_hash, this.apiUrl);
+      this.storageService.setState({ apiUrl: this.apiUrl, deploy_hash });
     });
   }
 

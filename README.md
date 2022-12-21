@@ -173,8 +173,8 @@ Smart contracts are implemented in [Rust](https://www.rust-lang.org/) + [Casper 
 # 🛣️ Roadmap / Todo / Tofix
 
 - [✓] Add Dictionnary implementation to test smart contracts
-- [ ] Add casper-client into wasm client side ?
-- [ ] Add Events watchers
+- [ ] Add some RPC calls into wasm client side ?
+- [✓] Add Events watchers
 - [ ] Whitelist Signer on casper.onrender.com
 - [ ] Fix Github workflow
 - [ ] Fix blur events on input
@@ -189,8 +189,7 @@ Smart contracts are implemented in [Rust](https://www.rust-lang.org/) + [Casper 
 - [ ] Add check deploy and size check
 - [ ] Add multisignature flow
 - [ ] Add delegation / stacking flow ?
-- [ ] Upgrading smart contracts
-- [ ] Update Package version with new ModuleBytes
+- [✓] Upgrading smart contracts
 - [ ] Escrow app on /escrow route
 - [ ] Add Escrow smart contracts
 - [ ] Fluter app ?

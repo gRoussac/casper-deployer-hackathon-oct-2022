@@ -6,6 +6,8 @@ import { DeployerService } from '@casper-data/data-access-deployer';
 import { of } from 'rxjs';
 import { DeployerComponent } from './deployer.component';
 import { RouteurHubService } from '@casper-util/routeur-hub';
+import { TOASTER_TOKEN } from '@casper-util/toaster';
+import { ESCROW_TOKEN } from '@casper-util/wasm';
 
 describe('DeployerComponent', () => {
   let component: DeployerComponent;
@@ -26,6 +28,12 @@ describe('DeployerComponent', () => {
             getPeers: jest.fn().mockReturnValue(of()),
             getState: jest.fn().mockReturnValue(of())
           }
+        },
+        {
+          provide: TOASTER_TOKEN, useValue: {},
+        },
+        {
+          provide: ESCROW_TOKEN, useValue: {},
         },
       ],
       schemas: [NO_ERRORS_SCHEMA]

@@ -4,6 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { config, ENV_CONFIG } from '@casper-util/config';
 import { HIGHLIGHT_WEBWORKER_FACTORY } from '@casper-util/hightlight-webworker';
+import { TOASTER_TOKEN } from '@casper-util/toaster';
 import { ResultService } from '../result/result.service';
 
 import { PutDeployComponent } from './put-deploy.component';
@@ -25,6 +26,9 @@ describe('PutDeployComponent', () => {
           provide: HIGHLIGHT_WEBWORKER_FACTORY, useValue: {
             HIGHLIGHT_WEBWORKER_FACTORY
           }
+        },
+        {
+          provide: TOASTER_TOKEN, useValue: {},
         },
       ],
       schemas: [NO_ERRORS_SCHEMA]

@@ -92,20 +92,20 @@ export class DictionaryComponent implements AfterViewInit, OnDestroy {
 
   setAccountBase64() {
     const base64 = this.escrow.account_hash_to_base64_encode(CLPublicKey.fromHex(this.activePublicKey).toAccountHashStr());
-    base64 && ((this.dictionaryItemKeyElt?.nativeElement as HTMLInputElement).value = base64);
+    base64 && (this.dictionaryItemKeyElt.nativeElement.value = base64);
   }
 
   setAccountHash() {
     if (!this.activePublicKey) {
       return;
     }
-    (this.dictionaryItemKeyElt?.nativeElement as HTMLInputElement).value = (CLPublicKey.fromHex(this.activePublicKey).toAccountHashStr()).split('-').pop() || '';
+    this.dictionaryItemKeyElt.nativeElement.value = (CLPublicKey.fromHex(this.activePublicKey).toAccountHashStr()).split('-').pop() || '';
   }
 
   reset() {
-    (this.seedUrefElt?.nativeElement as HTMLInputElement).value = '';
-    (this.contractHashElt?.nativeElement as HTMLInputElement).value = '';
-    (this.dictionaryNameElt?.nativeElement as HTMLInputElement).value = '';
-    (this.dictionaryItemKeyElt?.nativeElement as HTMLInputElement).value = '';
+    this.seedUrefElt.nativeElement.value = '';
+    this.contractHashElt.nativeElement.value = '';
+    this.dictionaryNameElt.nativeElement.value = '';
+    this.dictionaryItemKeyElt.nativeElement.value = '';
   }
 }

@@ -1,7 +1,6 @@
 import { api_interface, DeployReturn, Peer } from '@casper-api/api-interfaces';
 import { Controller, Get, Post, Query, Body } from '@nestjs/common';
-import { DeployUtil, GetDeployResult } from 'casper-js-sdk';
-import { StoredValue } from 'casper-js-sdk/dist/lib/StoredValue';
+import { DeployUtil, GetDeployResult, StoredValue } from 'casper-js-sdk';
 import { AppService } from '../../app.service';
 
 @Controller(api_interface.Deployer)

@@ -2,8 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { api_interface, DeployReturn, Peer, State } from '@casper-api/api-interfaces';
 import { map, Observable, ReplaySubject, timeout } from 'rxjs';
-import { DeployUtil, GetDeployResult } from 'casper-js-sdk';
-import { StoredValue } from 'casper-js-sdk/dist/lib/StoredValue';
+import { DeployUtil, GetDeployResult, StoredValue } from 'casper-js-sdk';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 
 @Injectable({

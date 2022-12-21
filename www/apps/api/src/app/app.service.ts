@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { DeployReturn, Peer, Purse, Users } from '@casper-api/api-interfaces';
 import { environment } from '../environments/environment';
-import { CLPublicKey, DeployUtil, GetDeployResult } from "casper-js-sdk";
+import { CLPublicKey, DeployUtil, GetDeployResult, StoredValue } from "casper-js-sdk";
 import { BigNumber } from '@ethersproject/bignumber';
-import { StoredValue } from 'casper-js-sdk/dist/lib/StoredValue';
 import { ClientService } from '../client/client.service';
 import { ServiceService } from '../service/service.service';
 

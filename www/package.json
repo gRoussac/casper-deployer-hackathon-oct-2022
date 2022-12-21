@@ -30,7 +30,7 @@
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "@nrwl/angular": "14.8.3",
-    "casper-js-sdk": "^2.10.0",
+    "casper-js-sdk": "^2.10.1",
     "escrow": "file:../wasm/pkg",
     "highlight.js": "^11.6.0",
     "http-proxy-middleware": "^2.0.6",

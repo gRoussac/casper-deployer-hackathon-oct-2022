@@ -64,7 +64,7 @@ export class ResultComponent implements AfterViewInit, OnDestroy {
   }
 
   emptyNotes() {
-    (this.NotesElt.nativeElement as HTMLTextAreaElement).value = '';
+    this.NotesElt.nativeElement.value = '';
   }
 
 }

@@ -183,7 +183,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
       return BigInt(0).toLocaleString();
     }
     // TODO Fix with motesToCSPR
-    return (BigInt(purse.balance) / BigInt(1e+10)).toLocaleString();
+    return (BigInt(purse.balance) / BigInt(1e+9)).toLocaleString();
   }
 
 }

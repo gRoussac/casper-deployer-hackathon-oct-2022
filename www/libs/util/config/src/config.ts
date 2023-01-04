@@ -23,8 +23,8 @@ export const config: EnvironmentConfig = {
   chainName_localhost: "casper-net-1",
   path_sep: "/",
   gasPrice: '1',
-  gasFee: '150000000',
-  minimumTransfer: '25000000000',
+  gasFee: '1500000000',
+  minimumTransfer: '2500000000',
   TTL: '1800000',
   idMax: '100000000',
   gasFeeTransfer: '10000'

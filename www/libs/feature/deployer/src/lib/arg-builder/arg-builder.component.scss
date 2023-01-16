@@ -1,0 +1,24 @@
+h2 {
+  margin-top: -0.5rem;
+}
+.overflow-y {
+  overflow-y: auto;
+}
+.overflow-y-auto {
+  max-height: 76%;
+  overscroll-behavior: contain;
+  padding-right: 10px;
+  &::-webkit-scrollbar {
+    width: 7px;
+  }
+  &::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px rgb(232, 240, 254) !important;
+    border-radius: 0.5rem;
+    cursor: pointer;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgb(232, 240, 254) !important;
+    border-radius: 0.5rem;
+    cursor: pointer;
+  }
+}

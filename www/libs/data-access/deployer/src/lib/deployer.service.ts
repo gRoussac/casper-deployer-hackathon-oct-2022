@@ -35,7 +35,6 @@ export class DeployerService {
           const stateRootHash = this.handleResponse<string>(response);
           this.setState({
             stateRootHash,
-            apiUrl
           });
           return stateRootHash;
         })
@@ -66,7 +65,6 @@ export class DeployerService {
         map(response => {
           const status = this.handleResponse<string>(response);
           this.setState({
-            apiUrl,
             status
           });
           return status;

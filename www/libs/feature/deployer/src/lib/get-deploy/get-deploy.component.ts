@@ -69,6 +69,11 @@ export class GetDeployComponent implements OnDestroy, AfterViewInit {
 
   reset() {
     this.getDeployElt.nativeElement.value = '';
-    this.storageService.setState({ apiUrl: this.apiUrl, deploy_hash: '' });
+    this.storageService.setState({ deploy_hash: '' });
+  }
+
+  onDeployChange() {
+    const deploy_hash = this.getDeployElt.nativeElement.value;
+    deploy_hash && this.storageService.setState({ deploy_hash });
   }
 }

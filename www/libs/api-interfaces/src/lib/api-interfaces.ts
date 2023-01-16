@@ -1,3 +1,4 @@
+import { NamedCLTypeArg } from "casper-js-sdk";
 import { Roles } from "./api-enums";
 
 export type User = {
@@ -26,7 +27,16 @@ export type State = {
   stateRootHash?: string;
   status?: string;
   deploy_hash?: string;
+  deploy_args?: string;
   user?: User;
+  key?: string;
+  'key-old'?: string;
+  path?: string;
+  notes?: string;
+  fee?: string;
+  sessionName?: string;
+  sessionHash?: string;
+  args?: NamedCLTypeArg[];
 };
 
 export type DeployReturn = {

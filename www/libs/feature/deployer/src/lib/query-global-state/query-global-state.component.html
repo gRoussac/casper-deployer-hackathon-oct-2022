@@ -1,38 +1,54 @@
 <div class="w-full">
   <form class="bg-white shadow-md rounded p-3 mb-4" (submit)="(false)">
     <h2 class="title">Keys</h2>
-    <div class="mb-4">
+    <div>
       <label
         class="flex justify-between text-gray-700 text-sm font-bold mb-2"
         for="key"
       >
         Global Key
+
         <span class="z-index">
           <span *ngIf="activePublicKey" class="mr-3" (click)="setAccountHash()"
-            >account-hash↓</span
+            >↓ account-hash</span
           >
-          <input type="reset" value="clear" />
+          <input type="reset" value="clear" (click)="reset()" />
         </span>
       </label>
-      <div class="mb-2">
+      <div class="flex flex-col items-end">
         <input
           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           name="key"
           #keyElt
           type="search"
           placeholder="ex: uref-0x || hash-0x || account-hash-0x || dictionnary-0x"
-          (change)="(true)"
+          (change)="onKeyChange()"
           (keyup.enter)="getBlockState()"
         />
+        <span
+          [hidden]="!hasPrevious"
+          (click)="setPrevious()"
+          class="cursor-pointer mt-1 text-gray-700 text-sm font-bold"
+          >⤺ prev</span
+        >
+        <span [hidden]="hasPrevious" class="mt-1 text-sm font-bold"
+          >&nbsp;</span
+        >
       </div>
     </div>
 
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between mb-2 text-gray-700 text-sm font-bold"
         for="path"
       >
-        Named key Path
+        <span>Named key Path</span>
+        <span
+          *ngIf="pathElt.value.length"
+          class="cursor-pointer"
+          (click)="pop()"
+          >↤ pop</span
+        >
       </label>
       <div class="mb-2">
         <input
@@ -41,9 +57,20 @@
           #pathElt
           type="search"
           [placeholder]="['ex: counter', 'count'].join(config['path_sep'])"
-          (change)="(true)"
+          (change)="onPathChange()"
           (keyup.enter)="getBlockState()"
         />
+      </div>
+      <div class="mb-2">
+        <select
+          (change)="selectKey($event)"
+          #selectKeyElt
+          class="border border-gray-300 text-gray-900 text-sm focus:outline-none rounded focus:shadow-outline block w-full p-2.5"
+        >
+          <option *ngFor="let option of options" [value]="option">
+            {{ option }}
+          </option>
+        </select>
       </div>
     </div>
 

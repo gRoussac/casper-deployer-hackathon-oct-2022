@@ -1,0 +1,24 @@
+{
+  "name": "ui-tabs",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/ui/tabs/src",
+  "prefix": "casper",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/ui/tabs"],
+      "options": {
+        "jestConfig": "libs/ui/tabs/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["libs/ui/tabs/**/*.ts", "libs/ui/tabs/**/*.html"]
+      }
+    }
+  },
+  "tags": []
+}

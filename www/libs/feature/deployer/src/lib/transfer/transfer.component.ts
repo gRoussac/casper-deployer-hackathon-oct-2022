@@ -4,7 +4,7 @@ import { DeployerService } from '@casper-data/data-access-deployer';
 import { ResultService } from '../result/result.service';
 import { DeployReturn, State } from '@casper-api/api-interfaces';
 import { Subscription } from 'rxjs';
-import { CLPublicKey, CLURef, DeployUtil } from 'casper-js-sdk';
+import { CLPublicKey, CLURef, DeployUtil, motesToCSPR } from 'casper-js-sdk';
 import { Result } from 'ts-results';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 import { WatcherService } from '@casper-util/watcher';
@@ -118,5 +118,14 @@ export class TransferComponent implements AfterViewInit, OnDestroy {
   get isButtonDisabled() {
     return !this.transferToElt?.nativeElement.value ||
       !this.amountElt?.nativeElement.value;
+  }
+
+  convert() {
+    const amount = this.amountElt?.nativeElement.value.trim();
+    if (!amount) {
+      return;
+    }
+    // TODO Fix with motesToCSPR
+    return (Number(BigInt(amount * 100) / BigInt(1e+9)) / 100).toLocaleString();
   }
 }

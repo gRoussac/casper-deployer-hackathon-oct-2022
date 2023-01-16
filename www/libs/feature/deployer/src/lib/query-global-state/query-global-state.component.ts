@@ -7,6 +7,7 @@ import { ResultService } from '../result/result.service';
 import { StoredValue } from 'casper-js-sdk/dist/lib/StoredValue';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 import { CLPublicKey } from 'casper-js-sdk';
+import { StorageService } from '@casper-util/storage';
 
 @Component({
   selector: 'casper-deployer-query-global-state',
@@ -24,20 +25,22 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
   @Output() connect: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('keyElt') keyElt!: ElementRef;
   @ViewChild('pathElt') pathElt!: ElementRef;
+  options: string[] = [''];
 
   private getStateSubscription!: Subscription;
   private getBlockStateSubscription!: Subscription;
+  private _hasPrevious!: boolean;
 
   constructor(
     private readonly deployerService: DeployerService,
     private readonly resultService: ResultService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    @Inject(ENV_CONFIG) public readonly config: EnvironmentConfig
+    @Inject(ENV_CONFIG) public readonly config: EnvironmentConfig,
+    private readonly storageService: StorageService
   ) { }
 
   ngAfterViewInit(): void {
     this.getStateSubscription = this.deployerService.getState().subscribe((state: State) => {
-      state.stateRootHash && (this.stateRootHash = state.stateRootHash);
       state.apiUrl && (this.apiUrl = state.apiUrl);
       if (state.status !== undefined) {
         this.status = state.status;
@@ -45,8 +48,26 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
       if (state.user?.activePublicKey) {
         this.activePublicKey = state.user.activePublicKey;
       }
+      if (state.stateRootHash) {
+        this.stateRootHash = state.stateRootHash;
+        const key = this.keyElt.nativeElement.value;
+        const path = this.pathElt.nativeElement.value;
+        if (key && path) {
+          const no_result = true;
+          this.getBlockState(no_result);
+        }
+      }
+      state.stateRootHash && (this.stateRootHash = state.stateRootHash);
       this.changeDetectorRef.markForCheck();
     });
+    const key = this.storageService.get('key');
+    key && (this.keyElt.nativeElement.value = key);
+    const path = this.storageService.get('path');
+    path && (this.pathElt.nativeElement.value = path);
+    const keyOld = this.storageService.get('key-old');
+    keyOld && (this._hasPrevious = true);
+
+
   }
 
   ngOnDestroy() {
@@ -54,7 +75,7 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
     this.getBlockStateSubscription && this.getBlockStateSubscription.unsubscribe();
   }
 
-  getBlockState() {
+  getBlockState(no_result?: boolean) {
     const key = this.keyElt.nativeElement.value;
     const path = this.pathElt.nativeElement.value;
     key && this.stateRootHash && (this.getBlockStateSubscription = this.deployerService.getBlockState(
@@ -62,8 +83,25 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
       key,
       path,
       this.apiUrl
-    ).subscribe(async storedValue => {
-      storedValue && this.resultService.setResult<StoredValue>('Stored Value', storedValue as StoredValue);
+    ).subscribe(async (storedValue): Promise<void> => {
+      const isString = typeof storedValue === 'string';
+      if (!isString) {
+        const account_keys = storedValue.Account?.namedKeys;
+        const contract_keys = storedValue.Contract?.namedKeys;
+        const keys = account_keys || contract_keys;
+        if (keys) {
+          this.options = [''];
+          keys.forEach(key => {
+            const old_key = this.pathElt.nativeElement.value;
+            !old_key && this.options.push(key.name);
+            old_key && this.options.push([old_key, key.name].join('/'));
+          });
+          this.changeDetectorRef.markForCheck();
+        }
+      }
+      if (!no_result) {
+        storedValue && this.resultService.setResult<StoredValue>('Stored Value', storedValue as StoredValue);
+      }
       this.getBlockStateSubscription.unsubscribe();
     }));
   }
@@ -73,15 +111,74 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
       !this.keyElt?.nativeElement.value;
   }
 
+  get hasPrevious() {
+    return this._hasPrevious;
+  }
+
+  setPrevious() {
+    const keyOld = this.storageService.get('key-old');
+    const keyCurrent = this.storageService.get('key');
+    keyOld && (this.keyElt.nativeElement.value = keyOld);
+    if (keyOld && keyCurrent && (keyOld !== keyCurrent)) {
+      this.storageService.setState({ 'key-old': keyCurrent });
+      this._hasPrevious = true;
+    } else {
+      this.storageService.setState({ 'key-old': '' });
+      this._hasPrevious = false;
+    }
+    keyOld && this.storageService.setState({ key: keyOld });
+  }
+
   setAccountHash() {
     if (!this.activePublicKey) {
       return;
     }
     this.keyElt.nativeElement.value = CLPublicKey.fromHex(this.activePublicKey).toAccountHashStr();
+    this.onKeyChange();
+  }
+
+  selectKey($event: Event) {
+    const path = ($event.target as HTMLSelectElement).value;
+    this.pathElt.nativeElement.value = path;
+    path && this.storageService.setState({ path });
   }
 
   copy(value: string): void {
     this.resultService.copyClipboard(value);
+  }
+
+  onKeyChange() {
+    const key = this.keyElt.nativeElement.value;
+    const keyCurrent = this.storageService.get('key');
+    if (key && keyCurrent && (key !== keyCurrent)) {
+      this.storageService.setState({ 'key-old': keyCurrent });
+      this._hasPrevious = true;
+    }
+    key && this.storageService.setState({ key });
+  }
+
+  onPathChange() {
+    const path = this.pathElt.nativeElement.value;
+    path && this.storageService.setState({ path });
+  }
+
+  reset() {
+    this.keyElt.nativeElement.value = '';
+    this.pathElt.nativeElement.value = '';
+    this.storageService.setState({ key: '', path: '' });
+  }
+
+  pop() {
+    const sep = '/';
+    const value = this.pathElt.nativeElement.value;
+    if (!value.includes(sep)) {
+      this.pathElt.nativeElement.value = '';
+      this.storageService.setState({ path: '' });
+    }
+    const remove = value.split(sep).pop();
+    this.pathElt.nativeElement.value = this.pathElt.nativeElement.value.replace([sep, remove].join(''), '');
+    this.getBlockState();
+    this.onPathChange();
   }
 
 }

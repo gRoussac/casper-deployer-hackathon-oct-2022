@@ -28,7 +28,6 @@ async function bootstrap() {
         try {
           const url = (req.query[api_url] || environment['sseUrl']) as string;
           base_url = new URL(url);
-          console.log(base_url);
         } catch (err) {
           console.error(err);
         }

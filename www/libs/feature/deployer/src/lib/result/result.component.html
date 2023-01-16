@@ -80,7 +80,11 @@
         value="clear"
         class="text-gray-700 text-sm font-bold mb-2 mr-1"
       />
-      <textarea #NotesElt class="mono text-xs rounded"></textarea>
+      <textarea
+        #NotesElt
+        class="mono text-xs rounded"
+        (change)="onNotesChange()"
+      ></textarea>
     </div>
   </div>
 </div>

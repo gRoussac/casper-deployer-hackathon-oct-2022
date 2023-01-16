@@ -150,8 +150,9 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
       argsValues = !!argsValue && (argsValue as string).split(';'),
       args: RuntimeArgs = RuntimeArgs.fromNamedArgs([]);
     const allowed_builder_functions = Object.keys(CLValueBuilder);
+    console.log(argsValues);
     argsValues && argsValues.forEach(arg => {
-      if (!arg) {
+      if (!arg.trim()) {
         return;
       }
       const argKeyValue = arg.split('=');
@@ -188,7 +189,6 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
           value && args.insert(key, value);
         } else {
           // TODO Fix any type
-          console.log(caster_fn);
           const CLValue = (caster_fn as any)(value);
           CLValue && args.insert(key, CLValue);
         }

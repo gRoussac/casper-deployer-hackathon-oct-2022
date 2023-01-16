@@ -75,10 +75,10 @@ export class ArgBuilderComponent {
             break;
           case 2:
             value = ['\'\'', '""'].includes(value) ? '' : value;
-            sep = '\';';
+            sep = '\';\n';
             break;
         }
-        this.argument += [value, sep, '\n'].join('');
+        this.argument += [value, sep].join('');
       });
     });
     this.argument && this.argurmentChanged.emit(this.argument);

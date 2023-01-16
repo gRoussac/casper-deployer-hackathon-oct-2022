@@ -134,8 +134,16 @@ export const defaultTabs = [{
     clType: CLTypeBuilder.u8()
   },
   {
-    name: 'metadata_muNamedCLTypeArgility',
+    name: 'metadata_mutability',
     clType: CLTypeBuilder.u8()
+  },
+  {
+    name: 'key_name',
+    clType: CLTypeBuilder.string()
+  },
+  {
+    name: 'is_hash_identifier_mode',
+    clType: CLTypeBuilder.bool()
   },
   {
     name: 'holder_mode',
@@ -143,6 +151,28 @@ export const defaultTabs = [{
   },
   {
     name: 'owner_reverse_lookup_mode',
+    clType: CLTypeBuilder.u8()
+  },
+  {
+    name: 'token_hash',
+    clType: CLTypeBuilder.key()
+  }, {
+    name: 'target_key',
+    clType: CLTypeBuilder.key()
+  }, {
+    name: 'source_key',
+    clType: CLTypeBuilder.key()
+  },
+  {
+    name: 'nft_contract_hash',
+    clType: CLTypeBuilder.key()
+  },
+  {
+    name: 'nft_package_hash',
+    clType: CLTypeBuilder.key()
+  },
+  {
+    name: 'named_key_convention',
     clType: CLTypeBuilder.u8()
   },
   {

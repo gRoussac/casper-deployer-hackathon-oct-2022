@@ -61,7 +61,8 @@ export class ArgBuilderComponent {
         return;
       }
       children.forEach((child: Element, index: number) => {
-        const value = (child as HTMLInputElement).value;
+        let value = (child as HTMLInputElement).value;
+
         let sep = '';
         switch (index) {
           case 0:
@@ -69,10 +70,12 @@ export class ArgBuilderComponent {
             sep = ':';
             break;
           case 1:
+            value = value.toLowerCase();
             sep = '=\'';
             break;
           case 2:
-            sep = '\';';
+            value = ['\'\'', '""'].includes(value) ? '' : value;
+            sep = '\';\n';
             break;
         }
         this.argument += [value, sep].join('');

@@ -150,29 +150,37 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
       argsValues = !!argsValue && (argsValue as string).split(';'),
       args: RuntimeArgs = RuntimeArgs.fromNamedArgs([]);
     const allowed_builder_functions = Object.keys(CLValueBuilder);
+    console.log(argsValues);
     argsValues && argsValues.forEach(arg => {
-      if (!arg) {
+      if (!arg.trim()) {
         return;
       }
       const argKeyValue = arg.split('=');
-      const [key, type] = argKeyValue[0].trim().split(':');
+      const split = argKeyValue[0].trim().split(':'),
+        key = split[0],
+        type = split[1].toLowerCase();
       let value: string | CLKey | CLURef | CLPublicKey = argKeyValue[1].trim().replace(this.quoteRegex, '');
       const fn = type ? type.toLowerCase() : 'string';
-      if (!key || !value || !allowed_builder_functions.includes(fn)) {
+      if (!key || !allowed_builder_functions.includes(fn)) {
         return;
       }
       try {
         const caster_fn: unknown = CLValueBuilder[fn as keyof CLValueBuilder];
-        if (['publickey', 'key'].includes(type)) {
+        if (['publickey'].includes(type)) {
           const public_key_as_array = decodeBase16(value);
           const type_key = public_key_as_array.slice(0, 1).toString();
           const public_key = CLValueBuilder.publicKey(
             public_key_as_array.slice(1),
             +type_key as CLPublicKeyTag
           );
-          value = type === 'publickey' ? public_key : CLValueBuilder.key(
-            public_key
-          );
+          value = public_key;
+        }
+        else if (['key'].includes(type)) {
+          const key = value.split('-').pop();
+          if (key) {
+            const keyAsByteArray = decodeBase16(key);
+            value = CLValueBuilder.key(CLValueBuilder.byteArray(keyAsByteArray));
+          }
         }
         else if (['uref'].includes(type)) {
           value = CLURef.fromFormattedStr(value);
@@ -405,7 +413,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  publicKeyChange() {
+  publicKeyChange($event: Event) {
     this.checkEntryPoints();
   }
 

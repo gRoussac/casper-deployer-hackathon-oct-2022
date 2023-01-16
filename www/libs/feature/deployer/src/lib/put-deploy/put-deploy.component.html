@@ -53,7 +53,7 @@
           #publicKeyElt
           type="search"
           [value]="publicKey || ''"
-          (change)="(true)"
+          (change)="publicKeyChange($event)"
           placeholder="ex: 0x"
         />
       </div>

@@ -13,7 +13,9 @@
 >
   <option
     *ngFor="let type of types; index as index"
-    [attr.selected]="type === defaultType.toString() ? true : null"
+    [attr.selected]="
+      type === defaultType.toString().split(' ').shift() ? true : null
+    "
   >
     {{ type }}
   </option>

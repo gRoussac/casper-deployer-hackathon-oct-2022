@@ -146,6 +146,14 @@ export const defaultTabs = [{
     clType: CLTypeBuilder.u8()
   },
   {
+    name: 'nft_contract_hash',
+    clType: CLTypeBuilder.key()
+  },
+  {
+    name: 'named_key_convention',
+    clType: CLTypeBuilder.u8()
+  },
+  {
     name: 'whitelist_mode',
     clType: CLTypeBuilder.u8()
   },

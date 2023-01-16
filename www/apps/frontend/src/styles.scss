@@ -15,6 +15,10 @@ textarea {
   min-height: 7.5rem;
 }
 
+button {
+  white-space: nowrap;
+}
+
 input[type='reset'],
 .cursor-pointer {
   cursor: pointer;
@@ -25,6 +29,7 @@ input[type='search'],
 input[type='url'],
 select {
   background-color: rgb(232, 240, 254);
+  max-height: 2.5rem;
 }
 
 form {

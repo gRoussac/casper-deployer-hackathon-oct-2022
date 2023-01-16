@@ -1,0 +1,109 @@
+<div
+  tabindex="-1"
+  *ngIf="isOpen"
+  class="bg-slate-400 opacity-75 z-10 fixed top-0 left-0 right-0 w-full overflow-x-hidden overflow-y-hidden md:inset-0 h-modal md:h-full"
+></div>
+<div
+  *ngIf="isOpen"
+  class="fixed top-0 left-0 w-full z-20 h-full right-0 flex justify-center items-center"
+>
+  <!-- Modal content -->
+  <div
+    class="relative w-full h-full max-w-4xl md:h-5/6 bg-white rounded-lg shadow-lg"
+  >
+    <button
+      (click)="closeModal.emit()"
+      type="button"
+      class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+      data-modal-hide="authentication-modal"
+    >
+      <svg
+        aria-hidden="true"
+        class="w-5 h-5"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+      <span class="sr-only">Close modal</span>
+    </button>
+    <div class="px-6 pt-6 lg:px-8 h-full max-h-full overflow-y">
+      <form class="py-6 h-full max-h-full">
+        <h2 class="title">Args builder</h2>
+        <casper-ui-tabs
+          class="my-6"
+          (activateContent)="activateContent($event)"
+          [active]="active"
+        ></casper-ui-tabs>
+        <div class="overflow-y-auto">
+          <div #form>
+            <ng-container *ngFor="let tab of defaultTabs">
+              <ng-container *ngIf="tab.name === active">
+                <ng-container
+                  *ngFor="let type of tab.types; index as i; trackBy: trackByFn"
+                >
+                  <casper-ui-argument
+                    [name]="type.name"
+                    [defaultType]="type.clType"
+                  ></casper-ui-argument>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mt-4 mb-2">
+          <button
+            class="flex bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+            type="button"
+            (click)="add()"
+          >
+            Add
+            <svg
+              class="w-6 h-6 ml-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
+            </svg>
+          </button>
+
+          <button
+            class="flex bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 mr-2 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+            type="button"
+            (click)="build()"
+          >
+            Build
+            <svg
+              class="w-6 h-6 ml-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 4.5h14.25M3 9h9.75M3 13.5h9.75m4.5-4.5v12m0 0l-3.75-3.75M17.25 21L21 17.25"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

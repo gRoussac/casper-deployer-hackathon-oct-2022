@@ -25,7 +25,7 @@
         class="flex justify-between text-gray-700 text-sm font-bold mb-2"
         for="transferToElt"
       >
-        Transfer {{ +amountElt.value / 1e9 }} CSPR to
+        Transfer {{ convert() }} CSPR to
       </label>
       <div class="mb-2">
         <input
@@ -50,10 +50,11 @@
         class="w-56 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         name="amount"
         #amountElt
+        maxlength="22"
         type="search"
         (change)="(true)"
         [value]="config['minimumTransfer'] || ''"
-        [placeholder]="'ex: ' + config['minimumTransfer']"
+        [placeholder]="'ex: ' + (+config['minimumTransfer']).toLocaleString()"
       />
       <button
         class="flex items-end ml-2 flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"

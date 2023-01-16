@@ -15,7 +15,12 @@ export class StorageService {
   ) { }
 
   setState(state: State) {
-    this.window?.localStorage.setItem(this.prefix, JSON.stringify(state));
+    const storage = JSON.parse(this.window?.localStorage.getItem(this.prefix) || '{}');
+    const new_storage = {
+      ...storage,
+      ...state
+    };
+    this.window?.localStorage.setItem(this.prefix, JSON.stringify(new_storage));
   }
 
   // set(key: string, state: State) {

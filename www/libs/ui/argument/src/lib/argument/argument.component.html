@@ -1,0 +1,26 @@
+<input
+  type="search"
+  name="name"
+  #nameElt
+  class="shadow appearance-none border rounded w-56 py-1 px-3 mr-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+  [value]="name"
+/>
+<select
+  #typeElt
+  name="clType"
+  (change)="(true)"
+  class="border text-gray-900 text-sm focus:outline-none rounded focus:shadow-outline block w-44 p-1 mr-3"
+>
+  <option
+    *ngFor="let type of types; index as index"
+    [attr.selected]="type === defaultType.toString() ? true : null"
+  >
+    {{ type }}
+  </option>
+</select>
+<input
+  #valueElt
+  name="value"
+  type="search"
+  class="shadow appearance-none border rounded w-full py-1 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+/>

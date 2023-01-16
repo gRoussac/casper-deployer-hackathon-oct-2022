@@ -19,8 +19,16 @@
 <section>
   <casper-deployer-put-deploy
     (connect)="connect()"
+    (edit)="edit()"
+    [argument]="argument"
   ></casper-deployer-put-deploy>
 </section>
 <section>
   <casper-deployer-result></casper-deployer-result>
 </section>
+<casper-deployer-arg-builder
+  [isOpen]="isBuilderOpened"
+  (closeModal)="closeBuilder()"
+  (closeModal)="closeBuilder()"
+  (argurmentChanged)="argurmentChanged($event)"
+></casper-deployer-arg-builder>

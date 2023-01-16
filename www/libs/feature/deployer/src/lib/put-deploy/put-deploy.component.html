@@ -65,17 +65,18 @@
           for="gasFee"
         >
           Gas fee max
-          <small class="mr-1 text-xs">{{ +gasFeeElt.value / 1e9 }} CSPR</small>
+          <small class="mr-1 text-xs">{{ convert() }} CSPR</small>
         </label>
         <div class="mb-2">
           <input
             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             name="gasFee"
             #gasFeeElt
+            maxlength="20"
             type="search"
             [value]="gasFee || ''"
-            (change)="(true)"
-            [placeholder]="'ex: ' + config['gasFee']"
+            (change)="onGasFeeChange()"
+            [placeholder]="'ex: ' + (+config['gasFee']).toLocaleString()"
           />
         </div>
       </div>
@@ -105,7 +106,7 @@
         class="flex justify-between text-gray-700 text-sm font-bold mb-2"
         for="sessionPath"
       >
-        Session code path
+        Session Code path
       </label>
       <div class="mb-2 flex items-center">
         <input
@@ -162,12 +163,12 @@
           </svg>
         </button>
         <span
-          class="flex items-center"
+          class="flex items-center break-all"
           *ngIf="file_name"
           (click)="resetSessionPathElt()"
           >{{ file_name }}
           <svg
-            class="w-6 h-6 ml-1 cursor-pointer"
+            class="w-6 h-6 ml-1 cursor-pointer shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -189,7 +190,7 @@
         class="flex justify-between text-gray-700 text-sm font-bold mb-2"
         for="sessionName"
       >
-        Contract or package name
+        Smart Contract name
         <input type="reset" value="clear" (click)="resetSecondForm($event)" />
       </label>
       <div class="mb-2">
@@ -199,7 +200,7 @@
           #sessionNameElt
           type="search"
           [value]="sessionName || ''"
-          (change)="(true)"
+          (change)="onSessionNameChange($event)"
           placeholder="ex: counter"
           [attr.disabled]="isSessionNameDisabled ? true : null"
         />
@@ -210,7 +211,7 @@
         class="flex justify-between text-gray-700 text-sm font-bold mb-2"
         for="sessionHash"
       >
-        Contract or package hash
+        Smart Contract hash or Package hash
       </label>
       <div class="mb-2">
         <input
@@ -219,8 +220,8 @@
           #sessionHashElt
           type="search"
           [value]="sessionHash || ''"
-          (change)="(true)"
-          placeholder="ex: contract-0x || hash-0x || 0x"
+          (change)="onSessionHashChange($event)"
+          placeholder="ex: hash-0x"
           [attr.disabled]="isSessionHashDisabled ? true : null"
         />
       </div>
@@ -230,9 +231,12 @@
         class="flex justify-between text-gray-700 text-sm font-bold mb-2"
         for="entryPointElt"
       >
-        Entry point (contract on chain)
+        Entry point
       </label>
-      <div class="mb-2">
+      <div
+        class="mb-2"
+        *ngIf="entryPointElt?.nativeElement.value || options.length === 1"
+      >
         <input
           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-slate-100"
           name="entryPoint"
@@ -244,25 +248,45 @@
           [attr.disabled]="isEntryPointDisabled ? true : null"
         />
       </div>
+
+      <div
+        class="mb-2"
+        *ngIf="!entryPointElt?.nativeElement.value && options.length > 1"
+      >
+        <select
+          #selectEntryPointElt
+          (change)="selectEntryPointChange($event)"
+          class="border border-gray-300 text-gray-900 text-sm focus:outline-none rounded focus:shadow-outline block w-full p-2.5"
+        >
+          <option *ngFor="let option of options" [value]="option">
+            {{ option }}
+          </option>
+        </select>
+      </div>
     </div>
     <div class="mb-4">
       <label
         class="flex justify-between text-gray-700 text-sm font-bold mb-2"
         for="args"
       >
-        Args
+        <span>Args</span>
+        <span class="cursor-pointer ml-auto mr-2" (click)="onEdit()"
+          >⇇ build</span
+        >
+        <span class="cursor-pointer" (click)="resetArgs()">clear</span>
       </label>
       <div class="mb-2">
-        <input
+        <textarea
+          rows="2"
           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-slate-100"
           name="args"
           #argsElt
           type="search"
-          [value]="args || ''"
-          (change)="(true)"
-          placeholder="ex: message:string='hello world', ..."
+          [value]="argument || ''"
+          (change)="onArgsChange()"
+          placeholder="ex: message:string='hello world'; ..."
           [attr.disabled]="isArgsDisabled ? true : null"
-        />
+        ></textarea>
       </div>
     </div>
     <div class="flex items-center justify-between mb-4">

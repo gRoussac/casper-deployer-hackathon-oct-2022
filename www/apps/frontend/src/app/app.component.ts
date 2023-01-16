@@ -108,6 +108,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptions.push(this.routeurHubService.getHubState().subscribe(async (state) => {
       if (state.apiUrl) {
         this.apiUrl = state.apiUrl;
+        console.log(state);
         this.storageService.setState(state);
       }
     }

@@ -1,7 +1,7 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, OnDestroy, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { DeployReturn, State } from '@casper-api/api-interfaces';
-import { CLPublicKey, CLValueBuilder, DeployUtil, RuntimeArgs, Contracts, decodeBase16, CLPublicKeyTag, CLURef, CLKey } from 'casper-js-sdk';
+import { CLPublicKey, CLValueBuilder, DeployUtil, RuntimeArgs, Contracts, decodeBase16, CLPublicKeyTag, CLURef, CLKey, EntryPoint } from 'casper-js-sdk';
 import { ResultService } from '../result/result.service';
 import { Subscription } from 'rxjs';
 import { DeployerService } from '@casper-data/data-access-deployer';
@@ -21,7 +21,9 @@ import { StorageService } from '@casper-util/storage';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PutDeployComponent implements AfterViewInit, OnDestroy {
+  @Input() argument!: string;
   @Output() connect: EventEmitter<void> = new EventEmitter<void>();
+  @Output() edit: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('chainNameElt') chainNameElt!: ElementRef;
   @ViewChild('chainNameSelectElt') chainNameSelectElt!: ElementRef;
   @ViewChild('versionElt') versionElt!: ElementRef;
@@ -31,6 +33,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
   @ViewChild('sessionHashElt') sessionHashElt!: ElementRef;
   @ViewChild('sessionNameElt') sessionNameElt!: ElementRef;
   @ViewChild('entryPointElt') entryPointElt!: ElementRef;
+  @ViewChild('selectEntryPointElt') selectEntryPointElt!: ElementRef;
   @ViewChild('publicKeyElt') publicKeyElt!: ElementRef;
   @ViewChild('argsElt') argsElt!: ElementRef;
   @ViewChild('isPackageElt') isPackageElt!: ElementRef;
@@ -48,12 +51,15 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
   entryPoint!: string;
   file_name!: string;
   version!: string;
-  args!: string;
   animate!: boolean;
+  stateRootHash?: string;
+  options: string[] = [''];
+  contract_entrypoints!: EntryPoint[];
 
   private wasm!: Uint8Array | undefined;
   private deploy?: DeployUtil.Deploy;
   private getStateSubscription!: Subscription;
+  private getBlockStateSubscription!: Subscription;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -83,16 +89,36 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
         }
         this.selectChainNameOption(chainName);
       }
+      if (state.stateRootHash) {
+        this.stateRootHash = state.stateRootHash;
+      }
+      if (state.stateRootHash || state.user?.activePublicKey) {
+        this.checkEntryPoints();
+      }
       this.changeDetectorRef.markForCheck();
     });
+    const deploy_args = this.storageService.get('deploy_args');
+    deploy_args && (this.argsElt.nativeElement.value = deploy_args);
+    const fee = this.storageService.get('fee');
+    fee && (this.gasFeeElt.nativeElement.value = fee);
+    const sessionName = this.storageService.get('sessionName');
+    const sessionHash = this.storageService.get('sessionHash');
+    sessionName && (this.sessionName = sessionName);
+    sessionHash && (this.sessionHash = sessionHash);
   }
 
   ngOnDestroy() {
     this.getStateSubscription && this.getStateSubscription.unsubscribe();
+    this.getBlockStateSubscription && this.getBlockStateSubscription.unsubscribe();
   }
 
   selectChainName($event: Event) {
     this.setChainName(($event.target as HTMLSelectElement).value);
+  }
+
+  onGasFeeChange() {
+    const fee = this.gasFeeElt.nativeElement.value;
+    fee && this.storageService.setState({ fee });
   }
 
   // TODO Refacto into service
@@ -107,8 +133,8 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
       sessionPath = this.sessionPathElt?.nativeElement.value,
       sessionName = this.sessionNameElt?.nativeElement.value,
       sessionHash = this.sessionHashElt?.nativeElement.value.split('-').pop(),
-      entryPoint = this.entryPointElt?.nativeElement.value,
-      version = +this.versionElt?.nativeElement.argsValues || null,
+      entryPoint = this.entryPointElt?.nativeElement.value || this.selectEntryPointElt?.nativeElement.value,
+      version = +this.versionElt?.nativeElement.value || null,
       gasFee = this.gasFeeElt?.nativeElement.value,
       ttl = +this.TTLElt?.nativeElement.value,
       isPackageElt = this.isPackageElt?.nativeElement.checked,
@@ -121,14 +147,17 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
         dependencies
       ),
       argsValue: string = this.argsElt?.nativeElement.value as string,
-      argsValues = !!argsValue && (argsValue as string).split(','),
+      argsValues = !!argsValue && (argsValue as string).split(';'),
       args: RuntimeArgs = RuntimeArgs.fromNamedArgs([]);
     const allowed_builder_functions = Object.keys(CLValueBuilder);
     argsValues && argsValues.forEach(arg => {
+      if (!arg) {
+        return;
+      }
       const argKeyValue = arg.split('=');
       const [key, type] = argKeyValue[0].trim().split(':');
       let value: string | CLKey | CLURef | CLPublicKey = argKeyValue[1].trim().replace(this.quoteRegex, '');
-      const fn = type ? type : 'string';
+      const fn = type ? type.toLowerCase() : 'string';
       if (!key || !value || !allowed_builder_functions.includes(fn)) {
         return;
       }
@@ -243,8 +272,10 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     $event?.preventDefault();
     this.sessionNameElt.nativeElement.value = '';
     this.sessionHashElt.nativeElement.value = '';
-    this.entryPointElt.nativeElement.value = '';
-    this.argsElt.nativeElement.value = '';
+    this.entryPointElt && (this.entryPointElt.nativeElement.value = '');
+    this.options = [''];
+    this.storageService.setState({ sessionName: '' });
+    this.storageService.setState({ sessionHash: '' });
   }
 
   resetSessionPathElt() {
@@ -290,6 +321,100 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     this.animate = false;
     this.resetSecondForm();
     this.changeDetectorRef.markForCheck();
+  }
+
+  convert() {
+    const amount = this.gasFeeElt?.nativeElement.value.trim();
+    if (!amount) {
+      return;
+    }
+    // TODO Fix with motesToCSPR
+    return (Number(BigInt(amount * 100) / BigInt(1e+9)) / 100).toLocaleString();
+  }
+
+  onEdit() {
+    this.edit.emit();
+  }
+
+  onArgsChange() {
+    const deploy_args = this.argsElt.nativeElement.value;
+    deploy_args && this.storageService.setState({ deploy_args });
+  }
+
+  resetArgs() {
+    this.argsElt.nativeElement.value = '';
+    this.storageService.setState({ deploy_args: '' });
+  }
+
+  onSessionNameChange($event: Event) {
+    const sessionName: string = ($event.target as HTMLInputElement).value;
+    if (sessionName) {
+      this.storageService.setState({ sessionName });
+      this.getEntryPoints(sessionName);
+    }
+  }
+
+  onSessionHashChange($event: Event) {
+    const sessionHash = ($event.target as HTMLInputElement).value;
+    this.storageService.setState({ sessionHash });
+    if (sessionHash) {
+      this.getEntryPoints('', sessionHash);
+    }
+  }
+
+  private getEntryPoints(sessionName: string, hash?: string) {
+    const publicKey = this.publicKeyElt?.nativeElement.value;
+    if (!publicKey) {
+      return;
+    }
+    const key = hash || CLPublicKey.fromHex(publicKey).toAccountHashStr();
+    key && this.stateRootHash && (this.getBlockStateSubscription = this.deployerService.getBlockState(
+      this.stateRootHash,
+      key,
+      sessionName,
+      this.apiUrl
+    ).subscribe(async (storedValue): Promise<void> => {
+      const isString = typeof storedValue === 'string';
+      if (!isString) {
+        const contract_entrypoints = storedValue.Contract?.entrypoints;
+        contract_entrypoints && (this.contract_entrypoints = contract_entrypoints);
+        this.options = [''];
+        if (contract_entrypoints) {
+          contract_entrypoints.forEach(key => {
+            key && this.options.push(key.name);
+          });
+        }
+        this.changeDetectorRef.markForCheck();
+      }
+    }));
+  }
+
+  selectEntryPointChange($event: Event) {
+    const entry_point_value = ($event.target as HTMLSelectElement).value;
+    if (!entry_point_value) {
+      this.storageService.setState({
+        args: []
+      });
+    }
+    else if (this.contract_entrypoints) {
+      const entry_point = this.contract_entrypoints.find((entry_point: EntryPoint) => entry_point.name === entry_point_value);
+      const args = entry_point?.args;
+      args && this.storageService.setState({
+        args
+      });
+    }
+  }
+
+  publicKeyChange() {
+    this.checkEntryPoints();
+  }
+
+  private checkEntryPoints() {
+    if (this.sessionName) {
+      this.getEntryPoints(this.sessionName);
+    } else if (this.sessionHash) {
+      this.getEntryPoints('', this.sessionHash);
+    }
   }
 
   private isFormValid() {

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ResultService } from './result.service';
 import { Result } from './result';
 import { Subscription } from 'rxjs';
+import { StorageService } from '@casper-util/storage';
 
 @Component({
   selector: 'casper-deployer-result',
@@ -25,7 +26,7 @@ export class ResultComponent implements AfterViewInit, OnDestroy {
   constructor(
     private readonly resultService: ResultService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly renderer: Renderer2
+    private readonly storageService: StorageService
   ) { }
 
   ngAfterViewInit() {
@@ -35,6 +36,8 @@ export class ResultComponent implements AfterViewInit, OnDestroy {
       this.resultHtml = res.resultHtml;
       this.changeDetectorRef.markForCheck();
     });
+    const notes = this.storageService.get('notes');
+    notes && (this.NotesElt.nativeElement.value = notes);
   }
 
   ngOnDestroy() {
@@ -63,8 +66,14 @@ export class ResultComponent implements AfterViewInit, OnDestroy {
     return this.resultElt?.nativeElement.scrollHeight > this.resultElt?.nativeElement.clientHeight;
   }
 
+  onNotesChange() {
+    const notes = this.NotesElt.nativeElement.value;
+    notes && this.storageService.setState({ notes });
+  }
+
   emptyNotes() {
     this.NotesElt.nativeElement.value = '';
+    this.storageService.setState({ notes: '' });
   }
 
 }

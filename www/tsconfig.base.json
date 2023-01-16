@@ -26,7 +26,9 @@
       "@casper-escrow/escrower": ["libs/feature/escrower/src/index.ts"],
       "@casper-escrow/postman": ["libs/feature/postman/src/index.ts"],
       "@casper-escrow/seller": ["libs/feature/seller/src/index.ts"],
+      "@casper-ui/argument": ["libs/ui/argument/src/index.ts"],
       "@casper-ui/header": ["libs/ui/header/src/index.ts"],
+      "@casper-ui/tabs": ["libs/ui/tabs/src/index.ts"],
       "@casper-util/config": ["libs/util/config/src/index.ts"],
       "@casper-util/hightlight-webworker": [
         "libs/util/hihlight-webworker/src/index.ts"

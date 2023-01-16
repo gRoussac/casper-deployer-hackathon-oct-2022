@@ -15,6 +15,7 @@ import { DictionaryComponent } from '../dictionary/dictionary.component';
 import { RouteurHubService } from '@casper-util/routeur-hub';
 import { State } from '@casper-api/api-interfaces';
 import { Subscription } from 'rxjs';
+import { ArgBuilderComponent } from '../arg-builder/arg-builder.component';
 
 @Component({
   selector: 'casper-deployer',
@@ -30,7 +31,8 @@ import { Subscription } from 'rxjs';
     GetDeployComponent,
     PutDeployComponent,
     ResultComponent,
-    DictionaryComponent
+    DictionaryComponent,
+    ArgBuilderComponent
   ],
   providers: [DeployerService, ResultService],
   templateUrl: './deployer.component.html',
@@ -39,6 +41,9 @@ import { Subscription } from 'rxjs';
 })
 export class DeployerComponent implements OnInit, OnDestroy {
   private routeurHubSubscription!: Subscription;
+
+  isBuilderOpened!: boolean;
+  argument!: string;
 
   constructor(
     private readonly deployerService: DeployerService,
@@ -65,6 +70,19 @@ export class DeployerComponent implements OnInit, OnDestroy {
 
   connect() {
     this.routeurHubService.connect();
+  }
+
+  edit() {
+    this.isBuilderOpened = true;
+  }
+
+  closeBuilder() {
+    this.isBuilderOpened = false;
+  }
+
+  argurmentChanged(argument: string) {
+    this.argument = argument;
+    this.closeBuilder();
   }
 
   refreshPurse() {

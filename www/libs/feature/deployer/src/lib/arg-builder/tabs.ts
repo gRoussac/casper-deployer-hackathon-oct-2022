@@ -77,7 +77,7 @@ export const defaultTabs = [{
     },
     {
       name: 'token_meta',
-      clType: CLTypeBuilder.string()
+      clType: CLTypeBuilder.map([CLTypeBuilder.string(), CLTypeBuilder.string()])
     },
     {
       name: 'token_ids',
@@ -85,7 +85,9 @@ export const defaultTabs = [{
     },
     {
       name: 'token_metas',
-      clType: CLTypeBuilder.list(CLTypeBuilder.string())
+      clType: CLTypeBuilder.list(
+        CLTypeBuilder.map([CLTypeBuilder.string(), CLTypeBuilder.string()])
+      )
     },
     recipientArg,
     {

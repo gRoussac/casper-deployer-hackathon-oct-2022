@@ -156,12 +156,6 @@ export const defaultTabs = [{
   {
     name: 'token_hash',
     clType: CLTypeBuilder.key()
-  }, {
-    name: 'target_key',
-    clType: CLTypeBuilder.key()
-  }, {
-    name: 'source_key',
-    clType: CLTypeBuilder.key()
   },
   {
     name: 'nft_contract_hash',

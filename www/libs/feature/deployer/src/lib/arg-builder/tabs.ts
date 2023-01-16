@@ -134,7 +134,7 @@ export const defaultTabs = [{
     clType: CLTypeBuilder.u8()
   },
   {
-    name: 'metadata_muNamedCLTypeArgility',
+    name: 'metadata_mutability',
     clType: CLTypeBuilder.u8()
   },
   {

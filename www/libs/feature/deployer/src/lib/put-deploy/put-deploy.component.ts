@@ -359,6 +359,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     if (sessionName) {
       this.storageService.setState({ sessionName });
       this.getEntryPoints(sessionName);
+      this.sessionName = sessionName;
     }
   }
 
@@ -367,6 +368,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     this.storageService.setState({ sessionHash });
     if (sessionHash) {
       this.getEntryPoints('', sessionHash);
+      this.sessionHash = sessionHash;
     }
   }
 

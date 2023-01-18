@@ -16,6 +16,7 @@
           type="search"
           placeholder="ex: uref-0x"
           (change)="(true)"
+          (dblclick)="select($event)"
           (keyup.enter)="getBalance()"
         />
       </div>

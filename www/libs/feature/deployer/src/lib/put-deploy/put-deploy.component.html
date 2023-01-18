@@ -221,6 +221,7 @@
           type="search"
           [value]="sessionHash || ''"
           (change)="onSessionHashChange($event)"
+          (dblclick)="select($event)"
           placeholder="ex: hash-0x"
           [attr.disabled]="isSessionHashDisabled ? true : null"
         />

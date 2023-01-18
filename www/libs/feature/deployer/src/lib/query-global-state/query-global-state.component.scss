@@ -4,3 +4,7 @@
     cursor: pointer;
   }
 }
+
+input {
+  user-select: all !important;
+}

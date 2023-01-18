@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 import { ResultService } from '../result/result.service';
 import { StoredValue } from 'casper-js-sdk/dist/lib/StoredValue';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
-import { CLPublicKey } from 'casper-js-sdk';
+import { CLPublicKey, decodeBase16 } from 'casper-js-sdk';
 import { StorageService } from '@casper-util/storage';
 
 @Component({
@@ -25,11 +25,16 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
   @Output() connect: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('keyElt') keyElt!: ElementRef;
   @ViewChild('pathElt') pathElt!: ElementRef;
+  @ViewChild('selectKeyElt') selectKeyElt!: ElementRef;
   options: string[] = [''];
 
   private getStateSubscription!: Subscription;
   private getBlockStateSubscription!: Subscription;
   private _hasPrevious!: boolean;
+
+  // TODO Extract share regex
+  private readonly key_regex = /[a-z-]+-([a-z0-9]{64})/;
+  private readonly exclude_regex = /contract-(wasm|package-wasm)-?[a-z0-9]+/;
 
   constructor(
     private readonly deployerService: DeployerService,
@@ -51,13 +56,15 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
       if (state.stateRootHash) {
         this.stateRootHash = state.stateRootHash;
         const key = this.keyElt.nativeElement.value;
-        const path = this.pathElt.nativeElement.value;
-        if (key && path) {
+        if (key) {
           const no_result = true;
           this.getBlockState(no_result);
         }
       }
-      state.stateRootHash && (this.stateRootHash = state.stateRootHash);
+      if (state.key) {
+        this.keyElt.nativeElement.value = state.key;
+        this.onKeyChange();
+      }
       this.changeDetectorRef.markForCheck();
     });
     const key = this.storageService.get('key');
@@ -66,8 +73,6 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
     path && (this.pathElt.nativeElement.value = path);
     const keyOld = this.storageService.get('key-old');
     keyOld && (this._hasPrevious = true);
-
-
   }
 
   ngOnDestroy() {
@@ -77,10 +82,13 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
 
   getBlockState(no_result?: boolean) {
     const key = this.keyElt.nativeElement.value;
+    if (this.exclude_regex.test(key)) { return; }
+    const newkey = key.replace(/["']/g, '').replace('contract-', 'hash-');
+    newkey && (this.keyElt.nativeElement.value = newkey);
     const path = this.pathElt.nativeElement.value;
-    key && this.stateRootHash && (this.getBlockStateSubscription = this.deployerService.getBlockState(
+    newkey && this.stateRootHash && (this.getBlockStateSubscription = this.deployerService.getBlockState(
       this.stateRootHash,
-      key,
+      newkey,
       path,
       this.apiUrl
     ).subscribe(async (storedValue): Promise<void> => {
@@ -90,11 +98,14 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
         const contract_keys = storedValue.Contract?.namedKeys;
         const keys = account_keys || contract_keys;
         if (keys) {
-          this.options = [''];
+          const old_key = this.pathElt.nativeElement.value;
+          this.options = [old_key ? old_key : ''];
           keys.forEach(key => {
-            const old_key = this.pathElt.nativeElement.value;
             !old_key && this.options.push(key.name);
             old_key && this.options.push([old_key, key.name].join('/'));
+          });
+          setTimeout(() => {
+            this.selectKeyElt.nativeElement.selectedIndex = 0;
           });
           this.changeDetectorRef.markForCheck();
         }
@@ -147,8 +158,16 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
     this.resultService.copyClipboard(value);
   }
 
+  select($event: Event) {
+    ($event.target as HTMLInputElement).select();
+  }
+
   onKeyChange() {
     const key = this.keyElt.nativeElement.value;
+    const parsing = key.match(this.key_regex);
+    if (parsing.length !== 2 || decodeBase16(parsing[1]).length !== 32) {
+      return;
+    }
     const keyCurrent = this.storageService.get('key');
     if (key && keyCurrent && (key !== keyCurrent)) {
       this.storageService.setState({ 'key-old': keyCurrent });
@@ -159,13 +178,17 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
 
   onPathChange() {
     const path = this.pathElt.nativeElement.value;
-    path && this.storageService.setState({ path });
+    path && this.getBlockState();
+    this.storageService.setState({ path });
   }
 
   reset() {
+    const key = this.keyElt.nativeElement.value;
+    this.storageService.setState({ "key-old": key, path: '' });
+    this._hasPrevious = true;
     this.keyElt.nativeElement.value = '';
     this.pathElt.nativeElement.value = '';
-    this.storageService.setState({ key: '', path: '' });
+    this.storageService.setState({ "key": '', path: '' });
   }
 
   pop() {
@@ -173,11 +196,10 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
     const value = this.pathElt.nativeElement.value;
     if (!value.includes(sep)) {
       this.pathElt.nativeElement.value = '';
-      this.storageService.setState({ path: '' });
+    } else {
+      const remove = value.split(sep).pop();
+      this.pathElt.nativeElement.value = this.pathElt.nativeElement.value.replace([sep, remove].join(''), '');
     }
-    const remove = value.split(sep).pop();
-    this.pathElt.nativeElement.value = this.pathElt.nativeElement.value.replace([sep, remove].join(''), '');
-    this.getBlockState();
     this.onPathChange();
   }
 

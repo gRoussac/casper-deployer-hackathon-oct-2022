@@ -31,7 +31,11 @@
             </span>
           </span>
           <div #resultElt class="mt-2 max-w-sm pre overflow-y">
-            <code [innerHtml]="resultHtml"></code>
+            <code
+              #codeElt
+              (dblclick)="listenDblClick($event)"
+              [innerHtml]="resultHtml"
+            ></code>
           </div>
           <div class="flex justify-end">
             <svg

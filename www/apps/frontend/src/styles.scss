@@ -66,3 +66,11 @@ h2.title {
   top: 220px !important;
   right: 17px !important;
 }
+.hljs-string {
+  color: #ff473e !important;
+  user-select: all !important;
+  cursor: copy;
+}
+.hljs-string.selected {
+  color: #4286f4 !important;
+}

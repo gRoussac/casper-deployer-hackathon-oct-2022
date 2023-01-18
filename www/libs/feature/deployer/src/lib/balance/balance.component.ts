@@ -70,5 +70,9 @@ export class BalanceComponent implements AfterViewInit, OnDestroy {
     this.resultService.copyClipboard(value);
   }
 
+  select($event: Event) {
+    ($event.target as HTMLInputElement).select();
+  }
+
 }
 

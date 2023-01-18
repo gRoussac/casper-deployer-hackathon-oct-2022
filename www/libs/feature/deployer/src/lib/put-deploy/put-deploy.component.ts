@@ -21,7 +21,6 @@ import { StorageService } from '@casper-util/storage';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PutDeployComponent implements AfterViewInit, OnDestroy {
-  @Input() argument!: string;
   @Output() connect: EventEmitter<void> = new EventEmitter<void>();
   @Output() edit: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('chainNameElt') chainNameElt!: ElementRef;
@@ -37,6 +36,19 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
   @ViewChild('publicKeyElt') publicKeyElt!: ElementRef;
   @ViewChild('argsElt') argsElt!: ElementRef;
   @ViewChild('isPackageElt') isPackageElt!: ElementRef;
+  @Input() set argument(value: string) {
+    if (!value) {
+      return;
+    }
+    this._argument = value.trim();
+    setTimeout(() => {
+      this.onArgsChange();
+    });
+  }
+
+  get argument(): string {
+    return this._argument;
+  }
 
   readonly window = this.document.defaultView;
   readonly quoteRegex = new RegExp(['^', "'", '+|', "'", '+$'].join(''), 'g');
@@ -60,6 +72,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
   private deploy?: DeployUtil.Deploy;
   private getStateSubscription!: Subscription;
   private getBlockStateSubscription!: Subscription;
+  private _argument!: string;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -345,7 +358,8 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
   }
 
   onArgsChange() {
-    const deploy_args = this.argsElt.nativeElement.value;
+    const deploy_args = this.argsElt?.nativeElement.value;
+    console.log(deploy_args);
     deploy_args && this.storageService.setState({ deploy_args });
   }
 
@@ -417,6 +431,10 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
 
   publicKeyChange($event: Event) {
     this.checkEntryPoints();
+  }
+
+  select($event: Event) {
+    ($event.target as HTMLInputElement).select();
   }
 
   private checkEntryPoints() {

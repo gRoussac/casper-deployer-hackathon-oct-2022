@@ -188,7 +188,7 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
     this._hasPrevious = true;
     this.keyElt.nativeElement.value = '';
     this.pathElt.nativeElement.value = '';
-    this.storageService.setState({ "key": '', path: '' });
+    this.storageService.setState({ key: '', path: '' });
   }
 
   pop() {

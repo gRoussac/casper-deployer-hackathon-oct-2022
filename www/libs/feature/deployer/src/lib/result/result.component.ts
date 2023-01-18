@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChildren, ElementRef, OnDestroy, QueryList, Renderer2, ViewChild, ViewChildren, } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, Renderer2, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ResultService } from './result.service';
 import { Result } from './result';
@@ -25,6 +25,7 @@ export class ResultComponent implements AfterViewInit, OnDestroy {
   @ViewChild('codeElt', { read: ElementRef }) contentChildren!: ElementRef;
 
   private getResultSubscription!: Subscription;
+  // TODO Extract share regex
   private readonly key_regex = /[a-z-]+-([a-z0-9]{64})/;
   private readonly exclude_regex = /contract-(wasm|package-wasm)-?[a-z0-9]+/;
 

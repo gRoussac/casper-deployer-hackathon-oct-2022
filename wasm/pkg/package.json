@@ -8,5 +8,7 @@
   ],
   "module": "escrow.js",
   "types": "escrow.d.ts",
-  "sideEffects": false
+  "sideEffects": [
+    "./snippets/*"
+  ]
 }

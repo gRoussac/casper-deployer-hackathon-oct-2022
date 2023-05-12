@@ -96,9 +96,14 @@ export class ResultComponent implements AfterViewInit, OnDestroy {
     this.storageService.setState({ notes: '' });
   }
 
-  listenDblClick($event: Event) {
+  listenClick($event: Event): string {
     const key = this.cleanKey(($event.target as HTMLSpanElement).textContent || '');
     key && this.resultService.copyClipboard(key);
+    return key;
+  }
+
+  listenDblClick($event: Event) {
+    const key = this.listenClick($event);
     if (!key || !this.checkKey(key)) {
       return;
     }

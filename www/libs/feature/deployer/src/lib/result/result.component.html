@@ -33,6 +33,7 @@
           <div #resultElt class="mt-2 max-w-sm pre overflow-y">
             <code
               #codeElt
+              (click)="listenClick($event)"
               (dblclick)="listenDblClick($event)"
               [innerHtml]="resultHtml"
             ></code>

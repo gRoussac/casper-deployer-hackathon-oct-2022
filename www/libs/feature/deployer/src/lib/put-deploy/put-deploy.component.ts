@@ -146,7 +146,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
       sessionPath = this.sessionPathElt?.nativeElement.value,
       sessionName = this.sessionNameElt?.nativeElement.value,
       sessionHash = this.sessionHashElt?.nativeElement.value.split('-').pop(),
-      entryPoint = this.entryPointElt?.nativeElement.value || this.selectEntryPointElt?.nativeElement.value,
+      entryPoint = this.entryPointElt?.nativeElement.value || this.selectEntryPointElt?.nativeElement.value || '',
       version = +this.versionElt?.nativeElement.value || null,
       gasFee = this.gasFeeElt?.nativeElement.value,
       ttl = +this.TTLElt?.nativeElement.value,
@@ -165,14 +165,14 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     const allowed_builder_functions = Object.keys(CLValueBuilder);
     console.log(argsValues);
     argsValues && argsValues.forEach(arg => {
-      if (!arg.trim()) {
+      if (arg && !arg.trim()) {
         return;
       }
       const argKeyValue = arg.split('=');
-      const split = argKeyValue[0].trim().split(':'),
+      const split = argKeyValue[0] && argKeyValue[0].trim().split(':'),
         key = split[0],
-        type = split[1].toLowerCase();
-      let value: string | CLKey | CLURef | CLPublicKey = argKeyValue[1].trim().replace(this.quoteRegex, '');
+        type = split[1] && split[1].toLowerCase();
+      let value: string | CLKey | CLURef | CLPublicKey = argKeyValue[1] && argKeyValue[1].trim().replace(this.quoteRegex, '');
       const fn = type ? type.toLowerCase() : 'string';
       if (!key || !allowed_builder_functions.includes(fn)) {
         return;
@@ -202,7 +202,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
           value && args.insert(key, value);
         } else {
           // TODO Fix any type
-          const CLValue = (caster_fn as any)(value);
+          const CLValue = value && (caster_fn as any)(value);
           CLValue && args.insert(key, CLValue);
         }
       } catch (err) {
@@ -224,6 +224,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
       return;
     }
     const payment = DeployUtil.standardPayment(gasFee);
+
     this.deploy = DeployUtil.makeDeploy(deployParams, session, payment);
     this.deploy && this.resultService.setResult<DeployUtil.Deploy>('Deploy', DeployUtil.deployToJson(this.deploy));
     if (!DeployUtil.validateDeploy(this.deploy)) {

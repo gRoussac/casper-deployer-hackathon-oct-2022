@@ -65,6 +65,10 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
         this.keyElt.nativeElement.value = state.key;
         this.onKeyChange();
       }
+      if (!state.path) {
+        this.pathElt.nativeElement.value = "";
+        this.getBlockState();
+      }
       this.changeDetectorRef.markForCheck();
     });
     const key = this.storageService.get('key');
@@ -107,8 +111,10 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
           setTimeout(() => {
             this.selectKeyElt.nativeElement.selectedIndex = 0;
           });
-          this.changeDetectorRef.markForCheck();
+        } else {
+          this.options = [''];
         }
+        this.changeDetectorRef.markForCheck();
       }
       if (!no_result) {
         storedValue && this.resultService.setResult<StoredValue>('Stored Value', storedValue as StoredValue);
@@ -138,6 +144,7 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
       this._hasPrevious = false;
     }
     keyOld && this.storageService.setState({ key: keyOld });
+    this.getBlockState();
   }
 
   setAccountHash() {
@@ -146,12 +153,14 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
     }
     this.keyElt.nativeElement.value = CLPublicKey.fromHex(this.activePublicKey).toAccountHashStr();
     this.onKeyChange();
+    this.getBlockState();
   }
 
   selectKey($event: Event) {
     const path = ($event.target as HTMLSelectElement).value;
     this.pathElt.nativeElement.value = path;
     path && this.storageService.setState({ path });
+    this.getBlockState();
   }
 
   copy(value: string): void {
@@ -178,7 +187,7 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
 
   onPathChange() {
     const path = this.pathElt.nativeElement.value;
-    path && this.getBlockState();
+    this.getBlockState();
     this.storageService.setState({ path });
   }
 

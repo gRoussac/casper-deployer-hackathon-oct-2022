@@ -160,10 +160,9 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
         dependencies
       ),
       argsValue: string = this.argsElt?.nativeElement.value as string,
-      argsValues = !!argsValue && (argsValue as string).split(';'),
+      argsValues = !!argsValue && (argsValue as string).split(';').filter(arg => arg.trim()).map(arg => arg.trim()),
       args: RuntimeArgs = RuntimeArgs.fromNamedArgs([]);
     const allowed_builder_functions = Object.keys(CLValueBuilder);
-    console.log(argsValues);
     argsValues && argsValues.forEach(arg => {
       if (arg && !arg.trim()) {
         return;
@@ -360,7 +359,6 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
 
   onArgsChange() {
     const deploy_args = this.argsElt?.nativeElement.value;
-    console.log(deploy_args);
     deploy_args && this.storageService.setState({ deploy_args });
   }
 

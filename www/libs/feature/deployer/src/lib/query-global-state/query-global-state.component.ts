@@ -65,7 +65,7 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
         this.keyElt.nativeElement.value = state.key;
         this.onKeyChange();
       }
-      if (!state.path) {
+      if (!state.path && !state.stateRootHash) {
         this.pathElt.nativeElement.value = "";
         this.getBlockState();
       }

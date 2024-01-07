@@ -1,13 +1,13 @@
 {
-  "name": "escrow",
+  "name": "deployer",
   "version": "0.1.0",
   "files": [
-    "escrow_bg.wasm",
-    "escrow.js",
-    "escrow.d.ts"
+    "deployer_bg.wasm",
+    "deployer.js",
+    "deployer.d.ts"
   ],
-  "module": "escrow.js",
-  "types": "escrow.d.ts",
+  "module": "deployer.js",
+  "types": "deployer.d.ts",
   "sideEffects": [
     "./snippets/*"
   ]

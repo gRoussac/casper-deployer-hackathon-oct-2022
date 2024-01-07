@@ -7,7 +7,9 @@
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/apps/frontend",
         "index": "apps/frontend/src/index.html",
@@ -21,7 +23,7 @@
           "apps/frontend/src/assets",
           {
             "input": "../wasm/pkg",
-            "glob": "escrow_bg.wasm",
+            "glob": "deployer_bg.wasm",
             "output": "assets"
           }
         ],
@@ -30,8 +32,13 @@
           "./node_modules/highlight.js/styles/lightfair.css",
           "./node_modules/toastr/build/toastr.min.css"
         ],
-        "scripts": ["./node_modules/toastr/build/toastr.min.js"],
-        "allowedCommonJsDependencies": ["casper-js-sdk", "promise-worker"]
+        "scripts": [
+          "./node_modules/toastr/build/toastr.min.js"
+        ],
+        "allowedCommonJsDependencies": [
+          "casper-js-sdk",
+          "promise-worker"
+        ]
       },
       "configurations": {
         "production": {
@@ -90,12 +97,17 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": ["apps/frontend/**/*.ts", "apps/frontend/**/*.html"]
+        "lintFilePatterns": [
+          "apps/frontend/**/*.ts",
+          "apps/frontend/**/*.html"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/apps/frontend"],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/frontend"
+      ],
       "options": {
         "jestConfig": "apps/frontend/jest.config.ts",
         "passWithNoTests": true

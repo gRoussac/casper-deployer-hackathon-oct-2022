@@ -3,7 +3,7 @@
     <h2 class="title">Deploy</h2>
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="apiUrl"
       >
         Chain name
@@ -23,7 +23,7 @@
         <select
           (change)="selectChainName($event)"
           #chainNameSelectElt
-          class="border border-gray-300 text-gray-900 text-sm focus:outline-none rounded focus:shadow-outline block w-full p-2.5"
+          class="border border-gray-300 text-gray-900 text-xs focus:outline-none rounded focus:shadow-outline block w-full p-2.5"
         >
           <optgroup label="default">
             <option [value]="config['chainName_test']">
@@ -38,7 +38,7 @@
     </div>
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="publicKey"
       >
         Public key hex
@@ -61,7 +61,7 @@
     <div class="mb-4 flex justify-between">
       <div class="mr-1">
         <label
-          class="flex justify-between items-end text-gray-700 text-sm font-bold mb-2"
+          class="flex justify-between items-end text-gray-700 text-xs font-bold mb-2"
           for="gasFee"
         >
           Gas fee max
@@ -82,7 +82,7 @@
       </div>
       <div class="ml-1">
         <label
-          class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+          class="flex justify-between text-gray-700 text-xs font-bold mb-2"
           for="TTL"
         >
           TTL
@@ -103,7 +103,7 @@
     <hr class="mb-3" />
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="sessionPath"
       >
         Session Code path
@@ -120,7 +120,7 @@
           accept=".wasm"
         />
         <button
-          class="flex items-end mr-3 bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+          class="flex items-end mr-3 bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
           type="button"
           (click)="sessionPathElt.click()"
         >
@@ -187,7 +187,7 @@
     <hr class="mb-3" />
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="sessionName"
       >
         Smart Contract name
@@ -208,7 +208,7 @@
     </div>
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="sessionHash"
       >
         Smart Contract hash or Package hash
@@ -229,7 +229,7 @@
     </div>
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="entryPointElt"
       >
         Entry point
@@ -257,7 +257,7 @@
         <select
           #selectEntryPointElt
           (change)="selectEntryPointChange($event)"
-          class="border border-gray-300 text-gray-900 text-sm focus:outline-none rounded focus:shadow-outline block w-full p-2.5"
+          class="border border-gray-300 text-gray-900 text-xs focus:outline-none rounded focus:shadow-outline block w-full p-2.5"
         >
           <option *ngFor="let option of options" [value]="option">
             {{ option }}
@@ -267,7 +267,7 @@
     </div>
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="args"
       >
         <span>Args</span>
@@ -293,7 +293,7 @@
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center flex-start grow">
         <label
-          class="self-end flex justify-between text-gray-700 text-sm font-bold mb-2 mt-3 mr-2"
+          class="self-end flex justify-between text-gray-700 text-xs font-bold mb-2 mt-3 mr-2"
           for="isPackage"
         >
           Call Package
@@ -309,7 +309,7 @@
       </div>
       <div class="flex ml-3">
         <label
-          class="self-end flex justify-between text-gray-700 text-sm font-bold mb-2 mr-2"
+          class="self-end flex justify-between text-gray-700 text-xs font-bold mb-2 mr-2"
           for="amount"
         >
           Version
@@ -328,7 +328,7 @@
     </div>
     <div class="flex items-center justify-between mb-2">
       <button
-        class="flex bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        class="flex bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
         type="button"
         (click)="makeDeploy()"
         [attr.disabled]="isMakeDeployDisabled ? true : null"
@@ -351,7 +351,7 @@
       </button>
       <!-- TODO Buggy -->
       <button
-        class="flex bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        class="flex bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
         type="button"
         (click)="speculativeDeploy()"
         [attr.disabled]="true"
@@ -373,7 +373,7 @@
         </svg>
       </button>
       <button
-        class="flex bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        class="flex bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
         type="button"
         (click)="signDeploy()"
         [attr.disabled]="isMakeDeployDisabled ? true : null"

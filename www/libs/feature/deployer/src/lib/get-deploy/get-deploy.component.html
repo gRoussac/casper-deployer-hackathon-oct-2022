@@ -3,7 +3,7 @@
     <h2 class="title">Deploy Info</h2>
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="activePublicKey"
       >
         Deploy hash <input type="reset" value="clear" (click)="reset()" />
@@ -22,7 +22,7 @@
     </div>
     <div class="flex items-end">
       <button
-        class="flex items-end ml-auto flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        class="flex items-end ml-auto flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
         type="button"
         (click)="getDeploy()"
         [attr.disabled]="isGetDeployDisabled ? true : null"

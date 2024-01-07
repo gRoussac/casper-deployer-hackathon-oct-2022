@@ -1,11 +1,11 @@
 import { ApplicationInitStatus, APP_INITIALIZER, inject, InjectionToken, Provider } from "@angular/core";
-import init, { Escrow } from "escrow";
+import init, { Deployer } from "deployer";
 
-export const ESCROW_TOKEN = new InjectionToken<Escrow>('escrow');
+export const DEPLOYER_TOKEN = new InjectionToken<Deployer>('deployer');
 
-export const fetchWasmFactory = async (): Promise<Escrow> => {
-  const wasm = await init('assets/escrow_bg.wasm');
-  return wasm && Escrow.new();
+export const fetchWasmFactory = async (): Promise<Deployer> => {
+  const wasm = await init('assets/deployer_bg.wasm');
+  return wasm && Deployer.new();
 };
 
 export function provideSafeAsync<T>(

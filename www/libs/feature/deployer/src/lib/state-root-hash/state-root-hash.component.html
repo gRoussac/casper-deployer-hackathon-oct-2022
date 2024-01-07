@@ -3,7 +3,7 @@
     <h2 class="title">Network</h2>
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="apiUrl"
       >
         Node
@@ -26,7 +26,7 @@
       <div class="mb-2">
         <select
           (change)="selectApiUrl($event); getStatus()"
-          class="border border-gray-300 text-gray-900 text-sm focus:outline-none rounded focus:shadow-outline block w-full p-2.5"
+          class="border border-gray-300 text-gray-900 text-xs focus:outline-none rounded focus:shadow-outline block w-full p-2.5"
         >
           <optgroup label="default">
             <option [value]="config['apiUrl_default']">
@@ -54,7 +54,7 @@
     </div>
     <div class="flex items-center justify-between">
       <label
-        class="self-end block text-gray-700 text-sm font-bold mb-2 mr-3"
+        class="self-end block text-gray-700 text-xs font-bold mb-2 mr-3"
         for="apiUrl"
       >
         Suffix
@@ -69,7 +69,7 @@
         (keyup.enter)="getStateRootHash()"
       />
       <button
-        class="flex items-end ml-auto bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        class="flex items-end ml-auto bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         type="button"
         (click)="getStatus()"
       >
@@ -105,7 +105,7 @@
         </svg>
       </button>
       <button
-        class="flex items-end ml-auto bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        class="flex items-end ml-auto bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
         type="button"
         (click)="getStateRootHash()"
         [attr.disabled]="status !== 'status' ? true : null"

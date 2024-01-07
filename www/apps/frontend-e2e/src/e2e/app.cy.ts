@@ -1,4 +1,4 @@
-describe('escrow', () => {
+describe('deployer', () => {
 
   beforeEach(() => {
     cy.intercept('/api/users').as('getUsers');

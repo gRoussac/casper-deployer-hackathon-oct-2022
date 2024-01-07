@@ -6,8 +6,8 @@ import { Subscription, map } from 'rxjs';
 import { HeaderComponent } from '@casper-ui/header';
 import { UsersService } from '@casper-data/data-access-users';
 import { Users, User, Roles, Purse } from '@casper-api/api-interfaces';
-import { ESCROW_TOKEN } from '@casper-util/wasm';
-import { Escrow } from "escrow";
+import { DEPLOYER_TOKEN } from '@casper-util/wasm';
+import { Deployer } from "deployer";
 import { CasperLabsHelper } from 'casper-js-sdk/dist/@types/casperlabsSigner';
 import { RouterModule } from '@angular/router';
 import { RouteurHubService } from '@casper-util/routeur-hub';
@@ -57,7 +57,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
-    @Inject(ESCROW_TOKEN) private readonly escrow: Escrow,
+    @Inject(DEPLOYER_TOKEN) private readonly deployer: Deployer,
     private readonly usersService: UsersService,
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly routeurHubService: RouteurHubService,
@@ -71,7 +71,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.window = this.document.defaultView;
     this.window?.addEventListener('signer:unlocked', async () => await this.refreshData());
     this.window?.addEventListener('signer:activeKeyChanged', async () => await this.refreshData());
-    this.escrow.hello();
+    this.deployer.hello();
   }
 
   ngAfterViewInit() {

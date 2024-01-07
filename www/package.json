@@ -31,7 +31,7 @@
     "@nestjs/platform-express": "^10.3.0",
     "@nx/angular": "17.2.8",
     "casper-js-sdk": "^2.15.3",
-    "escrow": "file:../wasm/pkg",
+    "deployer": "file:../wasm/pkg",
     "highlight.js": "^11.9.0",
     "http-proxy-middleware": "^2.0.6",
     "promise-worker": "^2.0.1",

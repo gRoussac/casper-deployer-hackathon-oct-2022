@@ -5,8 +5,8 @@ import { DeployerService } from '@casper-data/data-access-deployer';
 import { ResultService } from '../result/result.service';
 import { State } from '@casper-api/api-interfaces';
 import { StoredValue } from 'casper-js-sdk/dist/lib/StoredValue';
-import { Escrow } from 'escrow';
-import { ESCROW_TOKEN } from '@casper-util/wasm';
+import { Deployer } from 'deployer';
+import { DEPLOYER_TOKEN } from '@casper-util/wasm';
 import { CLPublicKey } from 'casper-js-sdk';
 
 @Component({
@@ -33,7 +33,7 @@ export class DictionaryComponent implements AfterViewInit, OnDestroy {
   constructor(
     private readonly deployerService: DeployerService,
     private readonly resultService: ResultService,
-    @Inject(ESCROW_TOKEN) private readonly escrow: Escrow,
+    @Inject(DEPLOYER_TOKEN) private readonly deployer: Deployer,
     private readonly changeDetectorRef: ChangeDetectorRef
   ) { }
 
@@ -91,7 +91,7 @@ export class DictionaryComponent implements AfterViewInit, OnDestroy {
   }
 
   setAccountBase64() {
-    const base64 = this.escrow.account_hash_to_base64_encode(CLPublicKey.fromHex(this.activePublicKey).toAccountHashStr());
+    const base64 = this.deployer.account_hash_to_base64_encode(CLPublicKey.fromHex(this.activePublicKey).toAccountHashStr());
     base64 && (this.dictionaryItemKeyElt.nativeElement.value = base64);
   }
 

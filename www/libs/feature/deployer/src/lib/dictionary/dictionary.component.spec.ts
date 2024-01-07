@@ -5,7 +5,7 @@ import { DeployerService } from '@casper-data/data-access-deployer';
 import { config, ENV_CONFIG } from '@casper-util/config';
 import { HIGHLIGHT_WEBWORKER_FACTORY } from '@casper-util/hightlight-webworker';
 import { TOASTER_TOKEN } from '@casper-util/toaster';
-import { ESCROW_TOKEN } from '@casper-util/wasm';
+import { DEPLOYER_TOKEN } from '@casper-util/wasm';
 import { ResultService } from '../result/result.service';
 import { DictionaryComponent } from './dictionary.component';
 
@@ -31,7 +31,7 @@ describe('DictionaryComponent', () => {
           provide: TOASTER_TOKEN, useValue: {},
         },
         {
-          provide: ESCROW_TOKEN, useValue: {
+          provide: DEPLOYER_TOKEN, useValue: {
             account_hash_to_base64_encode: jest.fn()
           },
         },

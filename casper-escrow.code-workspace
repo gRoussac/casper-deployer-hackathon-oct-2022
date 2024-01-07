@@ -5,12 +5,6 @@
     },
     {
       "path": "www"
-    },
-    {
-      "path": "casper/contracts"
-    },
-    {
-      "path": "casper/contracts/contract-test"
     }
   ],
   "settings": {}

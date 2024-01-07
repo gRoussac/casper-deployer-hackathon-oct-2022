@@ -104,7 +104,6 @@ Smart contracts are implemented in [Rust](https://www.rust-lang.org/) + [Casper 
 
 ## Folders at root directory is as follow :
 
-- casper : contrains Casper test smart contracts files
 - docker: contains Docker files
 - wasm: contains client wasm files
 - www: contains the Web application files
@@ -200,8 +199,8 @@ Smart contracts are implemented in [Rust](https://www.rust-lang.org/) + [Casper 
 
 ## Prerequisites
 
-- npm >= 8.19.2
-- nodejs >= 18.7.0 & < 19
+- npm >= 10.2.5
+- nodejs >= v20.10.0
 
 This web project was generated and is using
 
@@ -350,14 +349,6 @@ Run `nx graph` to see a diagram of the dependencies of the projects.
 
 Visit the [Nx Documentation](https://nx.dev/angular) to learn more.
 
-## 😶‍🌫️ Nx Cloud
-
-### Distributed Computation Caching & Distributed Task Execution
-
-Nx Cloud pairs with Nx in order to enable you to build and test code more rapidly, by up to 10 times.
-
-Visit [Nx Cloud](https://nx.app/) to learn more.
-
 #
 
 # 🚧 Workflow and contributions
@@ -380,4 +371,4 @@ Go to the `#hackathon` channel [on Discord](https://discord.gg/casperblockchain)
 
 ### 🪦 Errors ?
 
-If you see any typos or errors you can edit the code directly on GitHub and raise a Pull Request on `develop` branch, many thanks !
+If you see any typos or errors you can edit the code directly on GitHub and raise a Pull Request on `dev` branch, many thanks !

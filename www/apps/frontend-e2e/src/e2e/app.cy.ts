@@ -1,6 +1,6 @@
 describe('escrow', () => {
 
-  before(() => {
+  beforeEach(() => {
     cy.intercept('/api/users').as('getUsers');
     cy.intercept(/\/api\/deployer\/status\?apiUrl=http:\/\/.+\/rpc/).as('getStatus');
     cy.intercept(/\/api\/deployer\/peers\?apiUrl=http:\/\/.+\/rpc/).as('getPeers');

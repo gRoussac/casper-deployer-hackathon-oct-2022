@@ -6,7 +6,7 @@
   "targets": {
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/util/services/wasm"],
+      "outputs": ["{workspaceRoot}/coverage/libs/util/services/wasm"],
       "options": {
         "jestConfig": "libs/util/services/wasm/jest.config.ts",
         "passWithNoTests": true

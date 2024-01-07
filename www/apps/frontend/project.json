@@ -6,8 +6,10 @@
   "prefix": "casper",
   "targets": {
     "build": {
-      "executor": "@angular-builders/custom-webpack:browser",
-      "outputs": ["{options.outputPath}"],
+      "executor": "@angular-devkit/build-angular:browser",
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/apps/frontend",
         "index": "apps/frontend/src/index.html",
@@ -30,16 +32,13 @@
           "./node_modules/highlight.js/styles/lightfair.css",
           "./node_modules/toastr/build/toastr.min.css"
         ],
-        "scripts": ["./node_modules/toastr/build/toastr.min.js"],
-        "customWebpackConfig": {
-          "path": "custom-webpack.config.js",
-          "mergeRules": {
-            "module": {
-              "rules": "prepend"
-            }
-          },
-          "replaceDuplicatePlugins": true
-        }
+        "scripts": [
+          "./node_modules/toastr/build/toastr.min.js"
+        ],
+        "allowedCommonJsDependencies": [
+          "casper-js-sdk",
+          "promise-worker"
+        ]
       },
       "configurations": {
         "production": {
@@ -75,36 +74,40 @@
       "defaultConfiguration": "production"
     },
     "serve": {
-      "executor": "@angular-builders/custom-webpack:dev-server",
+      "executor": "@angular-devkit/build-angular:dev-server",
       "configurations": {
         "production": {
-          "browserTarget": "AngularCustomWebpackConfig:build:production"
+          "buildTarget": "frontend:build:production"
         },
         "development": {
-          "browserTarget": "frontend:build:development"
+          "buildTarget": "frontend:build:development"
         }
       },
       "defaultConfiguration": "development",
       "options": {
-        "proxyConfig": "apps/frontend/proxy.conf.json",
-        "browserTarget": "AngularCustomWebpackConfig:build"
+        "proxyConfig": "apps/frontend/proxy.conf.json"
       }
     },
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "browserTarget": "frontend:build"
+        "buildTarget": "frontend:build"
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": ["apps/frontend/**/*.ts", "apps/frontend/**/*.html"]
+        "lintFilePatterns": [
+          "apps/frontend/**/*.ts",
+          "apps/frontend/**/*.html"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/frontend"],
+      "outputs": [
+        "coverage/apps/frontend"
+      ],
       "options": {
         "jestConfig": "apps/frontend/jest.config.ts",
         "passWithNoTests": true

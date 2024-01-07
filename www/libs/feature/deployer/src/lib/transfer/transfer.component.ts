@@ -24,7 +24,7 @@ export class TransferComponent implements AfterViewInit, OnDestroy {
   @ViewChild('transferToElt') transferToElt!: ElementRef;
   @ViewChild('transferFromElt') transferFromElt!: ElementRef;
 
-  readonly window = this.document.defaultView;
+  window!: (Window & typeof globalThis) | null;
   activePublicKey?: string;
   apiUrl?: string;
 
@@ -38,7 +38,9 @@ export class TransferComponent implements AfterViewInit, OnDestroy {
     @Inject(ENV_CONFIG) public readonly config: EnvironmentConfig,
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly watcherService: WatcherService
-  ) { }
+  ) {
+    this.window = this.document.defaultView;
+  }
 
   ngAfterViewInit(): void {
     this.getStateSubscription = this.deployerService.getState().subscribe((state: State) => {

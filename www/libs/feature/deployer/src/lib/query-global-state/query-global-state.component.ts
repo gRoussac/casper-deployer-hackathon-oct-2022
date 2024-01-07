@@ -21,7 +21,7 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
   apiUrl?: string;
   stateRootHash?: string;
   activePublicKey?: string;
-  status?= '';
+  status? = '';
   @Output() connect: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('keyElt') keyElt!: ElementRef;
   @ViewChild('pathElt') pathElt!: ElementRef;

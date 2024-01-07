@@ -50,13 +50,13 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     return this._argument;
   }
 
-  readonly window = this.document.defaultView;
+  window!: (Window & typeof globalThis) | null;
   readonly quoteRegex = new RegExp(['^', "'", '+|', "'", '+$'].join(''), 'g');
   activePublicKey?: string;
   publicKey?: string;
   apiUrl?: string;
-  gasFee = this.config['gasFee'];
-  TTL = this.config['TTL'];
+  gasFee!: string;
+  TTL!: string;
   sessionPath!: string;
   sessionName!: string;
   sessionHash!: string;
@@ -83,7 +83,11 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     private readonly resultService: ResultService,
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly storageService: StorageService
-  ) { }
+  ) {
+    this.window = this.document.defaultView;
+    this.gasFee = this.config['gasFee'];
+    this.TTL = this.config['TTL'];
+  }
 
   ngAfterViewInit(): void {
     this.getStateSubscription = this.deployerService.getState().subscribe((state: State) => {

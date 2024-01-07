@@ -39,7 +39,7 @@ const imports = [
   ],
 })
 export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
-  readonly window = this.document.defaultView;
+  window!: (Window & typeof globalThis) | null;
   isConnected!: boolean;
   activePublicKey!: string;
   users!: Users;
@@ -68,6 +68,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   async ngOnInit(): Promise<void> {
     this.setRouteurHubSubscriptions();
     this.setUsersSubscription();
+    this.window = this.document.defaultView;
     this.window?.addEventListener('signer:unlocked', async () => await this.refreshData());
     this.window?.addEventListener('signer:activeKeyChanged', async () => await this.refreshData());
     this.escrow.hello();

@@ -57,7 +57,7 @@
         [placeholder]="'ex: ' + (+config['minimumTransfer']).toLocaleString()"
       />
       <button
-        class="flex items-end ml-2 flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        class="flex items-end ml-2 flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
         type="button"
         (click)="transfer()"
         [attr.disabled]="isButtonDisabled ? true : null"

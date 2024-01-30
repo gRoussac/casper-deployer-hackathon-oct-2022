@@ -4,10 +4,9 @@ import { Subscription } from 'rxjs';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { ResultService } from '../result/result.service';
 import { State } from '@casper-api/api-interfaces';
-import { StoredValue } from 'casper-js-sdk/dist/lib/StoredValue';
 import { Deployer } from 'deployer';
 import { DEPLOYER_TOKEN } from '@casper-util/wasm';
-import { CLPublicKey } from 'casper-js-sdk';
+import { PublicKey } from 'casper-sdk';
 
 @Component({
   selector: 'casper-deployer-state-dictionary',
@@ -54,8 +53,8 @@ export class DictionaryComponent implements AfterViewInit, OnDestroy {
   }
 
   getDictionary() {
-    this.stateRootHash && (this.getDictionarySubscription = this.deployerService.getDictionaryItemByName(this.stateRootHash, this.contractHash, this.dictionaryName, this.dictionaryItemKey, this.seedUref, this.apiUrl).subscribe(dict => {
-      dict && this.resultService.setResult<StoredValue>('Dictionnary', dict as StoredValue);
+    this.stateRootHash && (this.getDictionarySubscription = this.deployerService.getDictionaryItem(this.stateRootHash, this.contractHash, this.dictionaryName, this.dictionaryItemKey, this.seedUref, this.apiUrl).subscribe(dict => {
+      dict && this.resultService.setResult<object>('Dictionnary', dict);
       this.getDictionarySubscription.unsubscribe();
     }));
   }
@@ -91,7 +90,8 @@ export class DictionaryComponent implements AfterViewInit, OnDestroy {
   }
 
   setAccountBase64() {
-    const base64 = this.deployer.account_hash_to_base64_encode(CLPublicKey.fromHex(this.activePublicKey).toAccountHashStr());
+    const account_hash = new PublicKey(this.activePublicKey).toAccountHash().toFormattedString();
+    const base64 = this.deployer.account_hash_to_base64_encode(account_hash);
     base64 && (this.dictionaryItemKeyElt.nativeElement.value = base64);
   }
 
@@ -99,7 +99,8 @@ export class DictionaryComponent implements AfterViewInit, OnDestroy {
     if (!this.activePublicKey) {
       return;
     }
-    this.dictionaryItemKeyElt.nativeElement.value = (CLPublicKey.fromHex(this.activePublicKey).toAccountHashStr()).split('-').pop() || '';
+    const account_hash = new PublicKey(this.activePublicKey).toAccountHash().toHexString();
+    this.dictionaryItemKeyElt.nativeElement.value = (account_hash) || '';
   }
 
   reset() {

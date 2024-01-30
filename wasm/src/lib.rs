@@ -13,6 +13,7 @@ pub struct Deployer {}
 
 #[wasm_bindgen]
 impl Deployer {
+    #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
         Deployer {}
     }

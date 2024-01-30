@@ -11,41 +11,34 @@
       <div class="mb-2">
         <input
           [ngClass]="{
-            'empty:bg-red-200': loaded && apiUrlElt.value === ''
+            'empty:bg-red-200': apiUrlElt.value === ''
           }"
           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           name="apiUrl"
           #apiUrlElt
           type="url"
-          [placeholder]="'ex: ' + config['apiUrl_default']"
-          [value]="storageApiUrl || config['apiUrl_default']"
+          [placeholder]="'ex: ' + config['default_node_localhost']"
+          [value]="apiUrl || config['default_node_localhost']"
           (keyup.enter)="getStateRootHash()"
-          (change)="selectApiUrl($event); getStatus()"
+          (change)="selectApiUrl($event)"
         />
       </div>
       <div class="mb-2">
         <select
-          (change)="selectApiUrl($event); getStatus()"
+          (change)="selectApiUrl($event)"
           class="border border-gray-300 text-gray-900 text-xs focus:outline-none rounded focus:shadow-outline block w-full p-2.5"
         >
           <optgroup label="default">
-            <option [value]="config['apiUrl_default']">
-              {{ config['apiUrl_default'] }}
-            </option>
             <option
-              [value]="config['apiUrl_localhost']"
-              [attr.selected]="
-                storageApiUrl === config['apiUrl_localhost'] ? true : null
-              "
+              *ngFor="let default of defaults; index as i"
+              [attr.selected]="apiUrl === default ? true : null"
             >
-              {{ config['apiUrl_localhost'] }}
+              {{ default }}
             </option>
           </optgroup>
+
           <optgroup label="fetched">
-            <option
-              *ngFor="let peer of peers; index as i; trackBy: trackByFn"
-              [attr.selected]="storageApiUrl === peer.address ? true : null"
-            >
+            <option *ngFor="let peer of peers; index as i; trackBy: trackByFn">
               {{ peer.address }}
             </option>
           </optgroup>
@@ -53,23 +46,8 @@
       </div>
     </div>
     <div class="flex items-center justify-between">
-      <label
-        class="self-end block text-gray-700 text-xs font-bold mb-2 mr-3"
-        for="apiUrl"
-      >
-        Suffix
-      </label>
-      <input
-        class="w-20 shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        name="apiSuffix"
-        #apiSuffixElt
-        type="text"
-        [placeholder]="'ex: ' + config['api_suffix']"
-        [value]="config['api_suffix']"
-        (keyup.enter)="getStateRootHash()"
-      />
       <button
-        class="flex items-end ml-auto bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        class="flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         type="button"
         (click)="getStatus()"
       >
@@ -105,10 +83,9 @@
         </svg>
       </button>
       <button
-        class="flex items-end ml-auto bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        class="flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
         type="button"
         (click)="getStateRootHash()"
-        [attr.disabled]="status !== 'status' ? true : null"
       >
         State root hash
         <svg

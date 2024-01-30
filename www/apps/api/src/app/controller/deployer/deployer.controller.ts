@@ -1,7 +1,7 @@
 import { api_interface, DeployReturn, Peer } from '@casper-api/api-interfaces';
 import { Controller, Get, Post, Query, Body } from '@nestjs/common';
-import { DeployUtil, GetDeployResult, StoredValue } from 'casper-js-sdk';
 import { AppService } from '../../app.service';
+import { Deploy, GetDeployResult } from 'casper-sdk-nodejs';
 
 @Controller(api_interface.Deployer)
 export class DeployerController {
@@ -38,14 +38,13 @@ export class DeployerController {
 
   @Get(api_interface.PurseURef)
   async getPurseURef(
-    @Query('stateRootHash') stateRootHash: string,
     @Query('publicKey') publicKey?: string,
     @Query('apiUrl') apiUrl?: string
 
   ): Promise<string | Error> {
     try {
       const stringify = true;
-      return await this.appService.getPurseURef(stateRootHash, publicKey, apiUrl, stringify);
+      return await this.appService.getPurseURef(publicKey, apiUrl, stringify);
     } catch (error) {
       return { name: error.toString(), message: error };
     }
@@ -58,7 +57,7 @@ export class DeployerController {
     @Query('path') path?: string,
     @Query('apiUrl') apiUrl?: string
 
-  ): Promise<StoredValue | Error> {
+  ): Promise<object | Error> {
     try {
       return await this.appService.getBlockState(stateRootHash, key, path && JSON.parse(path), apiUrl);
     } catch (error) {
@@ -112,12 +111,13 @@ export class DeployerController {
     @Body('apiUrl') apiUrl?: string,
   ): Promise<DeployReturn | Error> {
     try {
-      const signedDeployFromJson = DeployUtil.deployFromJson(JSON.parse(signedDeploy));
+      const signedDeployFromJson = JSON.parse(signedDeploy);
       if (signedDeployFromJson.err) {
         console.error(signedDeployFromJson.val.message);
         return;
       }
-      return await this.appService.putDeploy(signedDeployFromJson.val as DeployUtil.Deploy, speculative, apiUrl);
+      const deploy = new Deploy(signedDeployFromJson);
+      return await this.appService.putDeploy(deploy, speculative, apiUrl);
     } catch (error) {
       return { name: error.toString(), message: error };
     }
@@ -132,12 +132,12 @@ export class DeployerController {
     @Query('seedUref') seedUref?: string,
     @Query('rawData') rawData?: boolean,
     @Query('apiUrl') apiUrl?: string,
-  ): Promise<StoredValue | Error> {
+  ): Promise<object | Error> {
     try {
       if (seedUref) {
-        return await this.appService.getDictionaryItemByURef(stateRootHash, dictionaryItemKey, seedUref, rawData, apiUrl);
+        return await this.appService.getDictionaryItemByURef(stateRootHash, dictionaryItemKey, seedUref, apiUrl);
       }
-      return await this.appService.getDictionaryItemByName(stateRootHash, contractHash, dictionaryName, dictionaryItemKey, rawData, apiUrl);
+      return await this.appService.getDictionaryItemByName(stateRootHash, contractHash, dictionaryName, dictionaryItemKey, apiUrl);
     } catch (error) {
       return { name: error.toString(), message: error };
     }

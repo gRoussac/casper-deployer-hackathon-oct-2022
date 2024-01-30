@@ -16,7 +16,6 @@ export class WatcherService {
   watchDeploy(deployHash: string, apiUrl?: string) {
     const config = this.config;
     apiUrl = apiUrl?.replace(config['rpc_port'], config['sse_port']);
-    apiUrl = apiUrl?.replace(config['api_suffix'], '');
     let eventsUrl = apiUrl?.includes(config['localhost']) ? config['eventsUrl_localhost'] : '';
     eventsUrl += apiUrl?.includes(config['localhost']) ?
       config['events_main_suffix'] :

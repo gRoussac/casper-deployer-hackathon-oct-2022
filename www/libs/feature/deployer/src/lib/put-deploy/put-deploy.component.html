@@ -15,8 +15,7 @@
           name="chainName"
           #chainNameElt
           type="search"
-          [placeholder]="'ex: ' + config['chainName_test']"
-          [value]="config['chainName_test']"
+          [placeholder]="'ex: ' + config['chain_name_testnet']"
         />
       </div>
       <div class="mb-2">
@@ -26,11 +25,37 @@
           class="border border-gray-300 text-gray-900 text-xs focus:outline-none rounded focus:shadow-outline block w-full p-2.5"
         >
           <optgroup label="default">
-            <option [value]="config['chainName_test']">
-              {{ config['chainName_test'] }}
+            <option
+              [value]="config['chain_name_testnet']"
+              [attr.selected]="
+                chain_name === config['chain_name_testnet'] || null
+              "
+            >
+              {{ config['chain_name_testnet'] }}
             </option>
-            <option [value]="config['chainName_localhost']">
-              {{ config['chainName_localhost'] }}
+            <option
+              [value]="config['chain_name_localhost']"
+              [attr.selected]="
+                chain_name === config['chain_name_localhost'] || null
+              "
+            >
+              {{ config['chain_name_localhost'] }}
+            </option>
+            <option
+              [value]="config['chain_name_integration']"
+              [attr.selected]="
+                chain_name === config['chain_name_integration'] || null
+              "
+            >
+              {{ config['chain_name_integration'] }}
+            </option>
+            <option
+              [value]="config['chain_name_mainnet']"
+              [attr.selected]="
+                chain_name === config['chain_name_mainnet'] || null
+              "
+            >
+              {{ config['chain_name_mainnet'] }}
             </option>
           </optgroup>
         </select>
@@ -53,7 +78,7 @@
           #publicKeyElt
           type="search"
           [value]="publicKey || ''"
-          (change)="publicKeyChange($event)"
+          (change)="publicKeyChange()"
           placeholder="ex: 0x"
         />
       </div>
@@ -95,7 +120,7 @@
             type="search"
             [value]="TTL || ''"
             (change)="(true)"
-            placeholder="ex: 1800000"
+            placeholder="ex: 30m"
           />
         </div>
       </div>
@@ -234,32 +259,30 @@
       >
         Entry point
       </label>
-      <div
-        class="mb-2"
-        *ngIf="entryPointElt?.nativeElement.value || options.length === 1"
-      >
+      <div class="mb-2" *ngIf="options.length === 1">
         <input
           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-slate-100"
           name="entryPoint"
           #entryPointElt
           type="search"
           [value]="entryPoint || ''"
-          (change)="(true)"
+          (change)="inputEntryPointChange($event)"
           placeholder="ex: counter_inc"
           [attr.disabled]="isEntryPointDisabled ? true : null"
         />
       </div>
 
-      <div
-        class="mb-2"
-        *ngIf="!entryPointElt?.nativeElement.value && options.length > 1"
-      >
+      <div class="mb-2" *ngIf="options.length > 1">
         <select
           #selectEntryPointElt
           (change)="selectEntryPointChange($event)"
           class="border border-gray-300 text-gray-900 text-xs focus:outline-none rounded focus:shadow-outline block w-full p-2.5"
         >
-          <option *ngFor="let option of options" [value]="option">
+          <option
+            *ngFor="let option of options"
+            [value]="option"
+            [selected]="option === entryPoint"
+          >
             {{ option }}
           </option>
         </select>
@@ -270,7 +293,7 @@
         class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="args"
       >
-        <span>Args</span>
+        <span>Args Json</span>
         <span class="cursor-pointer ml-auto mr-2" (click)="onEdit()"
           >⇇ build</span
         >
@@ -285,7 +308,7 @@
           type="search"
           [value]="argument || ''"
           (change)="onArgsChange()"
-          placeholder="ex: message:string='hello world'; ..."
+          placeholder='ex: [{"name":"message","type":"String","value":"Casper"}, ...]'
           [attr.disabled]="isArgsDisabled ? true : null"
         ></textarea>
       </div>

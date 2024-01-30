@@ -6,5 +6,9 @@
   "/events": {
     "target": "http://localhost:18101",
     "secure": false
+  },
+  "/rpc": {
+    "target": "http://localhost:11101",
+    "secure": false
   }
 }

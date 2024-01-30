@@ -2,8 +2,11 @@
   type="search"
   name="name"
   #nameElt
-  class="shadow appearance-none border rounded w-56 py-1 px-3 mr-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-  [value]="name"
+  class="shadow appearance-none border rounded w-60 py-1 px-3 mr-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+  [value]="
+    defaultType['name'] +
+    (defaultType['optional'] || defaultType['upgrade'] ? ' *' : '')
+  "
 />
 <select
   #typeElt
@@ -13,9 +16,7 @@
 >
   <option
     *ngFor="let type of types; index as index"
-    [attr.selected]="
-      type === defaultType.toString().split(' ').shift() ? true : null
-    "
+    [attr.selected]="type === defaultType['cl_type'].toString() ? true : null"
   >
     {{ type }}
   </option>

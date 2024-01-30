@@ -43,13 +43,18 @@
         <div class="overflow-y-auto">
           <div #form>
             <ng-container *ngFor="let tab of defaultTabs">
-              <ng-container *ngIf="tab.name === active">
+              <ng-container *ngIf="tab['name'] === active">
                 <ng-container
                   *ngFor="let type of tab.types; index as i; trackBy: trackByFn"
                 >
                   <casper-ui-argument
-                    [name]="type.name"
-                    [defaultType]="type.clType"
+                    [defaultType]="type"
+                    *ngIf="
+                      (!hasWasm &&
+                        (!(type.install || type.upgrade) ||
+                          type.entry_point)) ||
+                      (hasWasm && (type.install || type.upgrade))
+                    "
                   ></casper-ui-argument>
                 </ng-container>
               </ng-container>

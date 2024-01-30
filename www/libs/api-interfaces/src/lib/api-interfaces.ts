@@ -1,5 +1,15 @@
-import { NamedCLTypeArg } from "casper-js-sdk";
 import { Roles } from "./api-enums";
+import { CLType } from 'casper-sdk';
+
+export type NamedCLTypeArg = {
+  name: string;
+  cl_type: CLType;
+  entry_points?: string[];
+  install?: boolean;
+  entry_point?: boolean;
+  upgrade?: boolean;
+  optional?: boolean;
+};
 
 export type User = {
   role?: Roles;
@@ -7,10 +17,6 @@ export type User = {
 };
 
 export type Users = User[];
-
-export type Purse = {
-  balance: string;
-};
 
 export type Error = {
   name: string;
@@ -24,6 +30,7 @@ export type Peer = {
 
 export type State = {
   apiUrl?: string;
+  chain_name?: string;
   stateRootHash?: string;
   status?: string;
   deploy_hash?: string;
@@ -37,6 +44,8 @@ export type State = {
   sessionName?: string;
   sessionHash?: string;
   args?: NamedCLTypeArg[];
+  entry_point?: string;
+  has_wasm?: boolean;
 };
 
 export type DeployReturn = {

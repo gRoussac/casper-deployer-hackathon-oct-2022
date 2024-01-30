@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Tabs } from './tabs';
 
@@ -11,14 +11,12 @@ import { Tabs } from './tabs';
   styleUrls: ['./tabs.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TabsComponent implements OnInit {
+export class TabsComponent {
   @Output() activateContent: EventEmitter<Tabs> = new EventEmitter<Tabs>();
   @Input() active!: Tabs;
   tabs = Object.keys(Tabs).filter(key => isNaN(Number(key)));
   default = Tabs.Custom;
   constructor() { }
-
-  ngOnInit(): void { }
 
   isDefault(tabIndex: Tabs) {
     return this.active === tabIndex;

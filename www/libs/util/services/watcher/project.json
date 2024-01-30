@@ -7,7 +7,7 @@
   "targets": {
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/util/services/watcher"],
+      "outputs": ["{workspaceRoot}/coverage/libs/util/services/watcher"],
       "options": {
         "jestConfig": "libs/util/services/watcher/jest.config.ts",
         "passWithNoTests": true

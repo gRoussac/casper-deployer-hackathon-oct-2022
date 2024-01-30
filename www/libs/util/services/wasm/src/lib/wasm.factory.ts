@@ -1,11 +1,25 @@
 import { ApplicationInitStatus, APP_INITIALIZER, inject, InjectionToken, Provider } from "@angular/core";
-import init, { Escrow } from "escrow";
+import * as deployer from "deployer";
+import * as casper_sdk from "casper-sdk";
 
-export const ESCROW_TOKEN = new InjectionToken<Escrow>('escrow');
+const initDeployer = deployer.default;
+const Deployer = deployer.Deployer;
 
-export const fetchWasmFactory = async (): Promise<Escrow> => {
-  const wasm = await init('assets/escrow_bg.wasm');
-  return wasm && Escrow.new();
+const initSDK = casper_sdk.default;
+const SDK = casper_sdk.SDK;
+
+export const DEPLOYER_TOKEN = new InjectionToken<deployer.Deployer>('deployer');
+export const SDK_TOKEN = new InjectionToken<casper_sdk.SDK>('sdk');
+
+export const fetchWasmFactory = async (): Promise<deployer.Deployer> => {
+  const wasm = await initDeployer('assets/deployer_bg.wasm');
+  return wasm && new Deployer();
+};
+
+export const fetchSDKFactory = async (): Promise<casper_sdk.SDK> => {
+  const wasm = await initSDK('assets/casper_rust_wasm_sdk_bg.wasm');
+  const casperSDK = new SDK('http://localhost:4200');
+  return wasm && casperSDK;
 };
 
 export function provideSafeAsync<T>(

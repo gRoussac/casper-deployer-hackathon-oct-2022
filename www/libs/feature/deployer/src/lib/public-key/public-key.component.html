@@ -3,7 +3,7 @@
     <h2 class="title">Config</h2>
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="stateRootHash"
       >
         State root hash
@@ -25,7 +25,7 @@
     </div>
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="activePublicKey"
       >
         Public key hex
@@ -48,7 +48,7 @@
     </div>
     <div class="flex items-center justify-between">
       <button
-        class="flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        class="flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         type="button"
         (click)="onConnect()"
       >
@@ -69,12 +69,12 @@
         </svg>
       </button>
       <button
-        class="flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        class="flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
         type="button"
         (click)="getPurseURef()"
         [attr.disabled]="isPurseButtonDisabled ? true : null"
       >
-        Purse URef
+        Purse
         <svg
           class="w-6 h-6 ml-1"
           fill="none"
@@ -91,7 +91,7 @@
         </svg>
       </button>
       <button
-        class="flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        class="flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
         type="button"
         (click)="balanceOfByPublicKey()"
         [attr.disabled]="isPurseButtonDisabled ? true : null"

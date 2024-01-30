@@ -10,12 +10,14 @@ import { Result } from './result';
 export class ResultService {
 
   private readonly result = new Subject<Result>;
-  private readonly window = this.document.defaultView;
+  private window!: (Window & typeof globalThis) | null;
 
   constructor(
     private readonly highlightService: HighlightService,
     @Inject(DOCUMENT) private document: Document,
-  ) { }
+  ) {
+    this.window = this.document.defaultView;
+  }
 
   getResult() {
     return this.result.asObservable();

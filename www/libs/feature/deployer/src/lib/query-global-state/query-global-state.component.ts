@@ -4,10 +4,11 @@ import { State } from '@casper-api/api-interfaces';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { Subscription } from 'rxjs';
 import { ResultService } from '../result/result.service';
-import { StoredValue } from 'casper-js-sdk/dist/lib/StoredValue';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
-import { CLPublicKey, decodeBase16 } from 'casper-js-sdk';
 import { StorageService } from '@casper-util/storage';
+import { PublicKey } from 'casper-sdk';
+
+type NamedKeysType = { [key: string]: string; };
 
 @Component({
   selector: 'casper-deployer-query-global-state',
@@ -21,7 +22,7 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
   apiUrl?: string;
   stateRootHash?: string;
   activePublicKey?: string;
-  status?= '';
+  status? = '';
   @Output() connect: EventEmitter<void> = new EventEmitter<void>();
   @ViewChild('keyElt') keyElt!: ElementRef;
   @ViewChild('pathElt') pathElt!: ElementRef;
@@ -65,6 +66,10 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
         this.keyElt.nativeElement.value = state.key;
         this.onKeyChange();
       }
+      if (!state.path && !state.stateRootHash) {
+        this.pathElt.nativeElement.value = "";
+        this.getBlockState();
+      }
       this.changeDetectorRef.markForCheck();
     });
     const key = this.storageService.get('key');
@@ -91,27 +96,29 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
       newkey,
       path,
       this.apiUrl
-    ).subscribe(async (storedValue): Promise<void> => {
+    ).subscribe(async (storedValue: object | string): Promise<void> => {
       const isString = typeof storedValue === 'string';
       if (!isString) {
-        const account_keys = storedValue.Account?.namedKeys;
-        const contract_keys = storedValue.Contract?.namedKeys;
+        const account_keys: NamedKeysType[] | undefined = (storedValue as { Account?: { named_keys?: NamedKeysType[]; }; }).Account?.named_keys;
+        const contract_keys: NamedKeysType[] | undefined = (storedValue as { Contract?: { named_keys?: NamedKeysType[]; }; }).Contract?.named_keys;
         const keys = account_keys || contract_keys;
         if (keys) {
           const old_key = this.pathElt.nativeElement.value;
           this.options = [old_key ? old_key : ''];
-          keys.forEach(key => {
-            !old_key && this.options.push(key.name);
-            old_key && this.options.push([old_key, key.name].join('/'));
+          keys.forEach((key: NamedKeysType) => {
+            !old_key && this.options.push(key['name']);
+            old_key && this.options.push([old_key, key['name']].join('/'));
           });
           setTimeout(() => {
             this.selectKeyElt.nativeElement.selectedIndex = 0;
           });
-          this.changeDetectorRef.markForCheck();
+        } else {
+          this.options = [''];
         }
+        this.changeDetectorRef.markForCheck();
       }
       if (!no_result) {
-        storedValue && this.resultService.setResult<StoredValue>('Stored Value', storedValue as StoredValue);
+        storedValue && this.resultService.setResult<object>('Stored Value', storedValue);
       }
       this.getBlockStateSubscription.unsubscribe();
     }));
@@ -138,20 +145,24 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
       this._hasPrevious = false;
     }
     keyOld && this.storageService.setState({ key: keyOld });
+    this.getBlockState();
   }
 
   setAccountHash() {
     if (!this.activePublicKey) {
       return;
     }
-    this.keyElt.nativeElement.value = CLPublicKey.fromHex(this.activePublicKey).toAccountHashStr();
+    const account_hash = new PublicKey(this.activePublicKey).toAccountHash().toFormattedString();
+    this.keyElt.nativeElement.value = account_hash;
     this.onKeyChange();
+    this.getBlockState();
   }
 
   selectKey($event: Event) {
     const path = ($event.target as HTMLSelectElement).value;
     this.pathElt.nativeElement.value = path;
     path && this.storageService.setState({ path });
+    this.getBlockState();
   }
 
   copy(value: string): void {
@@ -165,7 +176,7 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
   onKeyChange() {
     const key = this.keyElt.nativeElement.value;
     const parsing = key.match(this.key_regex);
-    if (parsing.length !== 2 || decodeBase16(parsing[1]).length !== 32) {
+    if (parsing.length !== 2 || parsing[1].length !== 64) {
       return;
     }
     const keyCurrent = this.storageService.get('key');
@@ -178,7 +189,7 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
 
   onPathChange() {
     const path = this.pathElt.nativeElement.value;
-    path && this.getBlockState();
+    this.getBlockState();
     this.storageService.setState({ path });
   }
 

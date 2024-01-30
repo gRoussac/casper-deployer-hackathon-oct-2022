@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ENV_CONFIG, config } from '@casper-util/config';
 
 import { UsersService } from './users.service';
+import { DeployerService } from '@casper-data/data-access-deployer';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -12,6 +13,7 @@ describe('UsersService', () => {
       imports: [HttpClientModule],
       providers: [
         UsersService,
+        DeployerService,
         {
           provide: ENV_CONFIG, useValue: config
         },

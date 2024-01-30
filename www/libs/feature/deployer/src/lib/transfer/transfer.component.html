@@ -3,7 +3,7 @@
     <h2 class="title">Transfer</h2>
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="transferFrom"
       >
         Transfer from <input type="reset" value="clear" />
@@ -22,7 +22,7 @@
     </div>
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="transferToElt"
       >
         Transfer {{ convert() }} CSPR to
@@ -34,14 +34,14 @@
           #transferToElt
           type="search"
           (change)="(true)"
-          placeholder="ex: 0x || uref-0x"
+          placeholder="ex: 0x || account-hash-0x || uref-0x"
         />
       </div>
     </div>
     <div class="mb-4"></div>
     <div class="flex items-center justify-between">
       <label
-        class="self-end flex justify-between text-gray-700 text-sm font-bold mb-2 mr-2"
+        class="self-end flex justify-between text-gray-700 text-xs font-bold mb-2 mr-2"
         for="amount"
       >
         Amount
@@ -57,7 +57,7 @@
         [placeholder]="'ex: ' + (+config['minimumTransfer']).toLocaleString()"
       />
       <button
-        class="flex items-end ml-2 flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        class="flex items-end ml-2 flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
         type="button"
         (click)="transfer()"
         [attr.disabled]="isButtonDisabled ? true : null"

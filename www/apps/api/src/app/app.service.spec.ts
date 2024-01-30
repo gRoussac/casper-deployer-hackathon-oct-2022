@@ -1,11 +1,9 @@
 import { Test } from '@nestjs/testing';
-import { ClientService } from '../client/client.service';
-import { ServiceService } from '../service/service.service';
 import { UrlService } from '../util/url/url.service';
 import { environment } from '../environments/environment';
 import { AppService } from './app.service';
-import { GetPeersResult } from 'casper-js-sdk';
 import { Peer } from '@casper-api/api-interfaces';
+import { SDKService } from '../sdk/sdk.service';
 
 describe('AppService', () => {
   let service: AppService;
@@ -20,11 +18,11 @@ describe('AppService', () => {
     address,
     node_id
   }];
-  const getPeersResult: GetPeersResult = {
+  const getPeersResult = {
     api_version,
     peers
   };
-  const getStatusResult: GetPeersResult = {
+  const getStatusResult = {
     api_version,
     peers: undefined
   };
@@ -32,21 +30,20 @@ describe('AppService', () => {
   const getStateRootHash = jest.fn().mockResolvedValue(test);
   const getStatus = jest.fn().mockResolvedValue(getStatusResult);
 
-  const getService = jest.fn().mockReturnValue({
-    getPeers,
-    getStateRootHash,
-    getStatus
+  const getCasperSDK = jest.fn().mockReturnValue({
+    get_peers: getPeers,
+    get_state_root_hash: getStateRootHash,
+    get_node_status: getStatus
   });
 
   beforeAll(async () => {
     const app = await Test.createTestingModule({
       providers: [
         AppService,
-        ClientService,
         UrlService,
         {
-          provide: ServiceService, useValue: {
-            getService
+          provide: SDKService, useValue: {
+            getCasperSDK
           }
         }
       ],
@@ -60,64 +57,64 @@ describe('AppService', () => {
     });
 
     it('should return network peers', async () => {
-      getService.mockClear();
+      getCasperSDK.mockClear();
       const expectedPeers = [{
         address: `http://${address}:7777`, node_id
       }];
       expect(await service.getPeers(url)).toEqual<Peer[]>(expectedPeers);
-      expect(getService).toHaveBeenNthCalledWith(1, url);
+      expect(getCasperSDK).toHaveBeenNthCalledWith(1, url);
       expect(getPeers).toHaveBeenNthCalledWith(1);
     });
 
     it('should return StateRootHash', async () => {
-      getService.mockClear();
+      getCasperSDK.mockClear();
       const expectedStateRootHash = test;
       expect(await service.getStateRootHash(url)).toEqual<string>(expectedStateRootHash);
-      expect(getService).toHaveBeenNthCalledWith(1, url);
+      expect(getCasperSDK).toHaveBeenNthCalledWith(1, url);
       expect(getStateRootHash).toHaveBeenNthCalledWith(1);
-      getService.mockClear();
+      getCasperSDK.mockClear();
       expect(await service.getStateRootHash('')).toEqual<string>(expectedStateRootHash);
-      expect(getService).toHaveBeenNthCalledWith(1, '');
+      expect(getCasperSDK).toHaveBeenNthCalledWith(1, '');
       expect(getStateRootHash).toHaveBeenCalledTimes(2);
-      getService.mockClear();
+      getCasperSDK.mockClear();
       const stringify = true;
       expect(await service.getStateRootHash(url, stringify)).toEqual<string>(JSON.stringify(expectedStateRootHash));
-      expect(getService).toHaveBeenNthCalledWith(1, url);
+      expect(getCasperSDK).toHaveBeenNthCalledWith(1, url);
       expect(getStateRootHash).toHaveBeenCalledTimes(3);
-      getService.mockClear();
+      getCasperSDK.mockClear();
       expect(await service.getStateRootHash('', stringify)).toEqual<string>(JSON.stringify(expectedStateRootHash));
-      expect(getService).toHaveBeenNthCalledWith(1, '');
+      expect(getCasperSDK).toHaveBeenNthCalledWith(1, '');
       expect(getStateRootHash).toHaveBeenCalledTimes(4);
     });
 
     it('should return Status', async () => {
-      getService.mockClear();
+      getCasperSDK.mockClear();
       const expectedStatus = status;
       expect(await service.getStatus(url)).toEqual<string>(JSON.stringify(expectedStatus));
-      expect(getService).toHaveBeenNthCalledWith(1, url);
+      expect(getCasperSDK).toHaveBeenNthCalledWith(1, url);
       expect(getStatus).toHaveBeenNthCalledWith(1);
-      getService.mockClear();
+      getCasperSDK.mockClear();
       expect(await service.getStatus(undefined)).toEqual<string>(JSON.stringify(expectedStatus));
-      expect(getService).toHaveBeenNthCalledWith(1, undefined);
+      expect(getCasperSDK).toHaveBeenNthCalledWith(1, undefined);
       expect(getStatus).toHaveBeenNthCalledWith(1);
-      getService.mockClear();
+      getCasperSDK.mockClear();
       expect(await service.getStatus('')).toEqual<string>(JSON.stringify(expectedStatus));
-      expect(getService).toHaveBeenNthCalledWith(1, '');
+      expect(getCasperSDK).toHaveBeenNthCalledWith(1, '');
       expect(getStatus).toHaveBeenNthCalledWith(1);
-      getService.mockClear();
+      getCasperSDK.mockClear();
       let expectedResult = '';
       getStatus.mockResolvedValueOnce({
         api_version: expectedResult,
       });
       expect(await service.getStatus('')).toEqual<string>(JSON.stringify(expectedResult));
-      expect(getService).toHaveBeenNthCalledWith(1, '');
+      expect(getCasperSDK).toHaveBeenNthCalledWith(1, '');
       expect(getStatus).toHaveBeenNthCalledWith(1);
       expectedResult = undefined;
       getStatus.mockResolvedValueOnce({
         api_version: expectedResult,
       });
       expect(await service.getStatus('')).toEqual<string>(JSON.stringify(expectedResult));
-      expect(getService).toHaveBeenNthCalledWith(1, '');
+      expect(getCasperSDK).toHaveBeenNthCalledWith(1, '');
       expect(getStatus).toHaveBeenNthCalledWith(1);
     });
 

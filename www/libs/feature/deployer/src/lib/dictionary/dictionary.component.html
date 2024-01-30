@@ -4,7 +4,7 @@
 
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="activePublicKey"
       >
         URef of the dictionary
@@ -24,7 +24,7 @@
     </div>
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="activePublicKey"
       >
         Contract hash
@@ -43,7 +43,7 @@
     </div>
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="activePublicKey"
       >
         Dictionary name
@@ -62,7 +62,7 @@
     </div>
     <div class="mb-4">
       <label
-        class="flex justify-between text-gray-700 text-sm font-bold mb-2"
+        class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="activePublicKey"
       >
         <span>Dictionary item key</span>
@@ -92,7 +92,7 @@
     </div>
     <div class="flex items-end">
       <button
-        class="flex items-end ml-auto flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        class="flex items-end ml-auto flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
         type="button"
         (click)="getDictionary()"
         [attr.disabled]="isButtonDisabled ? true : null"

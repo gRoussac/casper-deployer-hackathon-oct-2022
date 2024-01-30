@@ -7,12 +7,14 @@ import { State } from '@casper-api/api-interfaces';
 })
 export class StorageService {
 
-  private readonly window = this.document.defaultView;
+  private window!: (Window & typeof globalThis) | null;
   private readonly prefix = 'casper-deployer';
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
-  ) { }
+  ) {
+    this.window = this.document.defaultView;
+  }
 
   setState(state: State) {
     const storage = JSON.parse(this.window?.localStorage.getItem(this.prefix) || '{}');

@@ -4,10 +4,27 @@ import { DeployerService } from '@casper-data/data-access-deployer';
 import { ResultService } from '../result/result.service';
 import { DeployReturn, State } from '@casper-api/api-interfaces';
 import { Subscription } from 'rxjs';
-import { CLPublicKey, CLURef, DeployUtil, motesToCSPR } from 'casper-js-sdk';
-import { Result } from 'ts-results';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 import { WatcherService } from '@casper-util/watcher';
+import { Deploy, PublicKey, motesToCSPR } from 'casper-sdk';
+import { DeployService } from '@casper-util/deploy';
+import { JsonTypes } from 'typedjson';
+import { TOASTER_TOKEN, Toaster } from '@casper-util/toaster';
+import { StorageService } from '@casper-util/storage';
+
+type CasperlabsHelperDeploy = { deploy: JsonTypes; };
+
+interface WindowWithCasperlabsHelper {
+  casperlabsHelper?: {
+    sign: (
+      deploy: CasperlabsHelperDeploy,
+      publicKey: string
+    ) => Promise<CasperlabsHelperDeploy>;
+  };
+  document?: {
+    defaultView?: (Window & typeof globalThis) | null;
+  };
+}
 
 @Component({
   selector: 'casper-deployer-transfer',
@@ -24,21 +41,27 @@ export class TransferComponent implements AfterViewInit, OnDestroy {
   @ViewChild('transferToElt') transferToElt!: ElementRef;
   @ViewChild('transferFromElt') transferFromElt!: ElementRef;
 
-  readonly window = this.document.defaultView;
+  window!: WindowWithCasperlabsHelper;
   activePublicKey?: string;
   apiUrl?: string;
 
   private getStateSubscription!: Subscription;
-  private deploy?: DeployUtil.Deploy;
+  private deploy?: Deploy;
+  private chain_name?: string;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
+    @Inject(TOASTER_TOKEN) private readonly toastr: Toaster,
+    @Inject(ENV_CONFIG) public readonly config: EnvironmentConfig,
     private readonly deployerService: DeployerService,
     private readonly resultService: ResultService,
-    @Inject(ENV_CONFIG) public readonly config: EnvironmentConfig,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly watcherService: WatcherService
-  ) { }
+    private readonly watcherService: WatcherService,
+    private readonly deployService: DeployService,
+    private readonly storageService: StorageService
+  ) {
+    this.window = this.document.defaultView as unknown as WindowWithCasperlabsHelper;
+  }
 
   ngAfterViewInit(): void {
     this.getStateSubscription = this.deployerService.getState().subscribe((state: State) => {
@@ -46,6 +69,7 @@ export class TransferComponent implements AfterViewInit, OnDestroy {
         this.activePublicKey = state.user.activePublicKey;
       }
       state.apiUrl && (this.apiUrl = state.apiUrl);
+      state.chain_name && (this.chain_name = state.chain_name);
       this.changeDetectorRef.markForCheck();
     });
   }
@@ -54,64 +78,47 @@ export class TransferComponent implements AfterViewInit, OnDestroy {
     this.getStateSubscription && this.getStateSubscription.unsubscribe();
   }
 
-  // TODO Refacto into service
   async transfer() {
     if (!this.activePublicKey) {
       this.connect.emit();
       return;
     }
-    const publicKey = CLPublicKey.fromHex(this.activePublicKey);
+    const public_key = new PublicKey(this.activePublicKey);
     const amount = this.amountElt?.nativeElement.value.trim();
-    const transferFrom = this.transferFromElt?.nativeElement.value.trim();
-    const transferTo = this.transferToElt?.nativeElement.value.trim();
-    let target: CLPublicKey | CLURef;
-    if (transferTo.includes('uref-')) {
-      target = CLURef.fromFormattedStr(transferTo);
-      // This seems to be buggy, produces error in signer "Target from deploy was neither AccountHash or PublicKey"
-    } else {
-      target = CLPublicKey.fromHex(transferTo);
-    }
-    let sourcePurse!: CLURef;
-    let transferFromPublicKey!: CLPublicKey;
-    if (transferFrom.includes('uref-')) {
-      sourcePurse = CLURef.fromFormattedStr(transferFrom);
-      // This seems to be buggy, produces error in signer "Active key changed during signing"
-      // can not retrieve publicKey from pure URef here
-      // and sourcePurse can not be CLPublicKey ?
-    } else if (transferFrom) {
-      transferFromPublicKey = CLPublicKey.fromHex(transferFrom); // This seems to be buggy if transferFrom is not active public key, produces error in signer "Active key changed during signing"
-    }
-    const deployParams: DeployUtil.DeployParams = new DeployUtil.DeployParams(
-      transferFromPublicKey ? transferFromPublicKey : publicKey,
-      this.apiUrl?.includes(this.config['localhost']) ? this.config['chainName_localhost'] : this.config['chainName_test'],
-      +this.config['gasPrice'],
-      +this.config['TTL'],
-      []
+    const session_account = this.transferFromElt?.nativeElement.value.trim();
+    const target_account = this.transferToElt?.nativeElement.value.trim() || public_key;
+
+    this.deploy = this.deployService.makeTransfer({
+      chain_name: this.chain_name || this.config['chain_name_localhost'],
+      session_account
+    },
+      target_account,
+      amount,
     );
 
-    const session = amount && transferTo && DeployUtil.ExecutableDeployItem.newTransfer(amount, target, sourcePurse, Math.floor(Math.random() * +this.config['idMax']));
-    if (!session) {
-      console.error(deployParams, session);
+    const casperlabsHelperDeploy: CasperlabsHelperDeploy = { deploy: this.deploy };
+    const signedDeployToJson = (casperlabsHelperDeploy && await this.window?.casperlabsHelper?.sign(
+      casperlabsHelperDeploy,
+      this.activePublicKey
+    ))?.deploy;
+
+    const signedDeploy = new Deploy(signedDeployToJson);
+    if (signedDeploy && !signedDeploy.validateDeploySize()) {
+      this.toastr.error(signedDeploy.toString(), 'Error with validateDeploy');
+      console.error(this.deploy);
       return;
     }
-    const payment = DeployUtil.standardPayment(+this.config['gasFeeTransfer']);
-    this.deploy = DeployUtil.makeDeploy(deployParams, session, payment);
-    this.deploy && this.resultService.setResult<DeployUtil.Deploy>('Transfer', DeployUtil.deployToJson(this.deploy));
-    const signedDeployToJson = this.deploy && await this.window?.casperlabsHelper.sign(
-      DeployUtil.deployToJson(this.deploy),
-      transferFrom,
-      transferTo
-    );
-    const signedDeploy: Result<DeployUtil.Deploy, Error> = DeployUtil.deployFromJson(signedDeployToJson);
-    if (signedDeploy.err) {
-      console.error(signedDeploy.val.message);
-      return;
+    const deploy = signedDeploy.toJson();
+    if (!deploy) {
+      this.toastr.error('', 'Error with validateDeploy');
+      console.error(signedDeploy);
     }
-    this.deployerService.putDeploy(signedDeploy.val, this.apiUrl).subscribe(deploy => {
+    this.deployerService.putDeploy(JSON.stringify(deploy), this.apiUrl).subscribe(deploy => {
       const deploy_hash = (deploy as DeployReturn).deploy_hash;
-      deploy_hash && this.resultService.setResult<DeployUtil.Deploy>('Deploy Hash', deploy_hash);
+      deploy_hash && this.resultService.setResult<Deploy>('Deploy Hash', deploy_hash || deploy);
       deploy_hash && this.deployerService.setState({ deploy_hash });
       deploy_hash && this.watcherService.watchDeploy(deploy_hash, this.apiUrl);
+      deploy_hash && this.storageService.setState({ deploy_hash });
     });
   }
 
@@ -125,7 +132,6 @@ export class TransferComponent implements AfterViewInit, OnDestroy {
     if (!amount) {
       return;
     }
-    // TODO Fix with motesToCSPR
-    return (Number(BigInt(amount * 100) / BigInt(1e+9)) / 100).toLocaleString();
+    return motesToCSPR(amount);
   }
 }

@@ -1,10 +1,10 @@
-describe('escrow', () => {
+describe('deployer', () => {
 
-  before(() => {
+  beforeEach(() => {
     cy.intercept('/api/users').as('getUsers');
-    cy.intercept(/\/api\/deployer\/status\?apiUrl=http:\/\/.+\/rpc/).as('getStatus');
-    cy.intercept(/\/api\/deployer\/peers\?apiUrl=http:\/\/.+\/rpc/).as('getPeers');
-    cy.intercept(/\/api\/deployer\/getStateRootHash\?apiUrl=http:\/\/.+\/rpc/).as('getStateRootHash');
+    cy.intercept(/\/api\/deployer\/status\?apiUrl=http:\/\/.+/).as('getStatus');
+    cy.intercept(/\/api\/deployer\/peers\?apiUrl=http:\/\/.+/).as('getPeers');
+    cy.intercept(/\/api\/deployer\/getStateRootHash\?apiUrl=http:\/\/.+/).as('getStateRootHash');
     cy.visit('/');
   });
 

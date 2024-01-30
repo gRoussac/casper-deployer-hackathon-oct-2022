@@ -1,11 +1,11 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { GetDeployResult } from 'casper-js-sdk';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { State } from '@casper-api/api-interfaces';
 import { ResultService } from '../result/result.service';
 import { StorageService } from '@casper-util/storage';
+import { GetDeployResult } from 'casper-sdk';
 
 @Component({
   selector: 'casper-deployer-get-deploy',
@@ -52,8 +52,8 @@ export class GetDeployComponent implements OnDestroy, AfterViewInit {
 
   getDeploy() {
     const deploy_hash = this.getDeployElt.nativeElement.value.replace('deploy-', '');
-    deploy_hash && (this.getDeploySubscription = this.deployerService.getDeploy(deploy_hash, this.apiUrl).subscribe(deploy => {
-      deploy && this.resultService.setResult<GetDeployResult>('Deploy info', deploy as GetDeployResult);
+    deploy_hash && (this.getDeploySubscription = this.deployerService.getDeploy(deploy_hash, this.apiUrl).subscribe(deployResult => {
+      deployResult && this.resultService.setResult<GetDeployResult>('Deploy info', deployResult);
       this.refreshPurse.emit();
       this.getDeploySubscription.unsubscribe();
     }));

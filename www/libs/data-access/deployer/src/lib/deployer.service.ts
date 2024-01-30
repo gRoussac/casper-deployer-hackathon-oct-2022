@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { api_interface, DeployReturn, Peer, State } from '@casper-api/api-interfaces';
 import { map, Observable, ReplaySubject, timeout } from 'rxjs';
-import { DeployUtil, GetDeployResult, StoredValue } from 'casper-js-sdk';
+import { Deploy, GetDeployResult } from 'casper-sdk-nodejs';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 
 @Injectable({
@@ -31,7 +31,7 @@ export class DeployerService {
     return this.http
       .get<string | Error>(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.GetStateRootHash}`, { params })
       .pipe(
-        map(response => {
+        map((response: string | Error) => {
           const stateRootHash = this.handleResponse<string>(response);
           this.setState({
             stateRootHash,
@@ -48,7 +48,7 @@ export class DeployerService {
     return this.http
       .get<Peer[] | Error>(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Peers}`, { params })
       .pipe(
-        map(response => this.handleResponse<Peer[]>(response)),
+        map((response: Error | Peer[]) => this.handleResponse<Peer[]>(response)),
         timeout(20000),
       );
   }
@@ -62,7 +62,7 @@ export class DeployerService {
     return this.http
       .get<string | Error>(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Status}`, { params })
       .pipe(
-        map(response => {
+        map((response: string | Error) => {
           const status = this.handleResponse<string>(response);
           this.setState({
             status
@@ -82,7 +82,7 @@ export class DeployerService {
     return this.http
       .get<string | Error>(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.PurseURef}`, { params })
       .pipe(
-        map(response => {
+        map((response: string | Error) => {
           const purseURef = this.handleResponse<string>(response);
           return purseURef;
         }),
@@ -99,7 +99,7 @@ export class DeployerService {
     return this.http
       .get<string | Error>(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Balance}`, { params })
       .pipe(
-        map(response => this.handleResponse<string>(response)),
+        map((response: string | Error) => this.handleResponse<string>(response)),
         timeout(20000),
       );
   }
@@ -112,31 +112,30 @@ export class DeployerService {
     return this.http
       .get<string | Error>(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.BalanceOfByPublicKey}`, { params })
       .pipe(
-        map(response => this.handleResponse<string>(response)),
+        map((response: string | Error) => this.handleResponse<string>(response)),
         timeout(20000),
       );
   }
 
-  getBlockState(stateRootHash: string, key: string, paths?: string, apiUrl?: string): Observable<StoredValue | string> {
+  getBlockState(stateRootHash: string, key: string, paths?: string, apiUrl?: string): Observable<object | string> {
     let params = new HttpParams();
     params = params.append('stateRootHash', stateRootHash);
     params = params.append('key', key);
     const path = paths && paths?.split(this.config['path_sep']).map(path => path.trim());
     path && (params = params.append('path', JSON.stringify(path)));
     apiUrl && (params = params.append('apiUrl', apiUrl));
-
     return this.http
-      .get<StoredValue | Error>(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.State}`, { params })
+      .get<object | Error>(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.State}`, { params })
       .pipe(
-        map(response => {
-          const storedValue = this.handleResponse<StoredValue>(response);
+        map((response: object | Error) => {
+          const storedValue = this.handleResponse<object>(response);
           return storedValue;
         }),
         timeout(20000)
       );
   }
 
-  getDictionaryItemByName(stateRootHash: string, contractHash: string, dictionaryName: string, dictionaryItemKey: string, seedUref: string, apiUrl?: string): Observable<StoredValue | string> {
+  getDictionaryItem(stateRootHash: string, contractHash: string, dictionaryName: string, dictionaryItemKey: string, seedUref: string, apiUrl?: string): Observable<unknown | string> {
     let params = new HttpParams();
     params = params.append('stateRootHash', stateRootHash);
     params = params.append('contractHash', contractHash);
@@ -147,10 +146,10 @@ export class DeployerService {
     apiUrl && (params = params.append('apiUrl', apiUrl));
 
     return this.http
-      .get<StoredValue | Error>(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Dictionary}`, { params })
+      .get<unknown | Error>(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Dictionary}`, { params })
       .pipe(
-        map(response => {
-          const storedValue = this.handleResponse<StoredValue>(response);
+        map((response: unknown) => {
+          const storedValue = this.handleResponse<unknown>(response);
           return storedValue;
         }),
         timeout(20000)
@@ -164,20 +163,20 @@ export class DeployerService {
     return this.http
       .get<GetDeployResult | Error>(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Deploy_info}`, { params })
       .pipe(
-        map(response => this.handleResponse<GetDeployResult>(response)),
+        map((response: Error | GetDeployResult) => this.handleResponse<GetDeployResult>(response)),
         timeout(20000),
       );
   }
 
-  putDeploy(signedDeploy: DeployUtil.Deploy, apiUrl?: string, speculative?: boolean): Observable<DeployReturn | string> {
+  putDeploy(signedDeploy: string, apiUrl?: string, speculative?: boolean): Observable<DeployReturn | string> {
     let params = new HttpParams();
     apiUrl && (params = params.append('apiUrl', apiUrl));
     speculative && (params = params.append('speculative', speculative));
-    params = params.append('signedDeploy', JSON.stringify(DeployUtil.deployToJson(signedDeploy)));
+    params = params.append('signedDeploy', signedDeploy);
     return this.http
       .post<DeployReturn | Error>(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Put_Deploy}`, params)
       .pipe(
-        map(response => this.handleResponse<DeployReturn>(response)),
+        map((response: Error | DeployReturn) => this.handleResponse<DeployReturn>(response)),
         timeout(20000),
       );
   }

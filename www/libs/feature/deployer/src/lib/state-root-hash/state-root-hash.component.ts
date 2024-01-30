@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Inject, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Peer } from '@casper-api/api-interfaces';
 import { DeployerService } from '@casper-data/data-access-deployer';
@@ -14,6 +14,7 @@ import { StorageService } from '@casper-util/storage';
   imports: [CommonModule],
   templateUrl: './state-root-hash.component.html',
   styleUrls: ['./state-root-hash.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StateRootHashComponent implements OnDestroy, AfterViewInit {
   stateRootHash!: string;
@@ -23,10 +24,9 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
 
   peers!: Peer[];
   status = '';
-  loaded!: boolean;
-  storageApiUrl!: string;
-  @ViewChild('apiUrlElt') apiUrlElt!: ElementRef;
-  @ViewChild('apiSuffixElt') apiSuffixElt!: ElementRef;
+  apiUrl!: string;
+  @ViewChild('apiUrlElt') apiUrlElt!: HTMLInputElement;
+  defaults!: string[];
 
   constructor(
     @Inject(ENV_CONFIG) public readonly config: EnvironmentConfig,
@@ -35,16 +35,28 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
     private readonly routeurHubService: RouteurHubService,
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly storageService: StorageService
-  ) { }
+  ) {
+    this.defaults = [
+      this.config['default_node_localhost'],
+      this.config['default_node_testnet'],
+      this.config['default_node_integration'],
+      this.config['default_node_mainnet'],
+    ];
+  }
 
   ngAfterViewInit(): void {
-    this.setPeersSubscription();
     setTimeout(() => {
       const apiUrl = this.storageService.get('apiUrl');
       if (apiUrl) {
         this.deployerService.setState({ apiUrl });
-        this.storageApiUrl = apiUrl.replace(this.config['api_suffix'], '');
+        this.apiUrl = apiUrl;
+        if (!this.defaults.includes(this.apiUrl)) {
+          this.defaults.push(this.apiUrl);
+        }
+      } else {
+        this.apiUrl = this.defaults[0];
       }
+      this.getPeers();
     });
   }
 
@@ -54,47 +66,46 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
     this.getStatusSubscription && this.getStatusSubscription.unsubscribe();
   }
 
-  setPeersSubscription(): void {
-    this.apiUrl && (this.getPeersSubscription = this.deployerService.getPeers(this.apiUrl).subscribe(peersResult => {
-      this.peers = peersResult as Peer[];
-      this.getStatus();
-      this.getStateRootHash();
-      this.loaded = true;
-      this.getPeersSubscription.unsubscribe();
-      this.changeDetectorRef.markForCheck();
-    }));
-  }
-
   selectApiUrl(event: Event): void {
-    this.apiUrlElt.nativeElement.value = (event.target as HTMLInputElement).value;
+    let apiUrl = (event.target as HTMLInputElement).value;
+    if (!apiUrl) { return; }
+    let url: URL;
+    try {
+      url = new URL(apiUrl);
+      apiUrl = (url.origin + url.pathname).replace(/\/$/, '');
+    } catch (error) {
+      console.error(error);
+    }
+    this.apiUrl = apiUrl;
+    this.apiUrlElt.value = this.apiUrl;
     this.deployerService.setState({
       apiUrl: this.apiUrl
     });
     this.routeurHubService.setHubState({
       apiUrl: this.apiUrl
     });
+    if (!this.defaults.includes(this.apiUrl)) {
+      this.defaults.push(this.apiUrl);
+    }
+    this.getPeers();
     this.routeurHubService.refreshPurse();
   }
 
-  get apiUrl(): string {
-    const suffix = this.apiSuffixElt?.nativeElement.value || this.config['api_suffix'];
-    const apiUrl = this.apiUrlElt?.nativeElement.value &&
-      (this.apiUrlElt.nativeElement.value + suffix);
-    let url: URL;
-    try {
-      url = new URL(apiUrl || this.config['apiUrl_default']);
-      return url.origin + url.pathname;
-    } catch (error) {
-      console.error(error);
-    }
-    return '';
-  }
-
   getStateRootHash(): void {
-    this.getStateRootHashSubscription = this.deployerService.getStateRootHash(this.apiUrl).subscribe(stateRootHash => {
+    this.apiUrl && (this.getStateRootHashSubscription = this.deployerService.getStateRootHash(this.apiUrl).subscribe(stateRootHash => {
       stateRootHash && this.resultService.setResult<string>('State root hash', stateRootHash);
       this.getStateRootHashSubscription.unsubscribe();
-    });
+    }));
+  }
+
+  getPeers(): void {
+    this.apiUrl && (this.getPeersSubscription = this.deployerService.getPeers(this.apiUrl).subscribe(peersResult => {
+      this.peers = peersResult as Peer[];
+      this.getStatus();
+      this.getStateRootHash();
+      this.getPeersSubscription.unsubscribe();
+      this.changeDetectorRef.markForCheck();
+    }));
   }
 
   getStatus(): void {

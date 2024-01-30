@@ -7,7 +7,7 @@
   "targets": {
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/feature/buyer"],
+      "outputs": ["{workspaceRoot}/coverage/libs/feature/buyer"],
       "options": {
         "jestConfig": "libs/feature/buyer/jest.config.ts",
         "passWithNoTests": true

@@ -4,7 +4,6 @@ import { ResultService } from './result.service';
 import { Result } from './result';
 import { Subscription } from 'rxjs';
 import { StorageService } from '@casper-util/storage';
-import { decodeBase16 } from 'casper-js-sdk';
 import { DeployerService } from '@casper-data/data-access-deployer';
 
 @Component({
@@ -96,9 +95,14 @@ export class ResultComponent implements AfterViewInit, OnDestroy {
     this.storageService.setState({ notes: '' });
   }
 
-  listenDblClick($event: Event) {
+  listenClick($event: Event): string {
     const key = this.cleanKey(($event.target as HTMLSpanElement).textContent || '');
     key && this.resultService.copyClipboard(key);
+    return key;
+  }
+
+  listenDblClick($event: Event) {
+    const key = this.listenClick($event);
     if (!key || !this.checkKey(key)) {
       return;
     }
@@ -111,7 +115,7 @@ export class ResultComponent implements AfterViewInit, OnDestroy {
 
   private checkKey(key: string): boolean {
     const parsing = key && !this.exclude_regex.test(key) && key.match(this.key_regex);
-    if (!parsing || parsing.length !== 2 || decodeBase16(parsing[1]).length !== 32) {
+    if (!parsing || parsing.length !== 2 || parsing[1].length !== 64) {
       return false;
     }
     return true;

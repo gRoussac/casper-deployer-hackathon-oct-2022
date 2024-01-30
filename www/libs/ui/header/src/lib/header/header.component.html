@@ -1,11 +1,11 @@
 <a [href]="'/'">
-  <img [src]="'assets/logo-dark.svg'" />
+  <img [src]="'assets/logo.png'" />
 </a>
-<span [hidden]="!activePublicKey" class="text-xl font-bold mt-5">
+<span [hidden]="!activePublicKey" class="text-xl font-small mt-5">
   Active key {{ role ? ['for', role].join(' ') : '' }} :
   {{ activePublicKey }}
 </span>
-<span [hidden]="!activePublicKey || !balance" class="text-xl font-bold mt-5">
+<span [hidden]="!activePublicKey || !balance" class="text-xl font-small mt-5">
   Balance : {{ balance }} CSPR
 </span>
 <button [hidden]="isButtonHidden" (click)="connect.emit()">

@@ -15,7 +15,7 @@
 
 #### This projects aims to ease interactions with <a href="https://casperlabs.io/"><img  style="position: relative; top:3px" alt="Casper" src="https://user-images.githubusercontent.com/3099551/197350250-b9d5852b-44a6-45bb-a227-e12d6d4166c9.jpg" height="20" width="20" alt="Casper"/> Casper Blockchain</a> during smart contracts development and for regular queries done with the [Casper Client CLI](https://github.com/casper-ecosystem/casper-client-rs)
 
-#### This project relies on [casper-js-sdk](https://github.com/casper-ecosystem/casper-js-sdk) to help with onboarding developers on the Casper Network and also users by providing better insights on Casper Blockchain concepts (URef, Dictionnaries etc..) and with giving the ability to deploy a smart contract signed with the [Capser Signer](https://docs.casperlabs.io/workflow/signer-guide/).
+#### This project relies on [casper-js-sdk](https://github.com/casper-ecosystem/casper-js-sdk) and [casper-rust-sdk](https://github.com/casper-ecosystem/rustSDK) to help with onboarding developers on the Casper Network and also users by providing better insights on Casper Blockchain concepts (URef, Dictionnaries etc..) and with giving the ability to deploy a smart contract signed with the [Capser Signer](https://docs.casperlabs.io/workflow/signer-guide/).
 
 <br />
 <img alt="image" src="https://user-images.githubusercontent.com/3099551/197349529-ab5a899b-964f-4089-a6ad-84f059b9e50f.png">
@@ -61,7 +61,7 @@
   <img alt="JavaScript" src="https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E"/>
   <img alt="TypeScript" src="https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white"/>
   <img alt="Rust" src="https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white"/>
-  <img alt="WEBASSEMBLY" src="https://camo.githubusercontent.com/9734598c5ee062706c931512b7572b5675274ee5a728b9afddfe0d4cdd1ba82d/68747470733a2f2f696d672e736869656c64732e696f2f7374617469632f76313f7374796c653d666f722d7468652d6261646765266d6573736167653d576562417373656d626c7926636f6c6f723d363534464630266c6f676f3d576562417373656d626c79266c6f676f436f6c6f723d464646464646266c6162656c3d"/>
+  <img alt="WEBASSEMBLY" src="https://img.shields.io/badge/webassembly-%23000000.svg?style=for-the-badge&logo=wasm&logoColor=white"/>
 
 - **Tests 🧪**
 
@@ -104,7 +104,7 @@ Smart contracts are implemented in [Rust](https://www.rust-lang.org/) + [Casper 
 
 ## Folders at root directory is as follow :
 
-- casper : contrains Casper test smart contracts files
+- casper-sdk: contains the Casper Rust SDK in two versions, web and nodejs
 - docker: contains Docker files
 - wasm: contains client wasm files
 - www: contains the Web application files
@@ -129,9 +129,9 @@ Smart contracts are implemented in [Rust](https://www.rust-lang.org/) + [Casper 
   - [✓] Retrieve Balance associated with Public key
 - Transfer
   - [✓] Transfer from active Public Key
-  - [🪲] (bugged) Transfer from other Public Key or Purse Uref
+  - [✓] Transfer from other Public Key or Purse Uref
   - [✓] Transfer to Public Key
-  - [🪲] (bugged) Transfer to Purse Uref
+  - [✓] Transfer to Purse Uref
   - [✓] Define Amount to transfer
 - Purse
   - [✓] Input Purse URef
@@ -173,8 +173,10 @@ Smart contracts are implemented in [Rust](https://www.rust-lang.org/) + [Casper 
 # 🛣️ Roadmap / Todo / Tofix
 
 - [✓] Add Dictionnary implementation to test smart contracts
-- [ ] Add some RPC calls into wasm client side ?
+- [✓] Add some RPC calls into wasm client side (Rust SDK)
 - [✓] Add Events watchers
+- [ ] Re implement Events watchers from the Rust SDK
+- [ ] Casper wallet integration / private key / deprecate Casper Signer
 - [ ] Whitelist Signer on casper.onrender.com
 - [ ] Fix Github workflow
 - [ ] Fix blur events on input
@@ -184,7 +186,7 @@ Smart contracts are implemented in [Rust](https://www.rust-lang.org/) + [Casper 
 - [ ] Improve Cypress coverage
 - [ ] Add Cypress coverage Github action
 - [ ] Improve Css consistentcy
-- [ ] Fix transfers from URef or non active public key
+- [✓] Fix transfers from URef or non active public key
 - [ ] Fix speculative test deploys
 - [ ] Add check deploy and size check
 - [ ] Add multisignature flow
@@ -192,7 +194,8 @@ Smart contracts are implemented in [Rust](https://www.rust-lang.org/) + [Casper 
 - [✓] Upgrading smart contracts
 - [ ] Escrow app on /escrow route
 - [ ] Add Escrow smart contracts
-- [ ] Fluter app ?
+- [ ] Electron app
+- [ ] Load / sign deploy
 
 #
 
@@ -200,8 +203,8 @@ Smart contracts are implemented in [Rust](https://www.rust-lang.org/) + [Casper 
 
 ## Prerequisites
 
-- npm >= 8.19.2
-- nodejs >= 18.7.0 & < 19
+- npm >= 10.2.5
+- nodejs >= v20.10.0
 
 This web project was generated and is using
 
@@ -322,21 +325,14 @@ Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
 
 Settings can be changed in [/www/libs/util/config/src/config.ts](./www/libs/util/config/src/config.ts)
 
-Default settings are
+Default example settings are
 
 ```json
 {
   "api_prefix": "/api/",
-  "api_suffix": "/rpc",
-  "apiUrl_localhost": "http://localhost:11101",
-  "apiUrl_default": "http://3.136.227.9:7777",
-  "chainName_test": "casper-test",
-  "chainName_localhost": "casper-net-1",
-  "path_sep": "/",
-  "gasPrice": "1",
   "gasFee": "150000000",
   "minimumTransfer": "25000000000",
-  "TTL": "1800000",
+  "TTL": "30m",
   "idMax": "100000000",
   "gasFeeTransfer": "10000"
 }
@@ -349,14 +345,6 @@ Run `nx graph` to see a diagram of the dependencies of the projects.
 ## 🐕‍🦺 Further help
 
 Visit the [Nx Documentation](https://nx.dev/angular) to learn more.
-
-## 😶‍🌫️ Nx Cloud
-
-### Distributed Computation Caching & Distributed Task Execution
-
-Nx Cloud pairs with Nx in order to enable you to build and test code more rapidly, by up to 10 times.
-
-Visit [Nx Cloud](https://nx.app/) to learn more.
 
 #
 
@@ -380,4 +368,4 @@ Go to the `#hackathon` channel [on Discord](https://discord.gg/casperblockchain)
 
 ### 🪦 Errors ?
 
-If you see any typos or errors you can edit the code directly on GitHub and raise a Pull Request on `develop` branch, many thanks !
+If you see any typos or errors you can edit the code directly on GitHub and raise a Pull Request on `dev` branch, many thanks !

@@ -33,6 +33,7 @@
           <div #resultElt class="mt-2 max-w-sm pre overflow-y">
             <code
               #codeElt
+              (click)="listenClick($event)"
               (dblclick)="listenDblClick($event)"
               [innerHtml]="resultHtml"
             ></code>
@@ -82,7 +83,7 @@
         (click)="emptyNotes()"
         type="reset"
         value="clear"
-        class="text-gray-700 text-sm font-bold mb-2 mr-1"
+        class="text-gray-700 text-xs font-bold mb-2 mr-1"
       />
       <textarea
         #NotesElt

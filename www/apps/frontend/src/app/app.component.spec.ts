@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { ESCROW_TOKEN } from '@casper-util/wasm';
+import { DEPLOYER_TOKEN } from '@casper-util/wasm';
 import { AppComponent } from './app.component';
 import { UsersService } from '@casper-data/data-access-users';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
@@ -14,7 +14,7 @@ describe('AppComponent', () => {
       providers: [
         UsersService,
         {
-          provide: ESCROW_TOKEN, useValue: {
+          provide: DEPLOYER_TOKEN, useValue: {
             hello: jest.fn()
           },
         },

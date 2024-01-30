@@ -153,8 +153,6 @@ export class ArgBuilderComponent implements AfterViewInit, OnDestroy {
 
   private parseType(input: HTMLInputElement, type: string) {
     const inputValue = input.value.trim();
-    console.log(type);
-
     switch (type) {
       case CLType.Option(CLType.Any()).toString(): {
         const parsedInput = JSON.parse(inputValue);
@@ -195,8 +193,6 @@ export class ArgBuilderComponent implements AfterViewInit, OnDestroy {
 
   private parseValue<T>(input: HTMLInputElement, type: string): T {
     const inputValue = input.value.trim();
-
-    console.log(inputValue);
 
     switch (type) {
       case CLType.Bool().toString():

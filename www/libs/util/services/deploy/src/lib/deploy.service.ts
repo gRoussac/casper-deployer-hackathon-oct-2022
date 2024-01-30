@@ -63,7 +63,6 @@ export class DeployService {
       session_entry_point && (session_params.session_entry_point = session_entry_point);
       session_version && (session_params.session_version = session_version);
     } else {
-      session_path && (session_params.session_path = session_path);
       session_path && wasm && (session_params.session_bytes = Bytes.fromUint8Array(wasm));
     }
     session_args_json && (session_params.session_args_json = session_args_json);

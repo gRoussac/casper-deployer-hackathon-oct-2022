@@ -19,8 +19,7 @@ export const fetchWasmFactory = async (): Promise<deployer.Deployer> => {
 export const fetchSDKFactory = async (): Promise<casper_sdk.SDK> => {
   const wasm = await initSDK('assets/casper_rust_wasm_sdk_bg.wasm');
   const casperSDK = new SDK('http://localhost:4200');
-  console.log(casperSDK);
-  return wasm && new SDK('http://localhost:4200');
+  return wasm && casperSDK;
 };
 
 export function provideSafeAsync<T>(

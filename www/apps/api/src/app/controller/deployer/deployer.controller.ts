@@ -116,7 +116,6 @@ export class DeployerController {
         console.error(signedDeployFromJson.val.message);
         return;
       }
-      console.log(signedDeployFromJson);
       const deploy = new Deploy(signedDeployFromJson);
       return await this.appService.putDeploy(deploy, speculative, apiUrl);
     } catch (error) {

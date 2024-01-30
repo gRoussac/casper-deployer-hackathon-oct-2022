@@ -52,7 +52,7 @@ export const defaultTabs: {
     { ...decimalsArg, install: true },
     {
       name: 'total_supply',
-      cl_type: CLType?.U64(),
+      cl_type: CLType?.U256(),
       install: true
     },
     {

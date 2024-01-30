@@ -8,6 +8,7 @@ import { TOASTER_TOKEN } from '@casper-util/toaster';
 import { ResultService } from '../result/result.service';
 
 import { TransferComponent } from './transfer.component';
+import { SDK_TOKEN } from '@casper-util/wasm';
 
 describe('TransferComponent', () => {
   let component: TransferComponent;
@@ -21,6 +22,9 @@ describe('TransferComponent', () => {
         ResultService,
         {
           provide: ENV_CONFIG, useValue: config
+        },
+        {
+          provide: SDK_TOKEN, useValue: {},
         },
         {
           provide: HIGHLIGHT_WEBWORKER_FACTORY, useValue: {

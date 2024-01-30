@@ -14,8 +14,8 @@ import { NamedCLTypeArg } from '@casper-api/api-interfaces';
 export class ArgumentComponent {
   @Input() defaultType: NamedCLTypeArg = {
     name: '',
-    cl_type: CLType.U8(),
+    cl_type: CLType?.U8(),
   };
   CLTypeEnum = CLTypeEnum;
-  types = Object.keys(this.CLTypeEnum).filter(key => isNaN(Number(key)));
+  types = Object.keys(this.CLTypeEnum || {}).filter(key => isNaN(Number(key)));
 }

@@ -1,17 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { DeployReturn, Peer, Purse, Users } from '@casper-api/api-interfaces';
+import { DeployReturn, Peer, Users } from '@casper-api/api-interfaces';
 import { environment } from '../environments/environment';
-import { CLPublicKey, DeployUtil, GetDeployResult, StoredValue } from "casper-js-sdk";
 import { BigNumber } from '@ethersproject/bignumber';
-import { ClientService } from '../client/client.service';
-import { ServiceService } from '../service/service.service';
+import { SDKService } from '../sdk/sdk.service';
+import { Deploy, DictionaryItemStrParams, GetDeployResult } from 'casper-sdk-nodejs';
 
 @Injectable()
 export class AppService {
-
   constructor(
-    private readonly client: ClientService,
-    private readonly service: ServiceService
+    private readonly sdkService: SDKService
   ) { }
 
   getUsers(): Users {
@@ -19,100 +16,123 @@ export class AppService {
   }
 
   async getPeers(apiUrl: string): Promise<Peer[]> {
-    return (await this.service.getService(apiUrl).getPeers()).peers?.map(peer => {
+    return (await this.sdkService.getCasperSDK(apiUrl).get_peers()).peers?.map(peer => {
       const address = peer.address.split(':');
       peer.address = ['http://', address.shift(), ':', '7777'].join('');
       return peer;
     });
   }
 
+  async getStatus(apiUrl: string): Promise<string> {
+    return JSON.stringify((await this.sdkService.getCasperSDK(apiUrl).get_node_status()).api_version && 'status');
+  }
+
   async getStateRootHash(apiUrl: string, stringify = false): Promise<string> {
-    const stateRootHash = await this.service.getService(apiUrl).getStateRootHash();
+    const stateRootHash = (await this.sdkService.getCasperSDK(apiUrl).get_state_root_hash()).toString();
     if (stringify) {
       return JSON.stringify(stateRootHash);
     }
     return stateRootHash;
   }
 
-  async getStatus(apiUrl: string): Promise<string> {
-    return JSON.stringify((await this.service.getService(apiUrl).getStatus()).api_version && 'status');
-  }
-
-  async getPurse(publicKey: string, apiUrl: string): Promise<Purse> {
-    const balance = (await this.getAccountBalance(publicKey, apiUrl)).toString();
-    return { balance };
-  }
-
-  async getPurseURef(stateRootHash: string, publicKey: string, apiUrl: string, stringify = false): Promise<string> {
-    const purse_uref = await this.service.getService(apiUrl).getAccountBalanceUrefByPublicKey(stateRootHash, CLPublicKey.fromHex(publicKey));
+  async getPurseURef(publicKey: string, apiUrl: string, stringify = false): Promise<string> {
+    const sdk = this.sdkService.getCasperSDK(apiUrl);
+    const options = sdk.get_account_options({
+      account_identifier_as_string: publicKey
+    });
+    const account = (await sdk.state_get_account_info(options)).account;
     if (stringify) {
-      return JSON.stringify(purse_uref);
+      return JSON.stringify(account.main_purse);
     }
-    return purse_uref;
+    return account.main_purse;
   }
 
-  async getBlockState(stateRootHash: string, key: string, path: string[] = [], apiUrl: string): Promise<StoredValue> {
-    const storedValue = await this.service.getService(apiUrl).getBlockState(stateRootHash, key, path);
-    return storedValue;
+  async getBlockState(stateRootHash: string, key: string, path: string[] = [], apiUrl: string): Promise<object> {
+    const sdk = this.sdkService.getCasperSDK(apiUrl);
+    const options = sdk.query_global_state_options({
+      state_root_hash_as_string: stateRootHash,
+      key_as_string: key,
+      path
+    });
+    return (await sdk.query_global_state(options)).stored_value;
   }
 
   async getBalance(stateRootHash: string, purseURef: string, apiUrl: string, stringify = false): Promise<BigNumber | string> {
+    const sdk = this.sdkService.getCasperSDK(apiUrl);
     if (!stateRootHash) {
       stateRootHash = await this.getStateRootHash(apiUrl);
     }
-    const balanceBN = await this.service.getService(apiUrl).getAccountBalance(stateRootHash, purseURef);
+    const options = sdk.get_balance_options({
+      purse_uref_as_string: purseURef,
+      state_root_hash_as_string: stateRootHash
+    });
+    const balance_value = (await sdk.get_balance(options)).balance_value;
     if (stringify) {
-      const balance = balanceBN.toString();
-      return JSON.stringify(balance);
+      return JSON.stringify(balance_value);
     }
-    return balanceBN;
+    return balance_value;
+  }
+
+  async getBalanceOfByPublicKey(publicKey: string, apiUrl: string, stringify = false): Promise<string> {
+    if (!publicKey) { return; }
+    const sdk = this.sdkService.getCasperSDK(apiUrl);
+    const stateRootHash = await this.getStateRootHash(apiUrl);
+    const purse_identifier_as_string = await this.getPurseURef(publicKey, apiUrl);
+    const options = sdk.query_balance_options({
+      state_root_hash_as_string: stateRootHash,
+      purse_identifier_as_string
+    });
+    const balance_value = (await sdk.query_balance(options)).balance;
+    if (stringify) {
+      return JSON.stringify(balance_value);
+    }
+    return balance_value;
   }
 
   async getDeploy(deployHash: string, apiUrl: string): Promise<GetDeployResult> {
-    return await this.service.getService(apiUrl).getDeployInfo(deployHash);
+    const sdk = this.sdkService.getCasperSDK(apiUrl);
+    const options = sdk.get_deploy_options({
+      deploy_hash_as_string: deployHash
+    });
+    // TODO add checkbox finalized_approvals
+    return (await this.sdkService.getCasperSDK(apiUrl).get_deploy(options)).toJson();
   }
 
-  async putDeploy(signedDeploy: DeployUtil.Deploy, speculative = false, apiUrl: string): Promise<DeployReturn> {
-    if (signedDeploy && !DeployUtil.validateDeploy(signedDeploy)) {
+  async putDeploy(signedDeploy: Deploy, speculative = false, apiUrl: string): Promise<DeployReturn> {
+    const sdk = this.sdkService.getCasperSDK(apiUrl);
+    console.log(signedDeploy);
+    console.log(signedDeploy.toJson());
+    if (signedDeploy && !signedDeploy.validateDeploySize()) {
       console.error(signedDeploy);
       return;
     }
-    // TODO await this.checkDeploySize(signedDeploy)
     if (speculative) {
       console.log('speculative', speculative);
-      // TODO this seems buggy returns Method not found
-      return await this.service.getService(apiUrl).speculativeDeploy(signedDeploy);
+      return (await sdk.speculative_exec(signedDeploy)).toJson();
     }
-    return await this.service.getService(apiUrl).deploy(signedDeploy);
+    return (await sdk.put_deploy(signedDeploy)).toJson();
   }
 
-  // TODO returns void ???
-  async checkDeploySize(deploy: DeployUtil.Deploy, apiUrl: string): Promise<void> {
-    return await this.service.getService(apiUrl).checkDeploySize(deploy);
+  async getDictionaryItemByURef(stateRootHash: string, dictionaryItemKey: string, seedUref: string, apiUrl: string): Promise<object> {
+    const sdk = this.sdkService.getCasperSDK(apiUrl);
+    const dictionary_item_params = new DictionaryItemStrParams();
+    dictionary_item_params.setUref(seedUref, dictionaryItemKey);
+    const options = sdk.get_dictionary_item_options({
+      state_root_hash_as_string: stateRootHash,
+      dictionary_item_params: dictionary_item_params.toJson()
+    });
+    return (await sdk.get_dictionary_item(options)).stored_value;
   }
 
-  async getDictionaryItemByURef(stateRootHash: string, dictionaryItemKey: string, seedUref: string, rawData = false, apiUrl: string): Promise<StoredValue> {
-    return await this.service.getService(apiUrl).getDictionaryItemByURef(stateRootHash, dictionaryItemKey, seedUref, { rawData });
+  async getDictionaryItemByName(stateRootHash: string, contractHash: string, dictionaryName: string, dictionaryItemKey: string, apiUrl: string): Promise<object> {
+    const sdk = this.sdkService.getCasperSDK(apiUrl);
+    const dictionary_item_params = new DictionaryItemStrParams();
+    dictionary_item_params.setContractNamedKey(contractHash, dictionaryName, dictionaryItemKey);
+    const options = sdk.get_dictionary_item_options({
+      state_root_hash_as_string: stateRootHash,
+      dictionary_item_params: dictionary_item_params.toJson()
+    });
+    return (await sdk.get_dictionary_item(options)).stored_value;
   }
 
-  async getDictionaryItemByName(stateRootHash: string, contractHash: string, dictionaryName: string, dictionaryItemKey: string, rawData = false, apiUrl: string): Promise<StoredValue> {
-    return await this.service.getService(apiUrl).getDictionaryItemByName(stateRootHash, contractHash, dictionaryName, dictionaryItemKey, { rawData });
-  }
-
-  async getBalanceOfByPublicKey(publicKey: string, apiUrl: string, stringify = false): Promise<BigNumber | string> {
-    const balanceBN = await this.client.getClient(apiUrl).balanceOfByPublicKey(CLPublicKey.fromHex(publicKey));
-    if (stringify) {
-      const balance = balanceBN.toString();
-      return JSON.stringify(balance);
-    }
-    return balanceBN;
-  }
-
-  private async getAccountBalance(publicKey: string, apiUrl: string): Promise<BigNumber> {
-    if (!publicKey) { return; }
-    const casperService = this.service.getService(apiUrl);
-    const stateRootHash = await this.getStateRootHash(apiUrl);
-    const purseURef = await casperService.getAccountBalanceUrefByPublicKey(stateRootHash, CLPublicKey.fromHex(publicKey));
-    return await this.getBalance(stateRootHash, purseURef, apiUrl) as BigNumber;
-  }
 }

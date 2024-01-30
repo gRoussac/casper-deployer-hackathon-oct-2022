@@ -20,10 +20,16 @@
         "inlineStyleLanguage": "scss",
         "assets": [
           "apps/frontend/src/favicon.ico",
+          "apps/frontend/src/favicon.png",
           "apps/frontend/src/assets",
           {
             "input": "../wasm/pkg",
             "glob": "deployer_bg.wasm",
+            "output": "assets"
+          },
+          {
+            "input": "../casper-sdk/pkg",
+            "glob": "casper_rust_wasm_sdk_bg.wasm",
             "output": "assets"
           }
         ],

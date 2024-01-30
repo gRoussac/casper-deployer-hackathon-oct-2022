@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CLType, CLTypeBuilder, CLTypeTag } from 'casper-js-sdk';
+import { CLType, CLTypeEnum } from 'casper-sdk';
+import { NamedCLTypeArg } from '@casper-api/api-interfaces';
 
 @Component({
   selector: 'casper-ui-argument',
@@ -11,8 +12,10 @@ import { CLType, CLTypeBuilder, CLTypeTag } from 'casper-js-sdk';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ArgumentComponent {
-  @Input() name = '';
-  @Input() defaultType: CLType = CLTypeBuilder.u8();
-  CLTypeTag = CLTypeTag;
-  types = Object.keys(CLTypeTag).filter(key => isNaN(Number(key)));
+  @Input() defaultType: NamedCLTypeArg = {
+    name: '',
+    cl_type: CLType.U8(),
+  };
+  CLTypeEnum = CLTypeEnum;
+  types = Object.keys(this.CLTypeEnum).filter(key => isNaN(Number(key)));
 }

@@ -21,6 +21,6 @@ export class UrlService {
     } catch (_) {
       return url_test;
     }
-    return url.origin + url.pathname;
+    return (url.origin + url.pathname).replace(/\/$/, '');;
   }
 }

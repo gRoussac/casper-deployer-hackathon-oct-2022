@@ -1,17 +1,18 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 
 import { CommonModule, DOCUMENT } from '@angular/common';
-import { Subscription, map } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { HeaderComponent } from '@casper-ui/header';
 import { UsersService } from '@casper-data/data-access-users';
-import { Users, User, Roles, Purse } from '@casper-api/api-interfaces';
+import { Users, User, Roles } from '@casper-api/api-interfaces';
 import { DEPLOYER_TOKEN } from '@casper-util/wasm';
 import { Deployer } from "deployer";
 import { CasperLabsHelper } from 'casper-js-sdk/dist/@types/casperlabsSigner';
 import { RouterModule } from '@angular/router';
 import { RouteurHubService } from '@casper-util/routeur-hub';
 import { StorageService } from '@casper-util/storage';
+import { DeployerService } from '@casper-data/data-access-deployer';
 
 declare global {
   interface Window {
@@ -35,7 +36,8 @@ const imports = [
   providers: [
     UsersService,
     RouteurHubService,
-    StorageService
+    StorageService,
+    DeployerService
   ],
 })
 export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
@@ -165,26 +167,22 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private setAccountInformationSubscription() {
-    this.activePublicKey && (this.accountInformationSubscription = this.usersService.getPurse(this.activePublicKey, this.apiUrl)
-      .pipe(
-        map((purse: Purse | Error) =>
-          purse as Purse
-        )
-      ).subscribe(
+    this.activePublicKey && (this.accountInformationSubscription = this.usersService.getBalanceOfByPublicKey(this.activePublicKey, this.apiUrl)
+      .subscribe(
         (purse => {
-          this.balance = this.getBalance(purse);
+          this.balance = purse;
           this.changeDetectorRef.markForCheck();
           this.accountInformationSubscription.unsubscribe();
         })
       ));
   }
 
-  private getBalance(purse: Purse) {
-    if (!purse?.balance) {
-      return BigInt(0).toLocaleString();
-    }
-    // TODO Fix with motesToCSPR
-    return (BigInt(purse.balance) / BigInt(1e+9)).toLocaleString();
-  }
+  // private getBalance(purse) {
+  //   if (!purse?.balance) {
+  //     return BigInt(0).toLocaleString();
+  //   }
+  //   // TODO Fix with motesToCSPR
+  //   return (BigInt(purse.balance) / BigInt(1e+9)).toLocaleString();
+  // }
 
 }

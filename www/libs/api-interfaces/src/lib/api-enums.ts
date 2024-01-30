@@ -8,7 +8,6 @@ export enum Roles {
 export enum api_interface {
   Users = 'users',
   Peers = 'peers',
-  Purse = 'purse',
   PurseURef = 'purseURef',
   Balance = 'balance',
   Status = 'status',

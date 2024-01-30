@@ -32,6 +32,8 @@
     "@nx/angular": "17.2.8",
     "casper-js-sdk": "^2.15.3",
     "deployer": "file:../wasm/pkg",
+    "casper-sdk": "file:../casper-sdk/pkg",
+    "casper-sdk-nodejs": "file:../casper-sdk/pkg-nodejs",
     "highlight.js": "^11.9.0",
     "http-proxy-middleware": "^2.0.6",
     "promise-worker": "^2.0.1",
@@ -40,7 +42,8 @@
     "toastr": "^2.1.4",
     "ts-results": "npm:@casperlabs/ts-results@^3.3.5",
     "tslib": "^2.3.0",
-    "zone.js": "~0.14.0"
+    "zone.js": "~0.14.0",
+    "typedjson": "1.8.0"
   },
   "devDependencies": {
     "@angular-builders/custom-webpack": "^17.0.0",

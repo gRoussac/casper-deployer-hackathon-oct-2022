@@ -8,6 +8,7 @@ import { TOASTER_TOKEN } from '@casper-util/toaster';
 import { ResultService } from '../result/result.service';
 
 import { PutDeployComponent } from './put-deploy.component';
+import { SDK_TOKEN } from '@casper-util/wasm';
 
 describe('PutDeployComponent', () => {
   let component: PutDeployComponent;
@@ -26,6 +27,9 @@ describe('PutDeployComponent', () => {
           provide: HIGHLIGHT_WEBWORKER_FACTORY, useValue: {
             HIGHLIGHT_WEBWORKER_FACTORY
           }
+        },
+        {
+          provide: SDK_TOKEN, useValue: {},
         },
         {
           provide: TOASTER_TOKEN, useValue: {},

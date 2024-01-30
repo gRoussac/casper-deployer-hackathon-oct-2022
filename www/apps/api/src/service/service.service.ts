@@ -5,7 +5,7 @@ import { UrlService } from '../util/url/url.service';
 @Injectable()
 export class ServiceService {
 
-  private _apiUrl!: string;
+  private apiUrl!: string;
   private casperService!: CasperServiceByJsonRPC;
 
   constructor(
@@ -13,14 +13,14 @@ export class ServiceService {
   ) { }
 
   getService(apiUrl: string): CasperServiceByJsonRPC {
-    if (apiUrl && this._apiUrl === apiUrl) {
+    if (apiUrl && this.apiUrl === apiUrl) {
       return this.casperService;
     }
     apiUrl = this.urlService.shortUrl(apiUrl);
     if (!apiUrl || !this.urlService.isValidHttpUrl(apiUrl)) {
       throw TypeError('url seems invalid');
     }
-    this._apiUrl = apiUrl;
+    this.apiUrl = apiUrl;
     this.casperService = new CasperServiceByJsonRPC(apiUrl);
     return this.casperService;
   }

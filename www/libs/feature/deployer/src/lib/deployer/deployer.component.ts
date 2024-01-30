@@ -80,7 +80,7 @@ export class DeployerComponent implements OnInit, OnDestroy {
     this.isBuilderOpened = false;
   }
 
-  argurmentChanged(argument: string) {
+  argumentChanged(argument: string) {
     this.argument = argument;
     this.closeBuilder();
   }

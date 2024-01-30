@@ -1,15 +1,32 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
-import { DeployReturn, State } from '@casper-api/api-interfaces';
-import { CLPublicKey, CLValueBuilder, DeployUtil, RuntimeArgs, Contracts, decodeBase16, CLPublicKeyTag, CLURef, CLKey, EntryPoint } from 'casper-js-sdk';
+import { DeployReturn, NamedCLTypeArg, State } from '@casper-api/api-interfaces';
 import { ResultService } from '../result/result.service';
 import { Subscription } from 'rxjs';
 import { DeployerService } from '@casper-data/data-access-deployer';
-import { Result } from 'ts-results';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 import { Toaster, TOASTER_TOKEN } from '@casper-util/toaster';
 import { WatcherService } from '@casper-util/watcher';
 import { StorageService } from '@casper-util/storage';
+import { DeployService } from '@casper-util/deploy';
+import { Deploy, PublicKey, motesToCSPR } from 'casper-sdk';
+import { JsonTypes } from 'typedjson';
+
+type EntrypointsType = { [key: string]: string; };
+
+type CasperlabsHelperDeploy = { deploy: JsonTypes; };
+
+interface WindowWithCasperlabsHelper {
+  casperlabsHelper?: {
+    sign: (
+      deploy: CasperlabsHelperDeploy,
+      publicKey: string
+    ) => Promise<CasperlabsHelperDeploy>;
+  };
+  document?: {
+    defaultView?: (Window & typeof globalThis) | null;
+  };
+}
 
 @Component({
   selector: 'casper-deployer-put-deploy',
@@ -50,7 +67,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     return this._argument;
   }
 
-  window!: (Window & typeof globalThis) | null;
+  window!: WindowWithCasperlabsHelper;
   readonly quoteRegex = new RegExp(['^', "'", '+|', "'", '+$'].join(''), 'g');
   activePublicKey?: string;
   publicKey?: string;
@@ -65,13 +82,15 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
   version!: string;
   animate!: boolean;
   stateRootHash?: string;
+  chain_name?: string;
   options: string[] = [''];
-  contract_entrypoints!: EntryPoint[];
+  key!: string;
 
   private wasm!: Uint8Array | undefined;
-  private deploy?: DeployUtil.Deploy;
+  private deploy?: Deploy;
   private getStateSubscription!: Subscription;
   private getBlockStateSubscription!: Subscription;
+  private contract_entrypoints!: EntrypointsType[];
   private _argument!: string;
 
   constructor(
@@ -82,9 +101,10 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     private readonly watcherService: WatcherService,
     private readonly resultService: ResultService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly storageService: StorageService
+    private readonly storageService: StorageService,
+    private readonly deployService: DeployService,
   ) {
-    this.window = this.document.defaultView;
+    this.window = this.document.defaultView as unknown as WindowWithCasperlabsHelper;
     this.gasFee = this.config['gasFee'];
     this.TTL = this.config['TTL'];
   }
@@ -98,13 +118,24 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
       }
       if (state.apiUrl && this.apiUrl !== state.apiUrl) {
         this.apiUrl = state.apiUrl;
-        let chainName: string;
-        if (this.apiUrl.includes(this.config['apiUrl_localhost'])) {
-          chainName = this.config['chainName_localhost'];
-        } else {
-          chainName = this.config['chainName_test'];
+        let chainName: string = this.storageService.get('chain_name') || this.config['chain_name_localhost'];
+
+        if (this.apiUrl.includes(this.config['localhost'])) {
+          chainName = this.config['chain_name_localhost'];
+        } else if (this.apiUrl.includes(this.config['default_node_testnet'])) {
+          chainName = this.config['chain_name_testnet'];
         }
-        this.selectChainNameOption(chainName);
+        else if (this.apiUrl.includes(this.config['default_node_integration'])) {
+          chainName = this.config['chain_name_integration'];
+        }
+        else if (this.apiUrl.includes(this.config['default_node_mainnet'])) {
+          chainName = this.config['chain_name_mainnet'];
+        }
+
+        if (chainName) {
+          this.selectChainNameOption(chainName);
+          this.chain_name = chainName;
+        }
       }
       if (state.stateRootHash) {
         this.stateRootHash = state.stateRootHash;
@@ -120,8 +151,12 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     fee && (this.gasFeeElt.nativeElement.value = fee);
     const sessionName = this.storageService.get('sessionName');
     const sessionHash = this.storageService.get('sessionHash');
+    const key = this.storageService.get('key');
+    const entry_point = this.storageService.get('entry_point');
     sessionName && (this.sessionName = sessionName);
     sessionHash && (this.sessionHash = sessionHash);
+    key && (this.key = key);
+    entry_point && (this.entryPoint = entry_point);
   }
 
   ngOnDestroy() {
@@ -138,151 +173,98 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     fee && this.storageService.setState({ fee });
   }
 
-  // TODO Refacto into service
   makeDeploy(): void {
-    const publicKeyValue = this.publicKeyElt?.nativeElement.value;
-    if (!publicKeyValue) {
+    const publicKeyAsString = this.publicKeyElt?.nativeElement.value?.trim();
+    if (!publicKeyAsString) {
       this.connect.emit();
       return;
     }
-    const publicKey = CLPublicKey.fromHex(publicKeyValue),
-      chainName = this.chainNameElt?.nativeElement.value,
-      sessionPath = this.sessionPathElt?.nativeElement.value,
-      sessionName = this.sessionNameElt?.nativeElement.value,
-      sessionHash = this.sessionHashElt?.nativeElement.value.split('-').pop(),
-      entryPoint = this.entryPointElt?.nativeElement.value || this.selectEntryPointElt?.nativeElement.value || '',
-      version = +this.versionElt?.nativeElement.value || null,
-      gasFee = this.gasFeeElt?.nativeElement.value,
-      ttl = +this.TTLElt?.nativeElement.value,
-      isPackageElt = this.isPackageElt?.nativeElement.checked,
-      dependencies: Uint8Array[] = [],
-      deployParams: DeployUtil.DeployParams = new DeployUtil.DeployParams(
-        publicKey,
-        chainName,
-        +this.config['gasPrice'],
-        ttl,
-        dependencies
-      ),
-      argsValue: string = this.argsElt?.nativeElement.value as string,
-      argsValues = !!argsValue && (argsValue as string).split(';').filter(arg => arg.trim()).map(arg => arg.trim()),
-      args: RuntimeArgs = RuntimeArgs.fromNamedArgs([]);
-    const allowed_builder_functions = Object.keys(CLValueBuilder);
-    argsValues && argsValues.forEach(arg => {
-      if (arg && !arg.trim()) {
-        return;
-      }
-      const argKeyValue = arg.split('=');
-      const split = argKeyValue[0] && argKeyValue[0].trim().split(':'),
-        key = split[0],
-        type = split[1] && split[1].toLowerCase();
-      let value: string | CLKey | CLURef | CLPublicKey = argKeyValue[1] && argKeyValue[1].trim().replace(this.quoteRegex, '');
-      const fn = type ? type.toLowerCase() : 'string';
-      if (!key || !allowed_builder_functions.includes(fn)) {
-        return;
-      }
-      try {
-        const caster_fn: unknown = CLValueBuilder[fn as keyof CLValueBuilder];
-        if (['publickey'].includes(type)) {
-          const public_key_as_array = decodeBase16(value);
-          const type_key = public_key_as_array.slice(0, 1).toString();
-          const public_key = CLValueBuilder.publicKey(
-            public_key_as_array.slice(1),
-            +type_key as CLPublicKeyTag
-          );
-          value = public_key;
-        }
-        else if (['key'].includes(type)) {
-          const key = value.split('-').pop();
-          if (key) {
-            const keyAsByteArray = decodeBase16(key);
-            value = CLValueBuilder.key(CLValueBuilder.byteArray(keyAsByteArray));
-          }
-        }
-        else if (['uref'].includes(type)) {
-          value = CLURef.fromFormattedStr(value);
-        }
-        if (typeof value === 'object') {
-          value && args.insert(key, value);
-        } else {
-          // TODO Fix any type
-          const CLValue = value && (caster_fn as any)(value);
-          CLValue && args.insert(key, CLValue);
-        }
-      } catch (err) {
-        console.error('Error with arg', key, type, value, err);
-        this.toastr.error([key, type, value, err].join(' '), 'Error with arg');
-      }
-    });
-    let session = sessionPath && this.wasm && DeployUtil.ExecutableDeployItem.newModuleBytes(this.wasm as Uint8Array, args);
-    if (!isPackageElt) {
-      sessionName && (session = DeployUtil.ExecutableDeployItem.newStoredContractByName(sessionName, entryPoint, args));
-      sessionHash && (session = DeployUtil.ExecutableDeployItem.newStoredContractByHash(Contracts.contractHashToByteArray(sessionHash), entryPoint, args));
-    } else {
-      sessionName && (session = DeployUtil.ExecutableDeployItem.newStoredVersionContractByName(sessionName, version, entryPoint, args));
-      sessionHash && (session = DeployUtil.ExecutableDeployItem.newStoredVersionContractByHash(Contracts.contractHashToByteArray(sessionHash), version, entryPoint, args));
-    }
-    if (!session) {
-      console.error(deployParams, session);
-      this.toastr.error('', 'Error with deployParams');
-      return;
-    }
-    const payment = DeployUtil.standardPayment(gasFee);
+    const
+      chain_name: string = this.chainNameElt?.nativeElement.value?.trim() || '',
+      session_account: string = publicKeyAsString,
+      session_path: string = this.sessionPathElt?.nativeElement.value?.trim() || '',
+      session_name: string = this.sessionNameElt?.nativeElement.value?.trim() || '',
+      session_hash: string = this.sessionHashElt?.nativeElement.value?.trim() || '',
+      session_entry_point: string = (this.entryPointElt?.nativeElement.value || this.selectEntryPointElt?.nativeElement.value)?.toString().trim() || '',
+      session_version: string = (+(this.versionElt?.nativeElement.value?.trim())).toString() || '',
+      session_args_json: string = this.argsElt?.nativeElement.value?.trim() || '',
+      payment_amount: string = this.gasFeeElt?.nativeElement.value?.trim() || '',
+      ttl: string = this.TTLElt?.nativeElement.value?.trim() || '',
+      session_call_package: boolean = !!this.isPackageElt?.nativeElement.checked;
 
-    this.deploy = DeployUtil.makeDeploy(deployParams, session, payment);
-    this.deploy && this.resultService.setResult<DeployUtil.Deploy>('Deploy', DeployUtil.deployToJson(this.deploy));
-    if (!DeployUtil.validateDeploy(this.deploy)) {
-      console.error(this.deploy);
-      this.toastr.error('', 'Error with invalid deploy');
-    }
+    this.deploy = this.deployService.makeDeploy(
+      {
+        session_account,
+        chain_name,
+        ttl
+      },
+      {
+        session_path,
+        session_name,
+        session_hash,
+        session_entry_point,
+        session_version,
+        session_args_json,
+        session_call_package
+      },
+      payment_amount,
+      this.wasm
+    );
+    this.deploy && this.resultService.setResult<Deploy>('Deploy', this.deploy);
   }
 
-  async signDeploy(sendDeploy = true): Promise<DeployUtil.Deploy | void> {
+  async signDeploy(sendDeploy = true): Promise<string | void> {
     const publicKey = this.publicKeyElt?.nativeElement.value;
     if (!publicKey) {
       this.connect.emit();
       return;
     }
-    this.makeDeploy();
-    const signedDeployToJson = this.deploy && await this.window?.casperlabsHelper.sign(
-      DeployUtil.deployToJson(this.deploy),
-      publicKey
-    );
-    // TODO Bug is signer
-    if (!signedDeployToJson) {
-      console.error(this.window?.casperlabsHelper.sign, publicKey);
-      this.toastr.error(publicKey, 'Error with signer deploy');
-      this.connect.emit();
-      return;
+    try {
+      this.makeDeploy();
+      const casperlabsHelperDeploy: CasperlabsHelperDeploy = { deploy: this.deploy };
+      const signedDeployToJson = (casperlabsHelperDeploy && await this.window?.casperlabsHelper?.sign(
+        casperlabsHelperDeploy,
+        publicKey
+      ))?.deploy;
+
+      // TODO Bug is signer
+      if (!signedDeployToJson) {
+        console.error(this.window?.casperlabsHelper?.sign, publicKey);
+        this.toastr.error(publicKey, 'Error with signer deploy');
+        this.connect.emit();
+        return;
+      }
+      const signedDeploy = new Deploy(signedDeployToJson);
+      if (signedDeploy && !signedDeploy.validateDeploySize()) {
+        this.toastr.error(signedDeploy.toString(), 'Error with validateDeploy');
+        console.error(this.deploy);
+        return;
+      }
+      const deploy = signedDeploy.toJson();
+      if (!deploy) {
+        return '';
+      }
+      if (!sendDeploy) {
+        return deploy;
+      }
+      this.deployerService.putDeploy(JSON.stringify(deploy), this.apiUrl).subscribe((deploy: string | DeployReturn) => {
+        const deploy_hash = (deploy as DeployReturn).deploy_hash;
+        deploy_hash && this.resultService.setResult<Deploy>('Deploy Hash', deploy_hash || deploy);
+        deploy_hash && this.deployerService.setState({ deploy_hash });
+        deploy_hash && this.watcherService.watchDeploy(deploy_hash, this.apiUrl);
+        deploy_hash && this.storageService.setState({ deploy_hash });
+      });
+    } catch (err) {
+      console.error(err);
     }
-    const signedDeploy: Result<DeployUtil.Deploy, Error> = DeployUtil.deployFromJson(signedDeployToJson);
-    if (signedDeploy.err) {
-      this.toastr.error(signedDeploy.val.message, 'Error with signedDeploy');
-      console.error(signedDeploy.val.message);
-      return;
-    }
-    if (this.deploy && !DeployUtil.validateDeploy(this.deploy)) {
-      this.toastr.error(this.deploy.hash.toString(), 'Error with validateDeploy');
-      console.error(this.deploy);
-      return;
-    }
-    if (!sendDeploy) {
-      return signedDeploy.val;
-    }
-    this.deployerService.putDeploy(signedDeploy.val, this.apiUrl).subscribe(deploy => {
-      const deploy_hash = (deploy as DeployReturn).deploy_hash;
-      deploy && this.resultService.setResult<DeployUtil.Deploy>('Deploy Hash', deploy_hash || deploy);
-      this.deployerService.setState({ deploy_hash });
-      deploy_hash && this.watcherService.watchDeploy(deploy_hash, this.apiUrl);
-      this.storageService.setState({ apiUrl: this.apiUrl, deploy_hash });
-    });
   }
 
   async speculativeDeploy() {
     const speculative = true, sendDeploy = false;
     this.makeDeploy();
     const signedDeploy = await this.signDeploy(sendDeploy);
-    signedDeploy && (this.deployerService.putDeploy(signedDeploy, this.apiUrl, speculative).subscribe(deploy => {
-      deploy && this.resultService.setResult<DeployUtil.Deploy>('Speculative Deploy Hash', (deploy as DeployReturn).deploy_hash);
+    signedDeploy && (this.deployerService.putDeploy(signedDeploy, this.apiUrl, speculative).subscribe((deploy: string | DeployReturn) => {
+      deploy && this.resultService.setResult<Deploy>('Speculative Deploy Hash', (deploy as DeployReturn).deploy_hash);
     }));
   }
 
@@ -297,10 +279,10 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     $event?.preventDefault();
     this.sessionNameElt.nativeElement.value = '';
     this.sessionHashElt.nativeElement.value = '';
-    this.entryPointElt && (this.entryPointElt.nativeElement.value = '');
-    this.options = [''];
-    this.storageService.setState({ sessionName: '' });
-    this.storageService.setState({ sessionHash: '' });
+    this.entryPoint = '';
+    this.resetOptions();
+    this.storageService.setState({ sessionName: '', sessionHash: '', entry_point: '' });
+    this.updateArgs();
   }
 
   resetSessionPathElt() {
@@ -308,6 +290,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     this.wasm = undefined;
     this.file_name = '';
     this.deploy = undefined;
+    this.deployerService.setState({ has_wasm: false });
   }
 
   copy(value: string) {
@@ -345,6 +328,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     this.wasm = buffer && new Uint8Array(buffer);
     this.animate = false;
     this.resetSecondForm();
+    this.deployerService.setState({ has_wasm: true });
     this.changeDetectorRef.markForCheck();
   }
 
@@ -353,8 +337,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     if (!amount) {
       return;
     }
-    // TODO Fix with motesToCSPR
-    return (Number(BigInt(amount * 100) / BigInt(1e+9)) / 100).toLocaleString();
+    return motesToCSPR(amount);
   }
 
   onEdit() {
@@ -373,66 +356,108 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
 
   onSessionNameChange($event: Event) {
     const sessionName: string = ($event.target as HTMLInputElement).value;
+    const sessionHash = ($event.target as HTMLInputElement).value;
+    this.storageService.setState({ sessionName });
     if (sessionName) {
-      this.storageService.setState({ sessionName });
       this.getEntryPoints(sessionName);
       this.sessionName = sessionName;
+    } else if (!sessionHash) {
+      this.resetOptions();
+      this.contract_entrypoints = [];
     }
   }
 
   onSessionHashChange($event: Event) {
     const sessionHash = ($event.target as HTMLInputElement).value;
+    const sessionName: string = ($event.target as HTMLInputElement).value;
     this.storageService.setState({ sessionHash });
     if (sessionHash) {
       this.getEntryPoints('', sessionHash);
       this.sessionHash = sessionHash;
+    } else if (!sessionName) {
+      this.resetOptions();
+      this.contract_entrypoints = [];
     }
   }
 
   private getEntryPoints(sessionName: string, hash?: string) {
     const publicKey = this.publicKeyElt?.nativeElement.value;
-    if (!publicKey) {
+    if (sessionName && !publicKey && !this.key) {
       return;
     }
-    const key = hash || CLPublicKey.fromHex(publicKey).toAccountHashStr();
+    const key = hash || (publicKey && new PublicKey(publicKey).toAccountHash().toFormattedString()) || this.key;
     key && this.stateRootHash && (this.getBlockStateSubscription = this.deployerService.getBlockState(
       this.stateRootHash,
       key,
       sessionName,
       this.apiUrl
-    ).subscribe(async (storedValue): Promise<void> => {
+    ).subscribe(async (storedValue: object | string): Promise<void> => {
       const isString = typeof storedValue === 'string';
       if (!isString) {
-        const contract_entrypoints = storedValue.Contract?.entrypoints;
+        const contract_entrypoints = (storedValue as { Contract: { entry_points?: EntrypointsType[]; }; }).Contract?.entry_points;
         contract_entrypoints && (this.contract_entrypoints = contract_entrypoints);
-        this.options = [''];
+        this.resetOptions();
         if (contract_entrypoints) {
           contract_entrypoints.forEach(key => {
-            key && this.options.push(key.name);
+            key && this.options.push(key['name']);
           });
         }
+        this.entryPoint && this.updateArgs(this.entryPoint);
         this.changeDetectorRef.markForCheck();
       }
     }));
+  }
+
+  private resetOptions() {
+    this.options = [''];
+  }
+
+  private updateArgs(entry_point_value?: string) {
+    if (entry_point_value && this.contract_entrypoints) {
+      const entry_point = this.contract_entrypoints.find((entry_point: EntrypointsType) => entry_point['name'] === entry_point_value);
+      const args = entry_point?.['args'];
+      args && this.storageService.setState({
+        args: args as unknown as NamedCLTypeArg[],
+        entry_point: entry_point_value
+      });
+    } else {
+      this.storageService.setState({
+        args: [],
+        entry_point: ''
+      });
+    }
+  }
+
+  inputEntryPointChange($event: Event) {
+    const entry_point_value = ($event.target as HTMLSelectElement).value;
+    if (!entry_point_value) {
+      this.storageService.setState({
+        args: [],
+        entry_point: ''
+      });
+    } else {
+      this.storageService.setState({
+        entry_point: entry_point_value
+      });
+    }
+    this.entryPoint = entry_point_value;
   }
 
   selectEntryPointChange($event: Event) {
     const entry_point_value = ($event.target as HTMLSelectElement).value;
     if (!entry_point_value) {
       this.storageService.setState({
-        args: []
+        args: [],
+        entry_point: ''
       });
     }
-    else if (this.contract_entrypoints) {
-      const entry_point = this.contract_entrypoints.find((entry_point: EntryPoint) => entry_point.name === entry_point_value);
-      const args = entry_point?.args;
-      args && this.storageService.setState({
-        args
-      });
+    else {
+      this.updateArgs(entry_point_value);
     }
+    this.entryPoint = entry_point_value;
   }
 
-  publicKeyChange($event: Event) {
+  publicKeyChange() {
     this.checkEntryPoints();
   }
 
@@ -459,14 +484,16 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     return firstCondition && secondCondition;
   }
 
-  private setChainName(value: string) {
-    this.chainNameElt.nativeElement.value = value;
+  private setChainName(chain_name: string) {
+    this.chainNameElt.nativeElement.value = chain_name;
+    this.storageService.setState({ chain_name });
+    this.deployerService.setState({ chain_name });
   }
 
   private selectChainNameOption(chainName: string) {
     const select = (this.chainNameSelectElt.nativeElement as HTMLSelectElement);
     chainName && Array.prototype.slice.call(select.options).find((option, index) => {
-      const match = option.value.includes(chainName);
+      const match = chainName == option.value;
       if (match) {
         select.selectedIndex = index;
         this.setChainName(chainName);

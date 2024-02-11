@@ -170,19 +170,13 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.activePublicKey && (this.accountInformationSubscription = this.usersService.getBalanceOfByPublicKey(this.activePublicKey, this.apiUrl)
       .subscribe(
         (purse => {
+          if (JSON.parse(purse)!.name) {
+            return;
+          }
           this.balance = purse;
           this.changeDetectorRef.markForCheck();
           this.accountInformationSubscription.unsubscribe();
         })
       ));
   }
-
-  // private getBalance(purse) {
-  //   if (!purse?.balance) {
-  //     return BigInt(0).toLocaleString();
-  //   }
-  //   // TODO Fix with motesToCSPR
-  //   return (BigInt(purse.balance) / BigInt(1e+9)).toLocaleString();
-  // }
-
 }

@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@angular/core';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 import { Toaster, TOASTER_TOKEN } from '@casper-util/toaster';
 import { SDK_TOKEN } from '@casper-util/wasm';
-import { SDK, DeployWatcher, EventParseResult, DeploySubscription } from 'casper-sdk';
+import { SDK, EventParseResult, DeploySubscription } from 'casper-sdk';
 
 
 @Injectable({
@@ -11,8 +11,6 @@ import { SDK, DeployWatcher, EventParseResult, DeploySubscription } from 'casper
 export class WatcherService {
 
   private readonly api_url = 'api_url';
-
-  private current_watcher: DeployWatcher | null = null;
 
   constructor(
     @Inject(ENV_CONFIG) public readonly config: EnvironmentConfig,

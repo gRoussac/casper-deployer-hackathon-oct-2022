@@ -942,6 +942,147 @@ const signed_deploy = unsigned_deploy.sign(private_key);
 
 </details>
 
+<details>
+    <summary>Wait Deploy</summary>
+
+#### Rust
+
+Developers using Rust can utilize the wait_deploy function to wait for a specific deploy event. This is achieved by providing the desired event URL, deploy hash, and an optional timeout duration. Once the deploy is processed, the resulting data, such as the deploy's cost, can be easily accessed and utilized in subsequent logic.
+
+```rust
+pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+
+let deploy_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
+
+let timeout_duration = None; // Some(30000) for 30s instead of default timeout duration of 60s
+
+// Wait for deploy
+let event_parse_result = sdk
+    .wait_deploy(DEFAULT_EVENT_ADDRESS, &deploy_hash, timeout_duration)
+    .await
+    .unwrap();
+let deploy_processed = event_parse_result.body.unwrap().deploy_processed.unwrap();
+println!("{:?}", deploy_processed);
+```
+
+#### Typescript
+
+In TypeScript, the waitDeploy function provides a similar capability to wait for a specific deploy event. Developers can leverage this function by specifying the event address, deploy hash, and an optional timeout duration. The received EventParseResult object can then be processed to extract valuable information, such as the cost of the deploy.
+
+```ts
+const events_address = 'http://127.0.0.1:18101/events/main';
+
+const deploy_hash =
+  'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
+
+const timeout_duration = undefined; // 30000 for 30s instead of default timeout duration of 60s
+
+// Wait for deploy
+const eventParseResult: EventParseResult = await sdk.waitDeploy(
+  events_address,
+  install_result_as_json.deploy_hash,
+  timeout_duration
+);
+console.log(eventParseResult.body.DeployProcessed);
+const cost =
+  eventParseResult.body?.DeployProcessed?.execution_result.Success?.cost;
+console.log(`deploy cost ${cost}`);
+```
+
+</details>
+
+<details>
+    <summary>Watch Deploy</summary>
+
+#### Rust
+
+The watch_deploy functionality facilitates actively monitoring deploy events. By creating a deploy watcher, developers can subscribe to specific deploy hashes and define custom callback functions to handle these events. The watcher is then started, and as deploy events occur, the specified callback functions are executed. This mechanism enables real-time responsiveness to deploy events within Rust applications.
+
+```rust
+use casper_rust_wasm_sdk::deploy_watcher::deploy_watcher::{
+    DeploySubscription, EventHandlerFn,
+};
+
+pub const DEFAULT_EVENT_ADDRESS: &str = "http://127.0.0.1:18101/events/main";
+
+let deploy_hash = "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
+
+let timeout_duration = None; // Some(30000) for 30s instead of default timeout duration of 60s
+
+// Creates a watcher instance
+let mut watcher = sdk.watch_deploy(DEFAULT_EVENT_ADDRESS, timeout_duration);
+
+// Create a callback function handler of your design
+let event_handler_fn = get_event_handler_fn(deploy_hash.to_string());
+
+let mut deploy_subscriptions: Vec<DeploySubscription> = vec![];
+deploy_subscriptions.push(DeploySubscription::new(
+    deploy_hash.to_string(),
+    EventHandlerFn::new(event_handler_fn),
+));
+
+// Subscribe and start watching
+let _ = watcher.subscribe(deploy_subscriptions);
+let results = watcher.start().await;
+watcher.stop();
+println!("{:?}", results);
+```
+
+#### Typescript
+
+Similarly, TypeScript developers can utilize the watchDeploy function to actively watch for deploy events on the Casper blockchain. By creating a deploy watcher and defining callback functions, developers can subscribe to specific deploy hashes and respond dynamically as events unfold.
+
+```ts
+import { EventParseResult, DeploySubscription } from 'casper-sdk';
+
+const events_address = 'http://127.0.0.1:18101/events/main';
+
+const deploy_hash =
+  'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
+
+// Creates a watcher instance
+const watcher = sdk.watchDeploy(events_address);
+
+// Create a callback function handler of your design
+const getEventHandlerFn = (deployHash: string) => {
+  const eventHandlerFn = (eventParseResult: EventParseResult) => {
+    console.log(`callback for ${deployHash}`);
+    if (eventParseResult.err) {
+      return false;
+    } else if (
+      eventParseResult.body?.DeployProcessed?.execution_result.Success
+    ) {
+      console.log(
+        eventParseResult.body?.DeployProcessed?.execution_result.Success
+      );
+      return true;
+    } else {
+      console.error(
+        eventParseResult.body?.DeployProcessed?.execution_result.Failure
+      );
+      return false;
+    }
+  };
+  return eventHandlerFn;
+};
+
+const eventHandlerFn = getEventHandlerFn(deploy_hash);
+
+const deploySubscription: DeploySubscription = new DeploySubscription(
+  deploy_hash,
+  eventHandlerFn
+);
+const deploySubscriptions: DeploySubscription[] = [deploySubscription];
+
+// Subscribe and start watching
+watcher.subscribe(deploySubscriptions);
+const results = await watcher.start();
+watcher.stop();
+console.log(results);
+```
+
+</details>
+
 </details>
 
 <details>
@@ -1242,6 +1383,12 @@ You can download an alpha version of the app illustrating the SDK here:
 
 - [Deploy Type and static builder](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/types/deploy/struct.Deploy.html)
 
+### Deploy Watcher
+
+- [Deploy Watcher](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/deploy_watcher/index.html)
+- [DeploySubscription](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/deploy_watcher/struct.DeploySubscription.html)
+- [EventParseResult](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/deploy_watcher/struct.EventParseResult.html)
+
 ### Types
 
 - [Current exposed types](https://casper-ecosystem.github.io/rustSDK/api-rust/casper_rust_wasm_sdk/types/index.html)
@@ -1268,6 +1415,12 @@ You can download an alpha version of the app illustrating the SDK here:
 ### Deploy
 
 - [Deploy Type and static builder](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/Deploy.html)
+
+### Deploy Watcher
+
+- [Deploy Watcher](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/DeployWatcher.html)
+- [DeploySubscription](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/DeploySubscription.html)
+- [EventParseResult](https://casper-ecosystem.github.io/rustSDK/api-wasm/classes/EventParseResult.html)
 
 ### Types
 
@@ -1317,5 +1470,4 @@ make test
 
 - Expose more CL Types and Casper Client result Types
 - EventStream
-- Keygen
 - Wallet connect

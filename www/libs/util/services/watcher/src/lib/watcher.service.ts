@@ -42,7 +42,7 @@ export class WatcherService {
       <b>Hash:</b>
       ${deployHash}
       <br><b>Waiting for process...</b>`, 'Deploy accepted!');
-      watcher.start();
+      await watcher.start();
     }
     catch (err) {
       watcher.stop();

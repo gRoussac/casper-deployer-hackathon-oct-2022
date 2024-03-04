@@ -58,7 +58,6 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
         }
       } else {
         const currentHost = this.window?.location.hostname;
-        console.log(currentHost, this.defaults);
         if (currentHost && this.defaults[0].includes(currentHost)) {
           this.apiUrl = this.defaults[0];
         } else {

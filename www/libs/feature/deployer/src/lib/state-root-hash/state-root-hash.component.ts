@@ -41,6 +41,7 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
     this.window = this.document.defaultView;
     this.defaults = [
       this.config['default_node_localhost'],
+      this.config['default_node_docker'],
       this.config['default_node_testnet'],
       this.config['default_node_integration'],
       this.config['default_node_mainnet'],
@@ -61,7 +62,7 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
         if (currentHost && this.defaults[0].includes(currentHost)) {
           this.apiUrl = this.defaults[0];
         } else {
-          this.apiUrl = this.defaults[1];
+          this.apiUrl = this.defaults[2];
         }
       }
       this.getPeers();

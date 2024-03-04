@@ -1,6 +1,7 @@
 import { ApplicationInitStatus, APP_INITIALIZER, inject, InjectionToken, Provider } from "@angular/core";
 import * as deployer from "deployer";
 import * as casper_sdk from "casper-sdk";
+import { config } from "@casper-util/config";
 
 const initDeployer = deployer.default;
 const Deployer = deployer.Deployer;
@@ -18,7 +19,7 @@ export const fetchWasmFactory = async (): Promise<deployer.Deployer> => {
 
 export const fetchSDKFactory = async (): Promise<casper_sdk.SDK> => {
   const wasm = await initSDK('assets/casper_rust_wasm_sdk_bg.wasm');
-  const casperSDK = new SDK('http://localhost:4200');
+  const casperSDK = new SDK(config['default_node_localhost']);
   return wasm && casperSDK;
 };
 
@@ -47,4 +48,4 @@ export function provideSafeAsync<T>(
       },
     },
   ];
-}
+};

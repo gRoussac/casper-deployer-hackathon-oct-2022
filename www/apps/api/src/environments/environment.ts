@@ -20,5 +20,4 @@ export const environment = {
   users,
   apiUrl: 'https://rpc.testnet.casperlabs.io',
   sseUrl: 'https://rpc.testnet.casperlabs.io'
-  // apiUrl: 'http://localhost:11101/rpc'
 };

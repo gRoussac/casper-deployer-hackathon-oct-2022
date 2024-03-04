@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { Peer } from '@casper-api/api-interfaces';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { Subscription } from 'rxjs';
@@ -21,6 +21,7 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
   private getStateRootHashSubscription!: Subscription;
   private getPeersSubscription!: Subscription;
   private getStatusSubscription!: Subscription;
+  private window!: (Window & typeof globalThis) | null;
 
   peers!: Peer[];
   status = '';
@@ -30,12 +31,14 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
 
   constructor(
     @Inject(ENV_CONFIG) public readonly config: EnvironmentConfig,
+    @Inject(DOCUMENT) private document: Document,
     private readonly deployerService: DeployerService,
     private readonly resultService: ResultService,
     private readonly routeurHubService: RouteurHubService,
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly storageService: StorageService
   ) {
+    this.window = this.document.defaultView;
     this.defaults = [
       this.config['default_node_localhost'],
       this.config['default_node_testnet'],
@@ -54,7 +57,13 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
           this.defaults.push(this.apiUrl);
         }
       } else {
-        this.apiUrl = this.defaults[0];
+        const currentHost = this.window?.location.hostname;
+        console.log(currentHost, this.defaults);
+        if (currentHost && this.defaults[0].includes(currentHost)) {
+          this.apiUrl = this.defaults[0];
+        } else {
+          this.apiUrl = this.defaults[1];
+        }
       }
       this.getPeers();
     });

@@ -13,7 +13,6 @@ RUN unzip -q ./*.zip -d ${TMP}
 RUN mv ${TMP}/*/casper-sdk/ ./
 RUN mv ${TMP}/*/w* ./ && rm -rf ${TMP} *.zip
 WORKDIR /app/www
-ENV PORT=4200
 RUN npm install --verbose
 RUN npm run build --verbose
 CMD npm run serve

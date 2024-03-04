@@ -190,7 +190,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
       session_args_json: string = this.argsElt?.nativeElement.value?.trim() || '',
       payment_amount: string = this.gasFeeElt?.nativeElement.value?.trim() || '',
       ttl: string = this.TTLElt?.nativeElement.value?.trim() || '',
-      session_call_package: boolean = !!this.isPackageElt?.nativeElement.checked;
+      session_call_package = !!this.isPackageElt?.nativeElement.checked;
 
     this.deploy = this.deployService.makeDeploy(
       {

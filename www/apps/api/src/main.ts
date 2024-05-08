@@ -19,7 +19,7 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
   app.use(json({ limit: '50mb' }));
   app.use(urlencoded({ extended: true, limit: '50mb' }));
-  app.use('/api/events/*', function (req, res, next) {
+  app.use('/events/*', function (req, res, next) {
     proxy.createProxyMiddleware({
       target: resolveApiUrl(req),
       changeOrigin: true,

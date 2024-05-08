@@ -13,6 +13,7 @@ import { RouterModule } from '@angular/router';
 import { RouteurHubService } from '@casper-util/routeur-hub';
 import { StorageService } from '@casper-util/storage';
 import { DeployerService } from '@casper-data/data-access-deployer';
+import { motesToCSPR } from 'casper-sdk';
 
 declare global {
   interface Window {
@@ -170,10 +171,10 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.activePublicKey && (this.accountInformationSubscription = this.usersService.getBalanceOfByPublicKey(this.activePublicKey, this.apiUrl)
       .subscribe(
         (purse => {
-          if (JSON.parse(purse)!.name) {
+          if (JSON.parse(purse)?.name) {
             return;
           }
-          this.balance = purse;
+          this.balance = motesToCSPR(purse);
           this.changeDetectorRef.markForCheck();
           this.accountInformationSubscription.unsubscribe();
         })

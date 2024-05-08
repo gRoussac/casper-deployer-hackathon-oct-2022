@@ -105,7 +105,7 @@ export class AppService {
       return;
     }
     if (speculative) {
-      console.log('speculative', speculative);
+      console.debug('speculative', speculative);
       return (await sdk.speculative_exec(signedDeploy)).toJson();
     }
     return (await sdk.put_deploy(signedDeploy)).toJson();

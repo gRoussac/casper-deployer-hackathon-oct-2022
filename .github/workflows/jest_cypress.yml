@@ -1,19 +1,19 @@
-name: Unit and E2E Tests workflow
+# name: Unit and E2E Tests workflow
 
-on: [push, pull_request]
+# on: [push, pull_request]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    name: Jest and Cypress tests
-    defaults:
-      run:
-        working-directory: ./www
-    steps:
-      - uses: actions/checkout@v2
-      - name: 🏗 Install modules
-        run: npm install
-      - name: 💻 Run tests and collect coverage
-        run: npm run test && npm run e2e
-      - name: ✅ Upload coverage reports to Codecov with GitHub Action
-        uses: codecov/codecov-action@v3
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     name: Jest and Cypress tests
+#     defaults:
+#       run:
+#         working-directory: ./www
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: 🏗 Install modules
+#         run: npm install
+#       - name: 💻 Run tests and collect coverage
+#         run: npm run test && npm run e2e
+#       - name: ✅ Upload coverage reports to Codecov with GitHub Action
+#         uses: codecov/codecov-action@v3

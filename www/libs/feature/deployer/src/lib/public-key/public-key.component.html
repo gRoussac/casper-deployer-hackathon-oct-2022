@@ -40,7 +40,7 @@
           #activePublicKeyElt
           type="search"
           [value]="activePublicKey || ''"
-          (change)="(true)"
+          (change)="setActivePublicKey($event)"
           (keyup.enter)="getPurseURef()"
           placeholder="ex: 0x"
         />

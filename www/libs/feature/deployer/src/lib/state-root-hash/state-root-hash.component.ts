@@ -41,7 +41,7 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
     this.window = this.document.defaultView;
     this.defaults = [
       this.config['default_node_localhost'],
-      this.config['default_node_docker'],
+      this.config['default_node_launcher'],
       this.config['default_node_testnet'],
       this.config['default_node_integration'],
       this.config['default_node_mainnet'],

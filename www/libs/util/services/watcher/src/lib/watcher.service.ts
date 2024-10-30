@@ -21,17 +21,8 @@ export class WatcherService {
   async watchDeploy(deployHash: string, apiUrl?: string) {
     const config = this.config;
     apiUrl = apiUrl?.replace(config['rpc_port'], config['sse_port']);
-    let eventsUrl = apiUrl?.includes(config['localhost']) ? config['eventsUrl_localhost'] : '';
-    eventsUrl += apiUrl?.includes(config['localhost']) ?
-      config['events_main_suffix'] :
-      [
-        config['api_prefix'].slice(0, -1),
-        config['events_main_suffix'],
-        '?',
-        this.api_url,
-        '=', apiUrl,
-      ].join('');
-
+    const eventsUrl = config['eventsUrl_localhost'] + config['events_main_suffix'];
+    console.debug(eventsUrl);
 
     const watcher = this.sdk.watchDeploy(eventsUrl || config['eventsUrl_default']);
     try {

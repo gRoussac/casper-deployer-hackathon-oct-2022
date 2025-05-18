@@ -357,7 +357,7 @@ https://github.com/gRoussac/casper-deployer/blob/master/SECURITY.md
 
 ### ❓Have questions?
 
-Go to the `#hackathon` channel [on Discord](https://discord.gg/casperblockchain)
+Go to the `#hackathon` channel [on Discord](https://discord.gg/caspernetwork)
 
 ### 🪦 Errors ?
 

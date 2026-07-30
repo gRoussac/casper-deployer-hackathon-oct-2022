@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, Renderer2, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ResultService } from './result.service';
 import { Result } from './result';
 import { Subscription } from 'rxjs';
@@ -9,7 +9,7 @@ import { DeployerService } from '@casper-data/data-access-deployer';
 @Component({
   selector: 'casper-deployer-result',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './result.component.html',
   styleUrls: ['./result.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -9,7 +9,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Tabs, TabsComponent } from '@casper-ui/tabs';
 import { ArgumentComponent } from '@casper-ui/argument';
 import { customArg, defaultTabs } from './tabs';
@@ -50,7 +50,7 @@ const sortByName = (a: NamedCLTypeArg, b: NamedCLTypeArg) => {
 @Component({
   selector: 'casper-deployer-arg-builder',
   standalone: true,
-  imports: [CommonModule, TabsComponent, ArgumentComponent],
+  imports: [TabsComponent, ArgumentComponent],
   templateUrl: './arg-builder.component.html',
   styleUrls: ['./arg-builder.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

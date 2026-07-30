@@ -2,9 +2,9 @@
 /* eslint-disable */
 export class Deployer {
   free(): void;
+  account_hash_to_base64_encode(_account_hash: string): string;
   constructor();
   hello(): string;
-  account_hash_to_base64_encode(_account_hash: string): string;
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -12,9 +12,9 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly __wbg_deployer_free: (a: number, b: number) => void;
-  readonly deployer_new: () => number;
-  readonly deployer_hello: (a: number) => [number, number];
   readonly deployer_account_hash_to_base64_encode: (a: number, b: number, c: number) => any;
+  readonly deployer_hello: (a: number) => [number, number];
+  readonly deployer_new: () => number;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_export_1: WebAssembly.Table;
   readonly __wbindgen_malloc: (a: number, b: number) => number;

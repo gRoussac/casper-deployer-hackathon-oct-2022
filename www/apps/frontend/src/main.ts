@@ -8,6 +8,7 @@ import {
   EnvironmentProviders,
   importProvidersFrom,
   Provider,
+  provideZoneChangeDetection
 } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { config, ENV_CONFIG } from '@casper-util/config';
@@ -44,7 +45,7 @@ providers.push({ provide: ENV_CONFIG, useValue: config });
 
 providers.push({ provide: TOASTER_TOKEN, useValue: toastr });
 
-bootstrapApplication(AppComponent, { providers })
+bootstrapApplication(AppComponent, { providers: [provideZoneChangeDetection(), ...providers] })
   .then(() => {
     //
   })

@@ -3,17 +3,19 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/data-access/users/src",
+  "tags": ["data-access-users"],
   "targets": {
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/data-access/users"],
       "options": {
         "jestConfig": "libs/data-access/users/jest.config.ts",
-        "passWithNoTests": true
+        "passWithNoTests": true,
+        "tsConfig": "libs/data-access/users/tsconfig.spec.json"
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "options": {
         "lintFilePatterns": [
           "libs/data-access/users/**/*.ts",
@@ -21,6 +23,5 @@
         ]
       }
     }
-  },
-  "tags": ["data-access-users"]
+  }
 }

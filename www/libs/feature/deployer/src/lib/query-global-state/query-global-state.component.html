@@ -5,99 +5,104 @@
       <label
         class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="key"
-      >
+        >
         Global Key
 
         <span class="z-index">
-          <span *ngIf="activePublicKey" class="mr-3" (click)="setAccountHash()"
-            >↓ account-hash</span
-          >
-          <input type="reset" value="clear" (click)="reset()" />
-        </span>
-      </label>
-      <div class="flex flex-col items-end">
-        <input
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          name="key"
-          #keyElt
-          type="search"
-          placeholder="ex: uref-0x || hash-0x || account-hash-0x || dictionnary-0x"
-          (change)="onKeyChange()"
-          (dblclick)="select($event)"
-          (keyup.enter)="getBlockState()"
-        />
-        <span
-          [hidden]="!hasPrevious"
-          (click)="setPrevious()"
-          class="cursor-pointer mt-1 text-gray-700 text-xs font-bold"
-          >⤺ prev</span
-        >
-        <span [hidden]="hasPrevious" class="mt-1 text-xs font-bold"
-          >&nbsp;</span
-        >
-      </div>
-    </div>
+          @if (activePublicKey) {
+            <span class="mr-3" (click)="setAccountHash()"
+              >↓ account-hash</span
+              >
+            }
+            <input type="reset" value="clear" (click)="reset()" />
+          </span>
+        </label>
+        <div class="flex flex-col items-end">
+          <input
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            name="key"
+            #keyElt
+            type="search"
+            placeholder="ex: uref-0x || hash-0x || account-hash-0x || dictionnary-0x"
+            (change)="onKeyChange()"
+            (dblclick)="select($event)"
+            (keyup.enter)="getBlockState()"
+            />
+          <span
+            [hidden]="!hasPrevious"
+            (click)="setPrevious()"
+            class="cursor-pointer mt-1 text-gray-700 text-xs font-bold"
+            >⤺ prev</span
+            >
+            <span [hidden]="hasPrevious" class="mt-1 text-xs font-bold"
+              >&nbsp;</span
+              >
+            </div>
+          </div>
 
-    <div class="mb-4">
-      <label
-        class="flex justify-between mb-2 text-gray-700 text-xs font-bold"
-        for="path"
-      >
-        <span>Named key Path</span>
-        <span
-          *ngIf="pathElt.value.length"
-          class="cursor-pointer"
-          (click)="pop()"
-          >↤ pop</span
-        >
-      </label>
-      <div class="mb-2">
-        <input
-          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          name="path"
-          #pathElt
-          type="search"
-          [placeholder]="['ex: counter', 'count'].join(config['path_sep'])"
-          (change)="onPathChange()"
-          (keyup.enter)="getBlockState()"
-        />
-      </div>
-      <div class="mb-2">
-        <select
-          (change)="selectKey($event)"
-          #selectKeyElt
-          class="border border-gray-300 text-gray-900 text-xs focus:outline-none rounded focus:shadow-outline block w-full p-2.5"
-        >
-          <option *ngFor="let option of options" [value]="option">
-            {{ option }}
-          </option>
-        </select>
-      </div>
-    </div>
+          <div class="mb-4">
+            <label
+              class="flex justify-between mb-2 text-gray-700 text-xs font-bold"
+              for="path"
+              >
+              <span>Named key Path</span>
+              @if (pathElt.value.length) {
+                <span
+                  class="cursor-pointer"
+                  (click)="pop()"
+                  >↤ pop</span
+                  >
+                }
+              </label>
+              <div class="mb-2">
+                <input
+                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  name="path"
+                  #pathElt
+                  type="search"
+                  [placeholder]="['ex: counter', 'count'].join(config['path_sep'])"
+                  (change)="onPathChange()"
+                  (keyup.enter)="getBlockState()"
+                  />
+              </div>
+              <div class="mb-2">
+                <select
+                  (change)="selectKey($event)"
+                  #selectKeyElt
+                  class="border border-gray-300 text-gray-900 text-xs focus:outline-none rounded focus:shadow-outline block w-full p-2.5"
+                  >
+                  @for (option of options; track option) {
+                    <option [value]="option">
+                      {{ option }}
+                    </option>
+                  }
+                </select>
+              </div>
+            </div>
 
-    <div class="flex items-end">
-      <button
-        class="flex items-end ml-auto flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
-        type="button"
-        (click)="getBlockState()"
-        [attr.disabled]="isBlockStateDisabled ? true : null"
-      >
-        Stored value
-        <svg
-          class="w-6 h-6 ml-1"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z"
-          ></path>
-        </svg>
-      </button>
-    </div>
-  </form>
-</div>
+            <div class="flex items-end">
+              <button
+                class="flex items-end ml-auto flex items-end bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+                type="button"
+                (click)="getBlockState()"
+                [attr.disabled]="isBlockStateDisabled ? true : null"
+                >
+                Stored value
+                <svg
+                  class="w-6 h-6 ml-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>

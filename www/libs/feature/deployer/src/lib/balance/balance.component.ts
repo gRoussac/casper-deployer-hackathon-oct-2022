@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, OnDestroy, Output, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { State } from '@casper-api/api-interfaces';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { Subscription } from 'rxjs';
@@ -9,7 +9,7 @@ import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 @Component({
   selector: 'casper-deployer-balance',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './balance.component.html',
   styleUrls: ['./balance.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

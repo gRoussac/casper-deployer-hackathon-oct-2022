@@ -10,7 +10,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ResultService } from '../result/result.service';
 import { DeployReturn, State } from '@casper-api/api-interfaces';
 import { Subscription } from 'rxjs';
@@ -26,7 +26,7 @@ import { DeployerService } from '@casper-data/data-access-deployer';
 @Component({
   selector: 'casper-deployer-transfer',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   providers: [WatcherService, DeployService],
   templateUrl: './transfer.component.html',
   styleUrls: ['./transfer.component.scss'],

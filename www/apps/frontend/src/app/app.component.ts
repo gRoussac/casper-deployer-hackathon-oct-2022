@@ -9,9 +9,10 @@ import {
   Renderer2,
   Provider,
   ImportProvidersSource,
+  DOCUMENT
 } from '@angular/core';
 
-import { CommonModule, DOCUMENT } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { HeaderComponent } from '@casper-ui/header';
 import { UsersService } from '@casper-data/data-access-users';

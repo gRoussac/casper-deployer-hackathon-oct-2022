@@ -10,7 +10,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { State } from '@casper-api/api-interfaces';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { Subscription } from 'rxjs';
@@ -24,7 +24,7 @@ type NamedKeysType = { [key: string]: string };
 @Component({
   selector: 'casper-deployer-query-global-state',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './query-global-state.component.html',
   styleUrls: ['./query-global-state.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

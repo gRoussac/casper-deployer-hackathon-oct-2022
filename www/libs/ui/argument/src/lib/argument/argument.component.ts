@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { CLType, CLTypeEnum } from 'casper-rust-wasm-sdk';
 import { NamedCLTypeArg } from '@casper-api/api-interfaces';
 
 @Component({
   selector: 'casper-ui-argument',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './argument.component.html',
   styleUrls: ['./argument.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

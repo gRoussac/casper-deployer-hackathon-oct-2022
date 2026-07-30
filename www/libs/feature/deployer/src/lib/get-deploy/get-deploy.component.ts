@@ -9,7 +9,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Subscription } from 'rxjs';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { State } from '@casper-api/api-interfaces';
@@ -20,7 +20,7 @@ import { GetDeployResult } from 'casper-rust-wasm-sdk';
 @Component({
   selector: 'casper-deployer-get-deploy',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './get-deploy.component.html',
   styleUrls: ['./get-deploy.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -8,7 +8,7 @@ import {
   OnDestroy,
   ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Subscription } from 'rxjs';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { ResultService } from '../result/result.service';
@@ -20,7 +20,7 @@ import { PublicKey } from 'casper-rust-wasm-sdk';
 @Component({
   selector: 'casper-deployer-state-dictionary',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './dictionary.component.html',
   styleUrls: ['./dictionary.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

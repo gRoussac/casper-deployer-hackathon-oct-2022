@@ -4,7 +4,7 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { StateRootHashComponent } from '../state-root-hash/state-root-hash.component';
 import { QueryGlobalStateComponent } from '../query-global-state/query-global-state.component';
 import { GetDeployComponent } from '../get-deploy/get-deploy.component';
@@ -27,7 +27,6 @@ import { DeployService } from '@casper-util/deploy';
   selector: 'casper-deployer',
   standalone: true,
   imports: [
-    CommonModule,
     UtilHihlightWebworkerModule,
     StateRootHashComponent,
     PublicKeyComponent,
@@ -38,8 +37,8 @@ import { DeployService } from '@casper-util/deploy';
     PutDeployComponent,
     ResultComponent,
     DictionaryComponent,
-    ArgBuilderComponent,
-  ],
+    ArgBuilderComponent
+],
   providers: [ResultService, DeployerService, DeployService],
   templateUrl: './deployer.component.html',
   styleUrls: ['./deployer.component.scss'],

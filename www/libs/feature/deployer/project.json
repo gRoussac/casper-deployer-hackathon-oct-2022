@@ -4,17 +4,19 @@
   "projectType": "library",
   "sourceRoot": "libs/feature/deployer/src",
   "prefix": "casper",
+  "tags": ["feature deployer"],
   "targets": {
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/feature/deployer"],
       "options": {
         "jestConfig": "libs/feature/deployer/jest.config.ts",
-        "passWithNoTests": true
+        "passWithNoTests": true,
+        "tsConfig": "libs/feature/deployer/tsconfig.spec.json"
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "options": {
         "lintFilePatterns": [
           "libs/feature/deployer/**/*.ts",
@@ -22,6 +24,5 @@
         ]
       }
     }
-  },
-  "tags": ["feature deployer"]
+  }
 }

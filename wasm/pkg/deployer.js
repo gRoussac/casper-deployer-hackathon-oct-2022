@@ -104,6 +104,16 @@ export class Deployer {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_deployer_free(ptr, 0);
     }
+    /**
+     * @param {string} _account_hash
+     * @returns {string}
+     */
+    account_hash_to_base64_encode(_account_hash) {
+        const ptr0 = passStringToWasm0(_account_hash, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.deployer_account_hash_to_base64_encode(this.__wbg_ptr, ptr0, len0);
+        return ret;
+    }
     constructor() {
         const ret = wasm.deployer_new();
         this.__wbg_ptr = ret >>> 0;
@@ -124,16 +134,6 @@ export class Deployer {
         } finally {
             wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
         }
-    }
-    /**
-     * @param {string} _account_hash
-     * @returns {string}
-     */
-    account_hash_to_base64_encode(_account_hash) {
-        const ptr0 = passStringToWasm0(_account_hash, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.deployer_account_hash_to_base64_encode(this.__wbg_ptr, ptr0, len0);
-        return ret;
     }
 }
 

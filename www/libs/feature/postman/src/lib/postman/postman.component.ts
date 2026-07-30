@@ -1,11 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Users } from '@casper-api/api-interfaces';
 
 @Component({
   selector: 'casper-escrow-postman',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './postman.component.html',
   styleUrls: ['./postman.component.scss'],
 })

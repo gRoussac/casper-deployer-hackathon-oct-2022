@@ -4,12 +4,11 @@
   "projectType": "application",
   "sourceRoot": "apps/frontend/src",
   "prefix": "casper",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/frontend",
         "index": "apps/frontend/src/index.html",
@@ -38,12 +37,8 @@
           "./node_modules/highlight.js/styles/lightfair.css",
           "./node_modules/toastr/build/toastr.min.css"
         ],
-        "scripts": [
-          "./node_modules/toastr/build/toastr.min.js"
-        ],
-        "allowedCommonJsDependencies": [
-          "promise-worker"
-        ]
+        "scripts": ["./node_modules/toastr/build/toastr.min.js"],
+        "allowedCommonJsDependencies": ["promise-worker"]
       },
       "configurations": {
         "production": {
@@ -93,7 +88,8 @@
       "defaultConfiguration": "development",
       "options": {
         "proxyConfig": "apps/frontend/proxy.conf.json"
-      }
+      },
+      "continuous": true
     },
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
@@ -102,24 +98,19 @@
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": [
-          "apps/frontend/**/*.ts",
-          "apps/frontend/**/*.html"
-        ]
+        "lintFilePatterns": ["apps/frontend/**/*.ts", "apps/frontend/**/*.html"]
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/apps/frontend"
-      ],
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/frontend"],
       "options": {
         "jestConfig": "apps/frontend/jest.config.ts",
-        "passWithNoTests": true
+        "passWithNoTests": true,
+        "tsConfig": "apps/frontend/tsconfig.spec.json"
       }
     }
-  },
-  "tags": []
+  }
 }

@@ -1,5 +1,5 @@
-import { DOCUMENT } from '@angular/common';
-import { Inject, Injectable } from '@angular/core';
+
+import { Inject, Injectable, DOCUMENT } from '@angular/core';
 import { HighlightService } from '@casper-util/hightlight-webworker';
 import { Subject } from 'rxjs';
 import { Result } from './result';

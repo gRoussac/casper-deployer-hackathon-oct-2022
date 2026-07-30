@@ -6,7 +6,7 @@
   "prefix": "casper",
   "targets": {
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "options": {
         "lintFilePatterns": [
           "libs/util/config/**/*.ts",

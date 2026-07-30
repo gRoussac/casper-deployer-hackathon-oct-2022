@@ -4,17 +4,19 @@
   "projectType": "library",
   "sourceRoot": "libs/feature/escrower/src",
   "prefix": "casper",
+  "tags": ["feature escrower"],
   "targets": {
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/feature/escrower"],
       "options": {
         "jestConfig": "libs/feature/escrower/jest.config.ts",
-        "passWithNoTests": true
+        "passWithNoTests": true,
+        "tsConfig": "libs/feature/escrower/tsconfig.spec.json"
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "options": {
         "lintFilePatterns": [
           "libs/feature/escrower/**/*.ts",
@@ -22,6 +24,5 @@
         ]
       }
     }
-  },
-  "tags": ["feature escrower"]
+  }
 }

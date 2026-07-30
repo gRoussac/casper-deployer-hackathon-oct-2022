@@ -3,17 +3,19 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/util/hihlight-webworker/src",
+  "tags": ["util-highlight-webworker"],
   "targets": {
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/util/hihlight-webworker"],
       "options": {
         "jestConfig": "libs/util/hihlight-webworker/jest.config.ts",
-        "passWithNoTests": true
+        "passWithNoTests": true,
+        "tsConfig": "libs/util/hihlight-webworker/tsconfig.spec.json"
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "options": {
         "lintFilePatterns": [
           "libs/util/hihlight-webworker/**/*.ts",
@@ -21,6 +23,5 @@
         ]
       }
     }
-  },
-  "tags": ["util-highlight-webworker"]
+  }
 }

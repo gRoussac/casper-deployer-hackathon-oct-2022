@@ -4,17 +4,19 @@
   "projectType": "library",
   "sourceRoot": "libs/ui/argument/src",
   "prefix": "casper",
+  "tags": ["argument"],
   "targets": {
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/ui/argument"],
       "options": {
         "jestConfig": "libs/ui/argument/jest.config.ts",
-        "passWithNoTests": true
+        "passWithNoTests": true,
+        "tsConfig": "libs/ui/argument/tsconfig.spec.json"
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "options": {
         "lintFilePatterns": [
           "libs/ui/argument/**/*.ts",
@@ -22,6 +24,5 @@
         ]
       }
     }
-  },
-  "tags": ["argument"]
+  }
 }

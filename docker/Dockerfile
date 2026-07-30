@@ -1,6 +1,6 @@
-FROM --platform=linux/amd64 node:22.14-alpine as build
+FROM --platform=linux/amd64 node:22-alpine AS build
 WORKDIR /app
-RUN npm install -g npm@latest
+RUN apk add --no-cache unzip
 
 ADD https://github.com/gRoussac/casper-deployer/archive/refs/heads/master.zip .
 ARG TMP="./tmp"
@@ -13,7 +13,7 @@ ENV PORT=4242
 RUN npm install
 RUN npm run build
 
-FROM --platform=linux/amd64 node:22.14-alpine as production
+FROM --platform=linux/amd64 node:22-alpine AS production
 
 # Set the working directory in the production image
 WORKDIR /app
@@ -33,4 +33,4 @@ EXPOSE 4242
 WORKDIR /app/www
 
 # Run the application
-CMD npm run serve
+CMD ["npm", "run", "serve"]

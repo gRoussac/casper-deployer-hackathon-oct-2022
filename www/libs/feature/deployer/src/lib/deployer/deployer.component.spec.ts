@@ -86,12 +86,4 @@ describe('DeployerComponent', () => {
     expect(component.connect).toBeDefined();
     expect(component.refreshPurse).toBeDefined();
   });
-
-  xit('should set state on activePublicKey input', () => {
-    //   setState.mockClear();
-    //   //component.activePublicKey = test;
-    //   expect(setState).toHaveBeenNthCalledWith(1, { activePublicKey: test });
-    //  // component.activePublicKey = undefined as unknown as string;
-    //   expect(setState).toHaveBeenNthCalledWith(2, { activePublicKey: undefined });
-  });
 });

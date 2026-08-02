@@ -7,7 +7,7 @@ jest.mock('casper-rust-wasm-sdk', () => ({
     .mockImplementation(() => ({ U8: jest.fn().mockResolvedValue('U8') })),
 }));
 
-describe.skip('ArgumentComponent', () => {
+describe('ArgumentComponent', () => {
   let component: ArgumentComponent;
   let fixture: ComponentFixture<ArgumentComponent>;
 

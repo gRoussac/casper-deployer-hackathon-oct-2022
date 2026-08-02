@@ -7,28 +7,12 @@ describe('RouteurHubService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [RouteurHubService]
+      providers: [RouteurHubService],
     });
     service = TestBed.inject(RouteurHubService);
   });
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
-
-  xit('should connect', () => {
-    expect(service).toBeTruthy();
-  });
-
-  xit('should refreshPurse', () => {
-    expect(service).toBeTruthy();
-  });
-
-  xit('should setState', () => {
-    expect(service).toBeTruthy();
-  });
-
-  xit('should getState', () => {
     expect(service).toBeTruthy();
   });
 });

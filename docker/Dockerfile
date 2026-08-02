@@ -18,9 +18,8 @@ WORKDIR /app/www
 
 COPY --from=build /app/www/dist ./dist
 COPY --from=build /app/www/package.json ./package.json
-# file: deps are symlinks in the build stage — copy the real pack contents.
-COPY --from=build /app/casper-rust-wasm-sdk/pkg-nodejs ./node_modules/casper-rust-wasm-sdk-nodejs
 
+# Install runtime npm deps first (file: entries become broken symlinks here).
 RUN npm install --omit=dev --no-fund --no-audit \
   @nestjs/common \
   @nestjs/core \
@@ -29,7 +28,13 @@ RUN npm install --omit=dev --no-fund --no-audit \
   http-proxy-middleware \
   reflect-metadata \
   rxjs \
-  tslib
+  tslib \
+  && rm -rf ./node_modules/casper-rust-wasm-sdk \
+            ./node_modules/casper-rust-wasm-sdk-nodejs \
+            ./node_modules/deployer
+
+# Replace broken file: symlinks with the real vendored Node WASM pack.
+COPY --from=build /app/casper-rust-wasm-sdk/pkg-nodejs ./node_modules/casper-rust-wasm-sdk-nodejs
 
 ENV PORT=4242
 EXPOSE 4242

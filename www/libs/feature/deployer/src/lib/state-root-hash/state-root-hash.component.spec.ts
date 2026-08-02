@@ -142,3 +142,67 @@ describe('StateRootHashComponent', () => {
     expect(getStateRootHash).not.toHaveBeenCalled();
   });
 });
+
+describe('StateRootHashComponent hosted browser', () => {
+  it('should default to testnet with no localhost flash or preset', async () => {
+    jest
+      .spyOn(
+        StateRootHashComponent.prototype as unknown as {
+          isLocalBrowserHost: () => boolean;
+        },
+        'isLocalBrowserHost',
+      )
+      .mockReturnValue(false);
+
+    const getPeers = jest.fn().mockReturnValue(of([]));
+
+    await TestBed.resetTestingModule();
+    await TestBed.configureTestingModule({
+      imports: [StateRootHashComponent, HttpClientModule],
+      providers: [
+        {
+          provide: ResultService,
+          useValue: { setResult: jest.fn(), copyClipboard: jest.fn() },
+        },
+        RouteurHubService,
+        { provide: ENV_CONFIG, useValue: config },
+        { provide: HIGHLIGHT_WEBWORKER_FACTORY, useValue: jest.fn() },
+        { provide: TOASTER_TOKEN, useValue: {} },
+        {
+          provide: DeployerService,
+          useValue: {
+            setState: jest.fn(),
+            getPeers,
+            getStatus: () => of('status'),
+            getStateRootHash: () => of('srh'),
+          },
+        },
+        {
+          provide: StorageService,
+          useValue: {
+            // Stale local value must not win on a hosted site.
+            get: jest.fn().mockReturnValue(config['default_node_localhost']),
+            set: jest.fn(),
+            setState: jest.fn(),
+          },
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
+
+    const fixture = TestBed.createComponent(StateRootHashComponent);
+    const component = fixture.componentInstance;
+
+    // Before detectChanges / AfterViewInit — first paint value.
+    expect(component.apiUrl).toBe(config['default_node_testnet']);
+    expect(component.defaults).not.toContain(config['default_node_localhost']);
+    expect(component.defaults[0]).toBe(config['default_node_testnet']);
+
+    fixture.detectChanges();
+    const input = fixture.nativeElement.querySelector(
+      'input[name="apiUrl"]',
+    ) as HTMLInputElement;
+    expect(input.value).toBe(config['default_node_testnet']);
+    expect(input.value).not.toContain('localhost');
+  });
+});

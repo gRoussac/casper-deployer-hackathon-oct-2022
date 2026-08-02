@@ -15,8 +15,8 @@
           name="apiUrl"
           #apiUrlElt
           type="url"
-          [placeholder]="'ex: ' + config['default_node_localhost']"
-          [value]="apiUrl || config['default_node_localhost']"
+          [placeholder]="'ex: ' + (defaults[0] || config['default_node_testnet'])"
+          [value]="apiUrl"
           (keyup.enter)="getStateRootHash()"
           (change)="selectApiUrl($event)"
         />

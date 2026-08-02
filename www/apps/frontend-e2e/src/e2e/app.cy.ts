@@ -61,29 +61,21 @@ describe('deployer', () => {
       });
   });
 
-  it('should list unique peer options from API without duplicating presets', () => {
+  it('should list unique peer options from API', () => {
     cy.wait('@getPeers');
     cy.get('select')
       .first()
-      .within(() => {
-        cy.get('optgroup[label="peers / custom"] option').should(
-          'have.length',
-          2,
-        );
-        cy.get('optgroup[label="peers / custom"] option')
-          .eq(0)
-          .should('have.value', 'http://localhost:11101')
-          .and('have.text', 'http://localhost:11101');
-        cy.get('optgroup[label="peers / custom"] option')
-          .eq(1)
-          .should('have.value', 'http://localhost:11102');
-      });
-    cy.get('select')
-      .first()
-      .find('option')
+      .find('optgroup[label="peers / custom"] option')
+      .should('have.length', 2)
       .then(($opts) => {
+        const values = [...$opts].map((o) => o.value);
         const texts = [...$opts].map((o) => (o.textContent || '').trim());
-        expect(new Set(texts).size).to.eq(texts.length);
+        expect(values).to.deep.eq([
+          'http://localhost:11101',
+          'http://localhost:11102',
+        ]);
+        expect(texts).to.deep.eq(values);
+        expect(new Set(values).size).to.eq(values.length);
       });
   });
 

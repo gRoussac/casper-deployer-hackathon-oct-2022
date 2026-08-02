@@ -9,6 +9,7 @@
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
       "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
       "options": {
         "outputPath": "dist/apps/frontend",
         "index": "apps/frontend/src/index.html",
@@ -22,12 +23,12 @@
           "apps/frontend/src/favicon.png",
           "apps/frontend/src/assets",
           {
-            "input": "../wasm/pkg",
+            "input": "node_modules/deployer",
             "glob": "deployer_bg.wasm",
             "output": "assets"
           },
           {
-            "input": "../casper-rust-wasm-sdk/pkg",
+            "input": "node_modules/casper-rust-wasm-sdk",
             "glob": "casper_rust_wasm_sdk_bg.wasm",
             "output": "assets"
           }
@@ -73,11 +74,17 @@
           "sourceMap": true,
           "namedChunks": true
         }
-      },
-      "defaultConfiguration": "production"
+      }
     },
     "serve": {
       "executor": "@angular-devkit/build-angular:dev-server",
+      "defaultConfiguration": "development",
+      "continuous": true,
+      "options": {
+        "proxyConfig": "apps/frontend/proxy.conf.json",
+        "host": "0.0.0.0",
+        "port": 4242
+      },
       "configurations": {
         "production": {
           "buildTarget": "frontend:build:production",
@@ -87,14 +94,7 @@
           "buildTarget": "frontend:build:development",
           "port": 4242
         }
-      },
-      "defaultConfiguration": "development",
-      "options": {
-        "proxyConfig": "apps/frontend/proxy.conf.json",
-        "host": "0.0.0.0",
-        "port": 4242
-      },
-      "continuous": true
+      }
     },
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",

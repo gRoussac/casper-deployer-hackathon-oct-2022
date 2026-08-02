@@ -4,6 +4,7 @@
   "projectType": "library",
   "sourceRoot": "libs/util/config/src",
   "prefix": "casper",
+  "tags": ["util config"],
   "targets": {
     "lint": {
       "executor": "@nx/eslint:lint",
@@ -14,6 +15,5 @@
         ]
       }
     }
-  },
-  "tags": ["util config"]
+  }
 }

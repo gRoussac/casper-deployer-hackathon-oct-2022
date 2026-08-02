@@ -3,7 +3,7 @@
     [isConnected]="isConnected"
     [activePublicKey]="activePublicKey"
     [balance]="balance"
-    [role]="user?.role"
+    [role]="$safeNavigationMigration(user?.role)"
     [isButtonHidden]="!walletVersion"
     (connect)="connect()"
   ></casper-ui-header>

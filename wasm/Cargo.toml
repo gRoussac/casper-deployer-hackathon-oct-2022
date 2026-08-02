@@ -1,16 +1,16 @@
 [package]
 name = "deployer"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
-wasm-bindgen = "*"
-wasm-bindgen-futures = "*"
-wee_alloc = "*"
+wasm-bindgen = "0.2.126"
+wasm-bindgen-futures = "0.4.76"
+wee_alloc = "0.4.5"
 casper-types = { version = "7.0.0", default-features = false }
-js-sys = "*"
+js-sys = "0.3.103"
 base64 = { version = "0.22.1", default-features = false, features = ["alloc"] }
-getrandom = { version = "0.3.3", features = ["wasm_js"] }
+getrandom = { version = "0.4.3", features = ["wasm_js"] }
 
 [lib]
 crate-type = ["cdylib"]

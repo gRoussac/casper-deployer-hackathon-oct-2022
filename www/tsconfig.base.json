@@ -38,7 +38,12 @@
       "@casper-util/wallet": ["libs/util/services/wallet/src/index.ts"],
       "@casper-util/wasm": ["libs/util/services/wasm/src/index.ts"],
       "@casper-util/watcher": ["libs/util/services/watcher/src/index.ts"]
-    }
+    },
+    "strict": false,
+    "noUncheckedSideEffectImports": false,
+    "types": ["*"],
+    "esModuleInterop": false,
+    "ignoreDeprecations": "6.0"
   },
   "exclude": ["node_modules", "tmp"]
 }

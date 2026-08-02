@@ -2,6 +2,7 @@ import {
   HttpClient,
   provideHttpClient,
   withInterceptorsFromDi,
+  withXhr
 } from '@angular/common/http';
 import {
   enableProdMode,
@@ -33,7 +34,7 @@ const ROUTES: Routes = [
 
 const providers: Array<Provider | EnvironmentProviders> = [
   importProvidersFrom([WasmModule, RouterModule.forRoot(ROUTES)]),
-  provideHttpClient(withInterceptorsFromDi()),
+  provideHttpClient(withXhr(), withInterceptorsFromDi()),
 ];
 
 providers.push({ provide: ENV_CONFIG, useValue: config });

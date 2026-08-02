@@ -170,7 +170,6 @@ describe('AppService', () => {
       };
       const result = await service.putTransaction(
         signed as never,
-        false,
         'http://localhost:11101',
       );
       expect(result.transaction_hash).toBe('tx-hash-1');

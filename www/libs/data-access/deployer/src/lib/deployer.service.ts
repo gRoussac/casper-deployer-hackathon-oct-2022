@@ -255,11 +255,9 @@ export class DeployerService {
   putDeploy(
     signedDeploy: string,
     apiUrl?: string,
-    speculative?: boolean,
   ): Observable<DeployReturn | string> {
     let params = new HttpParams();
     apiUrl && (params = params.append('apiUrl', apiUrl));
-    speculative && (params = params.append('speculative', speculative));
     params = params.append('signedDeploy', signedDeploy);
     return this.http
       .post<DeployReturn | Error>(
@@ -277,11 +275,9 @@ export class DeployerService {
   putTransaction(
     signedTransaction: string,
     apiUrl?: string,
-    speculative?: boolean,
   ): Observable<TransactionReturn | string> {
     let params = new HttpParams();
     apiUrl && (params = params.append('apiUrl', apiUrl));
-    speculative && (params = params.append('speculative', speculative));
     params = params.append('signedTransaction', signedTransaction);
     return this.http
       .post<TransactionReturn | Error>(

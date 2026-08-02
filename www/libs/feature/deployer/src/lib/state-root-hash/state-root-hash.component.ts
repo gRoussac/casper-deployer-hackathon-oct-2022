@@ -37,6 +37,7 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
 
   peers: Peer[] = [];
   status = '';
+  /** Set in the constructor so the first paint never flashes localhost on hosted sites. */
   apiUrl!: string;
   @ViewChild('apiUrlElt') apiUrlElt!: HTMLInputElement;
   defaults!: string[];
@@ -52,39 +53,24 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
   ) {
     this.window = this.document.defaultView;
     this.defaults = this.buildDefaults();
+    this.apiUrl = this.resolveInitialApiUrl();
+    this.peersSourceUrl = this.peersSourceFor(this.apiUrl);
+    if (
+      !this.defaults.includes(this.apiUrl) &&
+      !this.isGossipPeerUrl(this.apiUrl)
+    ) {
+      this.defaults.push(this.apiUrl);
+    }
   }
 
   ngAfterViewInit(): void {
+    // apiUrl is already correct from the constructor — only wire hub state + peers.
     setTimeout(() => {
-      const apiUrl = this.storageService.get('apiUrl');
-      if (apiUrl) {
-        this.apiUrl = apiUrl;
-        if (
-          !this.defaults.includes(this.apiUrl) &&
-          !this.isGossipPeerUrl(this.apiUrl)
-        ) {
-          this.defaults.push(this.apiUrl);
-        }
-        this.deployerService.setState({ apiUrl });
-        this.syncChainName(apiUrl);
-      } else {
-        const currentHost = this.window?.location.hostname;
-        const localhost = this.config['default_node_localhost'];
-        if (
-          this.isLocalBrowserHost() &&
-          currentHost &&
-          localhost.includes(currentHost)
-        ) {
-          this.apiUrl = localhost;
-        } else {
-          this.apiUrl = this.config['default_node_testnet'];
-        }
-        this.routeurHubService.setHubState({ apiUrl: this.apiUrl });
-        this.deployerService.setState({ apiUrl: this.apiUrl });
-        this.syncChainName(this.apiUrl);
-      }
-      this.peersSourceUrl = this.peersSourceFor(this.apiUrl);
+      this.deployerService.setState({ apiUrl: this.apiUrl });
+      this.routeurHubService.setHubState({ apiUrl: this.apiUrl });
+      this.syncChainName(this.apiUrl);
       this.getPeers();
+      this.changeDetectorRef.markForCheck();
     });
   }
 
@@ -227,6 +213,35 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
       defaults.unshift(this.config['default_node_localhost']);
     }
     return defaults;
+  }
+
+  private preferredDefaultApiUrl(): string {
+    return this.isLocalBrowserHost()
+      ? this.config['default_node_localhost']
+      : this.config['default_node_testnet'];
+  }
+
+  /** Ignore stored localhost when the UI does not offer that preset. */
+  private isUsableStoredApiUrl(apiUrl: string): boolean {
+    if (this.isLocalBrowserHost()) {
+      return true;
+    }
+    const localhost = this.config['default_node_localhost'];
+    if (
+      apiUrl === localhost ||
+      /https?:\/\/(localhost|127\.0\.0\.1):1110[1-5]\b/.test(apiUrl)
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  private resolveInitialApiUrl(): string {
+    const stored = this.storageService.get('apiUrl');
+    if (stored && this.isUsableStoredApiUrl(stored)) {
+      return stored;
+    }
+    return this.preferredDefaultApiUrl();
   }
 
   /** Casper gossip/network peers from info_get_peers are typically :35000. */

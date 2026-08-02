@@ -15,7 +15,7 @@ on:
 
 jobs:
   build-push-dev:
-    name: Build and Push Docker Image :dev
+    name: Build and Push Docker Image :dev and :latest
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker image :dev
+      - name: Build Docker image :dev and :latest
         run: make docker-build-dev
 
       - name: Log in to Docker Hub
@@ -34,7 +34,22 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Push :dev to Docker Hub (interchouette + gregoshop mirror)
+      - name: Push :dev and :latest to Docker Hub (interchouette + gregoshop mirror)
         run: make docker-push-dev-hub
         env:
           CI: "1"
+
+      # Render does not watch Hub for new digests — call the service Deploy Hook
+      # after a successful push so it pulls interchouette/casper-deployer:latest.
+      - name: Trigger Render redeploy
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "${RENDER_DEPLOY_HOOK}" ]; then
+            echo "RENDER_DEPLOY_HOOK secret not set; skipping Render redeploy"
+            exit 0
+          fi
+          echo "Triggering Render deploy hook…"
+          curl -fsS -X GET "${RENDER_DEPLOY_HOOK}"
+          echo
+          echo "Render deploy requested"

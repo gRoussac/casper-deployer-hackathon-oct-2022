@@ -17,9 +17,9 @@ APP_VERSION ?= 2.2.2
 
 help:
 	@echo "Casper Deployer Docker targets"
-	@echo "  make docker-build-dev     Build and tag :dev (Hub + gregoshop mirror)"
-	@echo "  make docker-push-dev-hub  Push :dev to Docker Hub"
-	@echo "  make docker-push-dev      Local interactive push (:dev)"
+	@echo "  make docker-build-dev     Build and tag :dev and :latest (Hub + gregoshop mirror)"
+	@echo "  make docker-push-dev-hub  Push :dev and :latest to Docker Hub"
+	@echo "  make docker-push-dev      Local interactive push (:dev + :latest)"
 	@echo "  make docker-build         Build :$(TAG) and :$(APP_VERSION)"
 	@echo "  make docker-push-release-hub  Push :$(APP_VERSION) and :latest"
 	@echo "Overrides: HUB_IMAGE=$(HUB_IMAGE) HUB_MIRROR_IMAGE=$(HUB_MIRROR_IMAGE) APP_VERSION=$(APP_VERSION) TAG=$(TAG)"
@@ -36,14 +36,19 @@ docker-build:
 docker-build-dev:
 	DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) docker build \
 		-t casper-deployer:dev \
+		-t casper-deployer:latest \
 		-t $(HUB_IMAGE):dev \
+		-t $(HUB_IMAGE):latest \
 		-t $(HUB_MIRROR_IMAGE):dev \
+		-t $(HUB_MIRROR_IMAGE):latest \
 		-f $(DOCKERFILE) \
 		.
 
 docker-push-dev-hub:
 	docker push $(HUB_IMAGE):dev
+	docker push $(HUB_IMAGE):latest
 	docker push $(HUB_MIRROR_IMAGE):dev
+	docker push $(HUB_MIRROR_IMAGE):latest
 
 docker-push-dev:
 	@if [ "$${CI:-0}" = "1" ]; then \

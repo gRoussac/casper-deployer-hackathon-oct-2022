@@ -102,12 +102,10 @@ Then `cd www && npm install`.
 
 - [x] Vendor `casper-rust-wasm-sdk` **2.2.2**
 - [x] Housecleaning (dead escrow stubs, coverage artifacts, Docker context, README)
-- [ ] Deploy → Transaction make / sign / send / watch
 - [x] Deploy → Transaction make / sign / send / watch (Phase 1)
-- [ ] Entity / AddressableEntity named-key + dictionary queries
 - [x] Entity / AddressableEntity named-key + dictionary queries (Phase 2)
 - [x] Network / peers / SSE hardening (Phase 3 — NCTL `11101`/`18101`, no launcher `7777`)
-- [ ] Re-enable CI + expand tests
+- [x] Re-enable CI + expand tests (Phase 4)
 
 ## License / security
 

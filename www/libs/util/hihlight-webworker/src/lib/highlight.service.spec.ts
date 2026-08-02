@@ -30,9 +30,10 @@ describe('HighlightService', () => {
   });
 
   it('highlightMessage should console on error', async () => {
-    const spy = jest.spyOn(console, 'error');
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
     postMessage.mockRejectedValue(test);
     await service.highlightMessage(test);
     expect(spy).toHaveBeenNthCalledWith(1, test);
+    spy.mockRestore();
   });
 });

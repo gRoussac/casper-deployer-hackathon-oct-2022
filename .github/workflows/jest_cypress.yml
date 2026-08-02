@@ -37,11 +37,3 @@ jobs:
         run: npx nx run frontend-e2e:e2e --skip-nx-cache
         env:
           CI: true
-
-      - name: Upload coverage
-        if: always()
-        continue-on-error: true
-        uses: codecov/codecov-action@v4
-        with:
-          directory: ./www/coverage
-          fail_ci_if_error: false

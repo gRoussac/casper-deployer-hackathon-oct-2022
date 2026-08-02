@@ -12,11 +12,11 @@ import {
 } from '@angular/core';
 
 import { ResultService } from '../result/result.service';
-import { DeployReturn, State } from '@casper-api/api-interfaces';
+import { State, TransactionReturn } from '@casper-api/api-interfaces';
 import { Subscription } from 'rxjs';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 import { WatcherService } from '@casper-util/watcher';
-import { Deploy, PublicKey, motesToCSPR } from 'casper-rust-wasm-sdk';
+import { Transaction, motesToCSPR } from 'casper-rust-wasm-sdk';
 import { DeployService } from '@casper-util/deploy';
 import { TOASTER_TOKEN, Toaster } from '@casper-util/toaster';
 import { StorageService } from '@casper-util/storage';
@@ -42,7 +42,7 @@ export class TransferComponent implements AfterViewInit, OnDestroy {
   apiUrl?: string;
 
   private getStateSubscription!: Subscription;
-  private deploy?: Deploy;
+  private transaction?: Transaction;
   private chain_name?: string;
 
   constructor(
@@ -79,48 +79,61 @@ export class TransferComponent implements AfterViewInit, OnDestroy {
       this.connect.emit();
       return;
     }
-    const public_key = new PublicKey(this.activePublicKey);
     const amount = this.amountElt?.nativeElement.value.trim();
-    const session_account = this.transferFromElt?.nativeElement.value.trim();
+    const initiator_addr =
+      this.transferFromElt?.nativeElement.value.trim() || this.activePublicKey;
     const target_account =
-      this.transferToElt?.nativeElement.value.trim() || public_key;
+      this.transferToElt?.nativeElement.value.trim() || this.activePublicKey!;
 
-    this.deploy = this.deployService.makeTransfer(
+    this.transaction = this.deployService.makeTransferTransaction(
       {
         chain_name: this.chain_name || this.config['chain_name_localhost'],
-        session_account,
+        initiator_addr: initiator_addr!,
       },
       target_account,
       amount,
     );
 
-    const signedDeploy =
-      this.deploy &&
-      (await this.walletService.signDeploy(this.deploy, this.activePublicKey));
+    const signedTransaction =
+      this.transaction &&
+      (await this.walletService.signTransaction(
+        this.transaction,
+        this.activePublicKey,
+      ));
 
-    if (signedDeploy && !signedDeploy.validateDeploySize()) {
-      this.toastr.error(signedDeploy.toString(), 'Error with validateDeploy');
-      console.error(this.deploy);
+    if (signedTransaction && !signedTransaction.verify()) {
+      this.toastr.warning(
+        signedTransaction.toString(),
+        'Transaction verify warning',
+      );
+      console.warn(this.transaction);
+    }
+    const transaction = signedTransaction!.toJson();
+    if (!transaction) {
+      this.toastr.error('', 'Error with validateTransaction');
+      console.error(signedTransaction);
       return;
     }
-    const deploy = signedDeploy!.toJson();
-    if (!deploy) {
-      this.toastr.error('', 'Error with validateDeploy');
-      console.error(signedDeploy);
-    }
     this.deployerService
-      .putDeploy(JSON.stringify(deploy), this.apiUrl)
-      .subscribe((deploy) => {
-        const deploy_hash = (deploy as DeployReturn).deploy_hash;
-        deploy_hash &&
-          this.resultService.setResult<Deploy>(
-            'Deploy Hash',
-            deploy_hash || deploy,
+      .putTransaction(JSON.stringify(transaction), this.apiUrl)
+      .subscribe((result) => {
+        const transaction_hash = (result as TransactionReturn).transaction_hash;
+        transaction_hash &&
+          this.resultService.setResult<string>(
+            'Transaction Hash',
+            transaction_hash || (result as string),
           );
-        deploy_hash && this.deployerService.setState({ deploy_hash });
-        deploy_hash &&
-          this.watcherService.watchDeploy(deploy_hash, this.apiUrl);
-        deploy_hash && this.storageService.setState({ deploy_hash });
+        if (transaction_hash) {
+          this.deployerService.setState({
+            transaction_hash,
+            deploy_hash: transaction_hash,
+          });
+          this.watcherService.watchTransaction(transaction_hash, this.apiUrl);
+          this.storageService.setState({
+            transaction_hash,
+            deploy_hash: transaction_hash,
+          });
+        }
       });
   }
 

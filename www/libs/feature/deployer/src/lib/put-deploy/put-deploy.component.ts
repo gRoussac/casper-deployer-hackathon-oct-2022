@@ -13,9 +13,10 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-  DeployReturn,
+  TransactionReturn,
   NamedCLTypeArg,
   State,
+  extractEntryPoints,
 } from '@casper-api/api-interfaces';
 import { ResultService } from '../result/result.service';
 import { Subscription } from 'rxjs';
@@ -25,7 +26,7 @@ import { Toaster, TOASTER_TOKEN } from '@casper-util/toaster';
 import { WatcherService } from '@casper-util/watcher';
 import { StorageService } from '@casper-util/storage';
 import { DeployService } from '@casper-util/deploy';
-import { Deploy, PublicKey, motesToCSPR } from 'casper-rust-wasm-sdk';
+import { Transaction, PublicKey, motesToCSPR } from 'casper-rust-wasm-sdk';
 import { WalletService } from '@casper-util/wallet';
 
 type EntrypointsType = { [key: string]: string };
@@ -88,7 +89,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
   key!: string;
 
   private wasm!: Uint8Array | undefined;
-  private deploy?: Deploy;
+  private transaction?: Transaction;
   private getStateSubscription!: Subscription;
   private getBlockStateSubscription!: Subscription;
   private contract_entrypoints!: EntrypointsType[];
@@ -120,11 +121,13 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
         }
         if (state.apiUrl && this.apiUrl !== state.apiUrl) {
           this.apiUrl = state.apiUrl;
-          let chainName: string =
-            this.storageService.get('chain_name') ||
-            this.config['chain_name_localhost'];
+          let chainName: string | undefined =
+            this.storageService.get('chain_name') || undefined;
 
-          if (this.apiUrl.includes(this.config['localhost'])) {
+          if (
+            this.apiUrl.includes(this.config['default_node_localhost']) ||
+            /:1110[1-5]\b/.test(this.apiUrl)
+          ) {
             chainName = this.config['chain_name_localhost'];
           } else if (
             this.apiUrl.includes(this.config['default_node_testnet'])
@@ -135,6 +138,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
           ) {
             chainName = this.config['chain_name_mainnet'];
           }
+          // Custom URL: keep stored/editable chain name
 
           if (chainName) {
             this.selectChainNameOption(chainName);
@@ -178,7 +182,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     fee && this.storageService.setState({ fee });
   }
 
-  makeDeploy(): void {
+  makeTransaction(): void {
     const publicKeyAsString = this.publicKeyElt?.nativeElement.value?.trim();
     if (!publicKeyAsString) {
       this.connect.emit();
@@ -186,7 +190,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     }
     const chain_name: string =
         this.chainNameElt?.nativeElement.value?.trim() || '',
-      session_account: string = publicKeyAsString,
+      initiator_addr: string = publicKeyAsString,
       session_path: string =
         this.sessionPathElt?.nativeElement.value?.trim() || '',
       session_name: string =
@@ -209,8 +213,8 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
       ttl: string = this.TTLElt?.nativeElement.value?.trim() || '',
       session_call_package = !!this.isPackageElt?.nativeElement.checked;
 
-    this.deploy = this.deployService.makeDeploy(
-      { session_account, chain_name, ttl },
+    this.transaction = this.deployService.makeTransaction(
+      { initiator_addr, chain_name, ttl },
       {
         session_path,
         session_name,
@@ -219,77 +223,111 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
         session_version,
         session_args_json,
         session_call_package,
+        is_install_upgrade: !!session_path,
       },
       payment_amount,
       this.wasm,
     );
-    this.deploy && this.resultService.setResult<Deploy>('Deploy', this.deploy);
+    this.transaction &&
+      this.resultService.setResult<Transaction>(
+        'Transaction',
+        this.transaction,
+      );
   }
 
-  async signDeploy(sendDeploy = true): Promise<string | void> {
+  /** @deprecated Use makeTransaction */
+  makeDeploy(): void {
+    this.makeTransaction();
+  }
+
+  async signTransaction(sendTransaction = true): Promise<string | void> {
     const publicKey = this.publicKeyElt?.nativeElement.value;
     if (!publicKey) {
       this.connect.emit();
       return;
     }
     try {
-      this.makeDeploy();
-      const signedDeployToJson =
-        this.deploy &&
-        (await this.walletService.signDeploy(this.deploy, publicKey));
+      this.makeTransaction();
+      const signedTransactionToJson =
+        this.transaction &&
+        (await this.walletService.signTransaction(this.transaction, publicKey));
 
-      if (!signedDeployToJson) {
-        this.toastr.error(publicKey, 'Error with signed deploy');
+      if (!signedTransactionToJson) {
+        this.toastr.error(publicKey, 'Error with signed transaction');
         this.connect.emit();
         return;
       }
-      const signedDeploy = new Deploy(signedDeployToJson);
-      if (signedDeploy && !signedDeploy.validateDeploySize()) {
-        this.toastr.error(signedDeploy.toString(), 'Error with validateDeploy');
-        console.error(this.deploy);
-        return;
+      const signedTransaction = new Transaction(signedTransactionToJson);
+      if (signedTransaction && !signedTransaction.verify()) {
+        this.toastr.warning(
+          signedTransaction.toString(),
+          'Transaction verify warning',
+        );
+        console.warn(this.transaction);
       }
-      const deploy = signedDeploy.toJson();
-      if (!deploy) {
+      const transaction = signedTransaction.toJson();
+      if (!transaction) {
         return '';
       }
-      if (!sendDeploy) {
-        return deploy;
+      if (!sendTransaction) {
+        this.resultService.setResult<Transaction>(
+          'Signed Transaction',
+          transaction,
+        );
+        return JSON.stringify(transaction);
       }
       this.deployerService
-        .putDeploy(JSON.stringify(deploy), this.apiUrl)
-        .subscribe((deploy: string | DeployReturn) => {
-          const deploy_hash = (deploy as DeployReturn).deploy_hash;
-          deploy_hash &&
-            this.resultService.setResult<Deploy>(
-              'Deploy Hash',
-              deploy_hash || deploy,
+        .putTransaction(JSON.stringify(transaction), this.apiUrl)
+        .subscribe((result: string | TransactionReturn) => {
+          const transaction_hash = (result as TransactionReturn)
+            .transaction_hash;
+          transaction_hash &&
+            this.resultService.setResult<string>(
+              'Transaction Hash',
+              transaction_hash || (result as string),
             );
-          deploy_hash && this.deployerService.setState({ deploy_hash });
-          deploy_hash &&
-            this.watcherService.watchDeploy(deploy_hash, this.apiUrl);
-          deploy_hash && this.storageService.setState({ deploy_hash });
+          if (transaction_hash) {
+            this.deployerService.setState({
+              transaction_hash,
+              deploy_hash: transaction_hash,
+            });
+            this.watcherService.watchTransaction(transaction_hash, this.apiUrl);
+            this.storageService.setState({
+              transaction_hash,
+              deploy_hash: transaction_hash,
+            });
+          }
         });
     } catch (err) {
       console.error(err);
     }
   }
 
-  async speculativeDeploy() {
+  /** @deprecated Use signTransaction */
+  async signDeploy(sendDeploy = true): Promise<string | void> {
+    return this.signTransaction(sendDeploy);
+  }
+
+  async speculativeTransaction() {
     const speculative = true,
-      sendDeploy = false;
-    this.makeDeploy();
-    const signedDeploy = await this.signDeploy(sendDeploy);
-    signedDeploy &&
+      sendTransaction = false;
+    this.makeTransaction();
+    const signedTransaction = await this.signTransaction(sendTransaction);
+    signedTransaction &&
       this.deployerService
-        .putDeploy(signedDeploy, this.apiUrl, speculative)
-        .subscribe((deploy: string | DeployReturn) => {
-          deploy &&
-            this.resultService.setResult<Deploy>(
-              'Speculative Deploy Hash',
-              (deploy as DeployReturn).deploy_hash,
+        .putTransaction(signedTransaction, this.apiUrl, speculative)
+        .subscribe((result: string | TransactionReturn) => {
+          result &&
+            this.resultService.setResult<string>(
+              'Speculative Transaction Hash',
+              (result as TransactionReturn).transaction_hash,
             );
         });
+  }
+
+  /** @deprecated Use speculativeTransaction */
+  async speculativeDeploy() {
+    return this.speculativeTransaction();
   }
 
   resetFirstForm($event: Event) {
@@ -317,7 +355,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     this.sessionPathElt.nativeElement.value = '';
     this.wasm = undefined;
     this.file_name = '';
-    this.deploy = undefined;
+    this.transaction = undefined;
     this.deployerService.setState({ has_wasm: false });
   }
 
@@ -432,13 +470,13 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
         .subscribe(async (storedValue: object | string): Promise<void> => {
           const isString = typeof storedValue === 'string';
           if (!isString) {
-            const contract_entrypoints = (
-              storedValue as { Contract: { entry_points?: EntrypointsType[] } }
-            ).Contract?.entry_points;
-            contract_entrypoints &&
+            const contract_entrypoints = extractEntryPoints(
+              storedValue,
+            ) as EntrypointsType[];
+            contract_entrypoints.length &&
               (this.contract_entrypoints = contract_entrypoints);
             this.resetOptions();
-            if (contract_entrypoints) {
+            if (contract_entrypoints.length) {
               contract_entrypoints.forEach((key) => {
                 key && this.options.push(key['name']);
               });

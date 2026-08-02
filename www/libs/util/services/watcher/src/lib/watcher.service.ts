@@ -5,7 +5,8 @@ import { SDK_TOKEN } from '@casper-util/wasm';
 import {
   SDK,
   EventParseResult,
-  DeploySubscription,
+  Subscription,
+  TransactionProcessed,
 } from 'casper-rust-wasm-sdk';
 
 @Injectable()
@@ -19,83 +20,130 @@ export class WatcherService {
     @Inject(SDK_TOKEN) private readonly sdk: SDK,
   ) {}
 
-  async watchDeploy(deployHash: string, apiUrl?: string) {
-    const config = this.config;
-    apiUrl = apiUrl?.replace(config['rpc_port'], config['sse_port']);
-    apiUrl = apiUrl?.replace(
-      config['rpc_port_localhost'],
-      config['sse_port_localhost'],
-    );
+  async watchTransaction(transactionHash: string, apiUrl?: string) {
+    const sseTarget = this.toSseTarget(apiUrl);
+    const proxyBase =
+      (!isDevMode() && this.config['events_url_default']) ||
+      this.config['events_url_default'];
     const eventsUrl = [
-      config['events_url_localhost'].replace(
-        config['sse_port_localhost'],
-        config['current_port'],
-      ),
-      ,
-      `/${this.events}?${this.api_url}=`,
-      apiUrl,
-      apiUrl?.includes('node.testnet')
-        ? `/${this.events}?` // TODO 2.0
-        : config['events_main_suffix'],
+      proxyBase.replace(/\/$/, ''),
+      `?${this.api_url}=`,
+      encodeURIComponent(sseTarget),
     ].join('');
-    // console.debug(eventsUrl, apiUrl, config['events_url_default']);
-    // console.log((!isDevMode() && eventsUrl) || config['events_url_default']);
-    const watcher = this.sdk.watchDeploy(
-      (!isDevMode() && eventsUrl) || config['events_url_default'],
-    );
+
+    const watcher = this.sdk.watchTransaction(eventsUrl);
     try {
-      const eventHandlerFn = this.getEventHandlerFn(deployHash);
-      const deploySubscription: DeploySubscription = new DeploySubscription(
-        deployHash,
+      const eventHandlerFn = this.getEventHandlerFn(transactionHash);
+      const subscription: Subscription = new Subscription(
+        transactionHash,
         eventHandlerFn,
       );
-      watcher.subscribe([deploySubscription]);
+      watcher.subscribe([subscription]);
       this.toastr.info(
         `
       <b>Hash:</b>
-      ${deployHash}
+      ${transactionHash}
       <br><b>Waiting for process...</b>`,
-        'Deploy accepted!',
+        'Transaction accepted!',
       );
       await watcher.start();
     } catch (err) {
       watcher.stop();
-      watcher.unsubscribe(deployHash);
+      watcher.unsubscribe(transactionHash);
       console.error(err);
     }
   }
 
-  private getEventHandlerFn(deployHash: string) {
+  /** @deprecated Use watchTransaction */
+  async watchDeploy(deployHash: string, apiUrl?: string) {
+    return this.watchTransaction(deployHash, apiUrl);
+  }
+
+  /**
+   * Map JSON-RPC apiUrl → SSE event stream URL (Casper 2 / NCTL 2).
+   * NCTL: 11101-11105 → 18101-18105 (+7000). No legacy 7777/9999.
+   */
+  private toSseTarget(apiUrl?: string): string {
+    const eventsSuffix = this.config['events_suffix'] || '/events';
+    if (!apiUrl) {
+      return (
+        this.config['events_url_localhost'] ||
+        `http://localhost:18101${eventsSuffix}`
+      );
+    }
+
+    try {
+      const url = new URL(apiUrl.includes('://') ? apiUrl : `http://${apiUrl}`);
+      if (url.hostname.includes('testnet.casper.network')) {
+        return `https://node.testnet.casper.network${eventsSuffix}`;
+      }
+      if (url.hostname.includes('mainnet.casper.network')) {
+        return `https://node.mainnet.casper.network${eventsSuffix}`;
+      }
+
+      const rpcPort = parseInt(url.port || '11101', 10);
+      if (rpcPort >= 11101 && rpcPort <= 11105) {
+        const ssePort =
+          rpcPort + parseInt(this.config['nctl_sse_offset'] || '7000', 10);
+        return `http://${url.hostname}:${ssePort}${eventsSuffix}`;
+      }
+
+      if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+        return `http://${url.hostname}:${this.config['sse_port_localhost'] || '18101'}${eventsSuffix}`;
+      }
+
+      // Custom node: same origin path /events
+      return `${url.protocol}//${url.host}${eventsSuffix}`;
+    } catch {
+      return (
+        this.config['events_url_localhost'] ||
+        `http://localhost:18101${eventsSuffix}`
+      );
+    }
+  }
+
+  private getProcessed(
+    eventParseResult: EventParseResult,
+  ): TransactionProcessed | undefined {
+    const body = eventParseResult.body;
+    return (
+      body?.get_transaction_processed ||
+      body?.transaction_processed ||
+      body?.get_deploy_processed
+    );
+  }
+
+  private getEventHandlerFn(transactionHash: string) {
     const eventHandlerFn = (eventParseResult: EventParseResult) => {
       if (eventParseResult.err) {
         this.toastr.error(
-          `${deployHash} ${eventParseResult.err}`,
-          '<b>Deploy not successful!</b>',
+          `${transactionHash} ${eventParseResult.err}`,
+          '<b>Transaction not successful!</b>',
         );
         console.error(eventParseResult);
-      } else if (
-        eventParseResult.body?.DeployProcessed?.execution_result.Success
-      ) {
-        // console.warn(eventParseResult.body.DeployProcessed);
+        return;
+      }
+
+      const processed = this.getProcessed(eventParseResult);
+      if (processed?.execution_result?.Success) {
         this.toastr.clear();
         this.toastr.success(
           `
         <b>Hash:</b>
-        ${deployHash}
+        ${transactionHash}
         <br><b>Block:</b>
-        ${eventParseResult.body?.DeployProcessed?.block_hash}
-        <br><b>Cost:</b> ${eventParseResult.body?.DeployProcessed?.execution_result.Success.cost} motes`,
-          'Deploy successful!',
+        ${processed.block_hash}
+        <br><b>Cost:</b> ${processed.execution_result.Success.cost} motes`,
+          'Transaction successful!',
         );
       } else {
-        //   console.warn(eventParseResult.body.DeployProcessed);
         this.toastr.warning(
           `<b>Hash:</b>
-        ${deployHash}
+        ${transactionHash}
         <br><b>Block:</b>
-        ${eventParseResult.body?.DeployProcessed?.block_hash}
-        <br><b>Error:</b> "<b>${eventParseResult.body?.DeployProcessed?.execution_result.Failure?.error_message}"</b>`,
-          '<b>Deploy warning!<b>',
+        ${processed?.block_hash}
+        <br><b>Error:</b> "<b>${processed?.execution_result?.Failure?.error_message}"</b>`,
+          '<b>Transaction warning!<b>',
         );
       }
     };

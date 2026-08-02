@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ArgBuilderComponent } from './arg-builder.component';
 import { DeployerService } from '@casper-data/data-access-deployer';
+import { StorageService } from '@casper-util/storage';
 
 describe('ArgBuilderComponent', () => {
   let component: ArgBuilderComponent;
@@ -12,7 +13,13 @@ describe('ArgBuilderComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ArgBuilderComponent],
-      providers: [{ provide: DeployerService, useValue: { getState } }],
+      providers: [
+        { provide: DeployerService, useValue: { getState } },
+        {
+          provide: StorageService,
+          useValue: { get: jest.fn(), set: jest.fn(), setState: jest.fn() },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ArgBuilderComponent);

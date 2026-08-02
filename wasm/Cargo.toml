@@ -3,16 +3,14 @@ name = "deployer"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 wasm-bindgen = "*"
 wasm-bindgen-futures = "*"
 wee_alloc = "*"
-casper-types = { version = "4.0.1", default-features = false }
+casper-types = { version = "7.0.0", default-features = false }
 js-sys = "*"
 base64 = { version = "0.22.1", default-features = false, features = ["alloc"] }
-getrandom = { version = "0.2.10", features = ["js"] }
+getrandom = { version = "0.3.3", features = ["wasm_js"] }
 
 [lib]
 crate-type = ["cdylib"]

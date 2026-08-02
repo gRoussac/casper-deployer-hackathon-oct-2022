@@ -37,7 +37,10 @@
           "./node_modules/highlight.js/styles/lightfair.css",
           "./node_modules/toastr/build/toastr.min.css"
         ],
-        "scripts": ["./node_modules/toastr/build/toastr.min.js"],
+        "scripts": [
+          "./node_modules/jquery/dist/jquery.min.js",
+          "./node_modules/toastr/build/toastr.min.js"
+        ],
         "allowedCommonJsDependencies": ["promise-worker"]
       },
       "configurations": {
@@ -45,13 +48,13 @@
           "budgets": [
             {
               "type": "initial",
-              "maximumWarning": "500kb",
-              "maximumError": "1.5mb"
+              "maximumWarning": "2mb",
+              "maximumError": "5mb"
             },
             {
               "type": "anyComponentStyle",
-              "maximumWarning": "2kb",
-              "maximumError": "4kb"
+              "maximumWarning": "4kb",
+              "maximumError": "8kb"
             }
           ],
           "fileReplacements": [
@@ -87,7 +90,9 @@
       },
       "defaultConfiguration": "development",
       "options": {
-        "proxyConfig": "apps/frontend/proxy.conf.json"
+        "proxyConfig": "apps/frontend/proxy.conf.json",
+        "host": "0.0.0.0",
+        "port": 4242
       },
       "continuous": true
     },

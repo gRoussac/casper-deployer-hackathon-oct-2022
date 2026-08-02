@@ -6,7 +6,7 @@ import { Injectable } from '@nestjs/common';
 export class SDKService {
   private node_address!: string;
   private casperSDK!: SDK;
-  private verbosity: Verbosity.Low;
+  private readonly verbosity = Verbosity.Low;
 
   constructor(private readonly urlService: UrlService) {}
 
@@ -19,11 +19,12 @@ export class SDKService {
       throw TypeError('node_address seems invalid');
     }
     this.node_address = node_address;
-    if (node_address) {
-      this.casperSDK = new SDK(node_address, this.verbosity);
-    } else {
-      this.casperSDK = new SDK(undefined, this.verbosity);
-    }
+    // SDK 2.2.2: (rpc_address, node_address?, verbosity?)
+    this.casperSDK = new SDK(
+      node_address || undefined,
+      undefined,
+      this.verbosity,
+    );
     return this.casperSDK;
   }
 }

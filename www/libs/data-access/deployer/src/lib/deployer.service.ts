@@ -5,9 +5,14 @@ import {
   DeployReturn,
   Peer,
   State,
+  TransactionReturn,
+  splitNamedKeyPath,
 } from '@casper-api/api-interfaces';
 import { map, Observable, ReplaySubject, timeout } from 'rxjs';
-import { GetDeployResult } from 'casper-rust-wasm-sdk-nodejs';
+import {
+  GetDeployResult,
+  GetTransactionResult,
+} from 'casper-rust-wasm-sdk-nodejs';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 
 @Injectable()
@@ -31,9 +36,10 @@ export class DeployerService {
     let params = new HttpParams();
     params = params.append('apiUrl', apiUrl);
     return this.http
-      .get<
-        string | Error
-      >(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.GetStateRootHash}`, { params })
+      .get<string | Error>(
+        `${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.GetStateRootHash}`,
+        { params },
+      )
       .pipe(
         map((response: string | Error) => {
           const stateRootHash = this.handleResponse<string>(response);
@@ -48,9 +54,10 @@ export class DeployerService {
     params = params.append('apiUrl', apiUrl);
 
     return this.http
-      .get<
-        Peer[] | Error
-      >(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Peers}`, { params })
+      .get<Peer[] | Error>(
+        `${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Peers}`,
+        { params },
+      )
       .pipe(
         map((response: Error | Peer[]) =>
           this.handleResponse<Peer[]>(response),
@@ -64,9 +71,10 @@ export class DeployerService {
     params = params.append('apiUrl', apiUrl);
     this.setState({ status: '' });
     return this.http
-      .get<
-        string | Error
-      >(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Status}`, { params })
+      .get<string | Error>(
+        `${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Status}`,
+        { params },
+      )
       .pipe(
         map((response: string | Error) => {
           const status = this.handleResponse<string>(response);
@@ -88,9 +96,10 @@ export class DeployerService {
     apiUrl && (params = params.append('apiUrl', apiUrl));
 
     return this.http
-      .get<
-        string | Error
-      >(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.PurseURef}`, { params })
+      .get<string | Error>(
+        `${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.PurseURef}`,
+        { params },
+      )
       .pipe(
         map((response: string | Error) => {
           const purseURef = this.handleResponse<string>(response);
@@ -111,9 +120,10 @@ export class DeployerService {
     params = params.append('purseURef', purseURef);
 
     return this.http
-      .get<
-        string | Error
-      >(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Balance}`, { params })
+      .get<string | Error>(
+        `${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Balance}`,
+        { params },
+      )
       .pipe(
         map((response: string | Error) =>
           this.handleResponse<string>(response),
@@ -131,9 +141,10 @@ export class DeployerService {
     params = params.append('publicKey', publicKey);
 
     return this.http
-      .get<
-        string | Error
-      >(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.BalanceOfByPublicKey}`, { params })
+      .get<string | Error>(
+        `${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.BalanceOfByPublicKey}`,
+        { params },
+      )
       .pipe(
         map((response: string | Error) =>
           this.handleResponse<string>(response),
@@ -151,14 +162,14 @@ export class DeployerService {
     let params = new HttpParams();
     params = params.append('stateRootHash', stateRootHash);
     params = params.append('key', key);
-    const path =
-      paths && paths?.split(this.config['path_sep']).map((path) => path.trim());
-    path && (params = params.append('path', JSON.stringify(path)));
+    const path = splitNamedKeyPath(paths, this.config['path_sep']);
+    path.length && (params = params.append('path', JSON.stringify(path)));
     apiUrl && (params = params.append('apiUrl', apiUrl));
     return this.http
-      .get<
-        object | Error
-      >(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.State}`, { params })
+      .get<object | Error>(
+        `${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.State}`,
+        { params },
+      )
       .pipe(
         map((response: object | Error) => {
           const storedValue = this.handleResponse<object>(response);
@@ -188,9 +199,10 @@ export class DeployerService {
     apiUrl && (params = params.append('apiUrl', apiUrl));
 
     return this.http
-      .get<
-        unknown | Error
-      >(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Dictionary}`, { params })
+      .get<unknown | Error>(
+        `${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Dictionary}`,
+        { params },
+      )
       .pipe(
         map((response: unknown) => {
           const storedValue = this.handleResponse<unknown>(response);
@@ -208,12 +220,33 @@ export class DeployerService {
     apiUrl && (params = params.append('apiUrl', apiUrl));
     params = params.append('deployHash', deployHash);
     return this.http
-      .get<
-        GetDeployResult | Error
-      >(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Deploy_info}`, { params })
+      .get<GetDeployResult | Error>(
+        `${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Deploy_info}`,
+        { params },
+      )
       .pipe(
         map((response: Error | GetDeployResult) =>
           this.handleResponse<GetDeployResult>(response),
+        ),
+        timeout(20000),
+      );
+  }
+
+  getTransaction(
+    transactionHash: string,
+    apiUrl?: string,
+  ): Observable<GetTransactionResult | string> {
+    let params = new HttpParams();
+    apiUrl && (params = params.append('apiUrl', apiUrl));
+    params = params.append('transactionHash', transactionHash);
+    return this.http
+      .get<GetTransactionResult | Error>(
+        `${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Transaction_info}`,
+        { params },
+      )
+      .pipe(
+        map((response: Error | GetTransactionResult) =>
+          this.handleResponse<GetTransactionResult>(response),
         ),
         timeout(20000),
       );
@@ -229,12 +262,35 @@ export class DeployerService {
     speculative && (params = params.append('speculative', speculative));
     params = params.append('signedDeploy', signedDeploy);
     return this.http
-      .post<
-        DeployReturn | Error
-      >(`${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Put_Deploy}`, params)
+      .post<DeployReturn | Error>(
+        `${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Put_Deploy}`,
+        params,
+      )
       .pipe(
         map((response: Error | DeployReturn) =>
           this.handleResponse<DeployReturn>(response),
+        ),
+        timeout(20000),
+      );
+  }
+
+  putTransaction(
+    signedTransaction: string,
+    apiUrl?: string,
+    speculative?: boolean,
+  ): Observable<TransactionReturn | string> {
+    let params = new HttpParams();
+    apiUrl && (params = params.append('apiUrl', apiUrl));
+    speculative && (params = params.append('speculative', speculative));
+    params = params.append('signedTransaction', signedTransaction);
+    return this.http
+      .post<TransactionReturn | Error>(
+        `${this.config['api_prefix']}${api_interface.Deployer}/${api_interface.Put_Transaction}`,
+        params,
+      )
+      .pipe(
+        map((response: Error | TransactionReturn) =>
+          this.handleResponse<TransactionReturn>(response),
         ),
         timeout(20000),
       );

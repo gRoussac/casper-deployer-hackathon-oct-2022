@@ -13,8 +13,10 @@ jest.mock('casper-rust-wasm-sdk', () => ({
     switchAccount: jest.fn().mockResolvedValue(true),
     getActivePublicKey: jest.fn().mockResolvedValue('mocked-public-key'),
     signDeploy: jest.fn().mockResolvedValue({}),
+    signTransaction: jest.fn().mockResolvedValue({}),
   })),
   Deploy: jest.fn(),
+  Transaction: jest.fn(),
 }));
 
 describe('WalletService', () => {

@@ -3,5 +3,7 @@ casper/contracts/*/target
 casper/*/tests/target/debug
 wasm/target/
 */target/*
-casper-escrow.code-workspace
-.gitignore
+casper-deployer.code-workspace
+www/coverage/
+www/dist/
+www/node_modules/

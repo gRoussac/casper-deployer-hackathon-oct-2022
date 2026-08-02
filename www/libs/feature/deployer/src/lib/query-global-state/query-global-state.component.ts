@@ -11,15 +11,19 @@ import {
   ViewChild,
 } from '@angular/core';
 
-import { State } from '@casper-api/api-interfaces';
+import {
+  State,
+  extractNamedKeys,
+  joinNamedKeyPath,
+  normalizeStateKey,
+  splitNamedKeyPath,
+} from '@casper-api/api-interfaces';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { Subscription } from 'rxjs';
 import { ResultService } from '../result/result.service';
 import { EnvironmentConfig, ENV_CONFIG } from '@casper-util/config';
 import { StorageService } from '@casper-util/storage';
 import { PublicKey } from 'casper-rust-wasm-sdk';
-
-type NamedKeysType = { [key: string]: string };
 
 @Component({
   selector: 'casper-deployer-query-global-state',
@@ -44,9 +48,8 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
   private getBlockStateSubscription!: Subscription;
   private _hasPrevious!: boolean;
 
-  // TODO Extract share regex
-  private readonly key_regex = /[a-z-]+-([a-z0-9]{64})/;
-  private readonly exclude_regex = /contract-(wasm|package-wasm)-?[a-z0-9]+/;
+  private readonly key_regex = /[a-z0-9-]+-([a-f0-9]{64})$/i;
+  private readonly exclude_regex = /contract-(wasm|package-wasm)-?[a-z0-9]+/i;
 
   constructor(
     private readonly deployerService: DeployerService,
@@ -79,11 +82,6 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
           this.keyElt.nativeElement.value = state.key;
           this.onKeyChange();
         }
-        // if (!state.path && !state.stateRootHash) {
-        //   console.debug(state);
-        //   this.pathElt.nativeElement.value = "";
-        //   this.getBlockState();
-        // }
         this.changeDetectorRef.markForCheck();
       });
     const key = this.storageService.get('key');
@@ -105,9 +103,10 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
     if (this.exclude_regex.test(key)) {
       return;
     }
-    const newkey = key.replace(/["']/g, '').replace('contract-', 'hash-');
+    const newkey = normalizeStateKey(key);
     newkey && (this.keyElt.nativeElement.value = newkey);
-    const path = this.pathElt.nativeElement.value;
+    const path = this.normalizedPath();
+    this.pathElt.nativeElement.value = path;
     newkey &&
       this.stateRootHash &&
       (this.getBlockStateSubscription = this.deployerService
@@ -115,19 +114,22 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
         .subscribe(async (storedValue: object | string): Promise<void> => {
           const isString = typeof storedValue === 'string';
           if (!isString) {
-            const account_keys: NamedKeysType[] | undefined = (
-              storedValue as { Account?: { named_keys?: NamedKeysType[] } }
-            ).Account?.named_keys;
-            const contract_keys: NamedKeysType[] | undefined = (
-              storedValue as { Contract?: { named_keys?: NamedKeysType[] } }
-            ).Contract?.named_keys;
-            const keys = account_keys || contract_keys;
-            if (keys) {
-              const old_key = this.pathElt.nativeElement.value;
-              this.options = [old_key ? old_key : ''];
-              keys.forEach((key: NamedKeysType) => {
-                !old_key && this.options.push(key['name']);
-                old_key && this.options.push([old_key, key['name']].join('/'));
+            const keys = extractNamedKeys(storedValue);
+            if (keys.length) {
+              const old_key = this.normalizedPath();
+              const sep = this.config['path_sep'] || '/';
+              this.options = [old_key || ''];
+              keys.forEach((namedKey) => {
+                if (!namedKey.name) {
+                  return;
+                }
+                if (!old_key) {
+                  this.options.push(namedKey.name);
+                } else {
+                  this.options.push(
+                    joinNamedKeyPath([old_key, namedKey.name], sep),
+                  );
+                }
               });
               setTimeout(() => {
                 this.selectKeyElt.nativeElement.selectedIndex = 0;
@@ -182,8 +184,9 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
 
   selectKey($event: Event) {
     const path = ($event.target as HTMLSelectElement).value;
-    this.pathElt.nativeElement.value = path;
-    path && this.storageService.setState({ path });
+    const normalized = this.normalizedPath(path);
+    this.pathElt.nativeElement.value = normalized;
+    this.storageService.setState({ path: normalized });
     this.getBlockState();
   }
 
@@ -198,7 +201,7 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
   onKeyChange() {
     const key = this.keyElt.nativeElement.value;
     const parsing = key.match(this.key_regex);
-    if (parsing.length !== 2 || parsing[1].length !== 64) {
+    if (!parsing || parsing.length !== 2 || parsing[1].length !== 64) {
       return;
     }
     const keyCurrent = this.storageService.get('key');
@@ -210,7 +213,8 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
   }
 
   onPathChange() {
-    const path = this.pathElt.nativeElement.value;
+    const path = this.normalizedPath();
+    this.pathElt.nativeElement.value = path;
     this.getBlockState();
     this.storageService.setState({ path });
   }
@@ -225,15 +229,18 @@ export class QueryGlobalStateComponent implements AfterViewInit, OnDestroy {
   }
 
   pop() {
-    const sep = '/';
-    const value = this.pathElt.nativeElement.value;
-    if (!value.includes(sep)) {
-      this.pathElt.nativeElement.value = '';
-    } else {
-      const remove = value.split(sep).pop();
-      this.pathElt.nativeElement.value =
-        this.pathElt.nativeElement.value.replace([sep, remove].join(''), '');
-    }
+    const sep = this.config['path_sep'] || '/';
+    const segments = splitNamedKeyPath(this.pathElt.nativeElement.value, sep);
+    segments.pop();
+    this.pathElt.nativeElement.value = joinNamedKeyPath(segments, sep);
     this.onPathChange();
+  }
+
+  private normalizedPath(raw?: string): string {
+    const sep = this.config['path_sep'] || '/';
+    return joinNamedKeyPath(
+      splitNamedKeyPath(raw ?? this.pathElt?.nativeElement?.value ?? '', sep),
+      sep,
+    );
   }
 }

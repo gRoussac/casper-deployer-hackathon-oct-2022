@@ -4,7 +4,7 @@ import { nxE2EPreset } from '@nx/cypress/plugins/cypress-preset';
 export default defineConfig({
   e2e: {
     ...nxE2EPreset(__dirname),
-    baseUrl: 'http://localhost:4242',
+    baseUrl: 'http://127.0.0.1:4242',
     viewportHeight: 1000,
     viewportWidth: 1920,
     video: false,

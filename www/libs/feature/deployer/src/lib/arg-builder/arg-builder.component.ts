@@ -14,10 +14,9 @@ import { Tabs, TabsComponent } from '@casper-ui/tabs';
 import { ArgumentComponent } from '@casper-ui/argument';
 import { customArg, defaultTabs } from './tabs';
 import { StorageService } from '@casper-util/storage';
-import { NamedCLTypeArg, State } from '@casper-api/api-interfaces';
+import { NamedCLTypeArg, State, CLType } from '@casper-api/api-interfaces';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { Subscription } from 'rxjs';
-import { CLType } from 'casper-rust-wasm-sdk';
 
 interface ArgumentEntry<T = unknown> {
   name: string;

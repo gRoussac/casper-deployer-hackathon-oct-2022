@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { HeaderComponent } from '@casper-ui/header';
 import { UsersService } from '@casper-data/data-access-users';
-import { Users, User, Roles } from '@casper-api/api-interfaces';
+import { Users, User } from '@casper-api/api-interfaces';
 import { DEPLOYER_TOKEN } from '@casper-util/wasm';
 import { Deployer } from 'deployer';
 import { RouterModule } from '@angular/router';
@@ -51,8 +51,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   balance!: string;
   apiUrl!: string;
   walletVersion!: string;
-
-  readonly Roles = Roles;
 
   private usersSubscription!: Subscription;
   private accountInformationSubscription!: Subscription;

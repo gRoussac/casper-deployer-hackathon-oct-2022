@@ -9,8 +9,9 @@ WEB_OUT_DIR = pkg
 
 pack: web
 
+# getrandom 0.3 on wasm32-unknown-unknown needs the wasm_js backend
 web:
-	wasm-pack build --target web --release --out-dir $(WEB_OUT_DIR) $(CURRENT_DIR)
+	RUSTFLAGS='--cfg getrandom_backend="wasm_js"' wasm-pack build --target web --release --out-dir $(WEB_OUT_DIR) $(CURRENT_DIR)
 
 clean:
 	rm -rf $(WEB_OUT_DIR)

@@ -2,7 +2,7 @@
 
 Angular + NestJS + Nx app for querying and submitting work to the **Casper 2.x** network, powered by [casper-rust-wasm-sdk](https://github.com/casper-ecosystem/casper-rust-wasm-sdk) **2.2.2**.
 
-Live (beta): [https://casper.onrender.com/](https://casper.onrender.com/)
+Live: [https://casper-deployer.interchouette.net/](https://casper-deployer.interchouette.net/)
 
 ## What it does
 
@@ -23,7 +23,8 @@ Browser calls never talk to public nodes directly for RPC — the Nest API (`/ap
 | Casper      | `casper-rust-wasm-sdk` 2.2.2 (browser + nodejs packs) |
 | Helper WASM | `wasm/` crate (`deployer`) for small encoding helpers |
 | Tests       | Jest, Cypress                                         |
-| Hosting     | Docker / Render (`PORT`, default `4242`)              |
+| Hosting     | Docker / [casper-deployer.interchouette.net](https://casper-deployer.interchouette.net/) (`PORT`, default `4242`) |
+
 
 ## Repository layout
 

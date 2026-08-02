@@ -14,23 +14,30 @@ ENV PORT=4242
 RUN npm run build
 
 FROM --platform=linux/amd64 node:24-alpine AS production
-WORKDIR /app
+WORKDIR /app/www
 
-COPY --from=build /app/www/dist /app/www/dist
-COPY --from=build /app/www/package.json /app/www/package.json
-COPY --from=build /app/www/node_modules/casper-rust-wasm-sdk-nodejs /app/node_modules/casper-rust-wasm-sdk-nodejs
+COPY --from=build /app/www/dist ./dist
+COPY --from=build /app/www/package.json ./package.json
 
-RUN npm install --omit=dev \
+# Install runtime npm deps first (file: entries become broken symlinks here).
+RUN npm install --omit=dev --no-fund --no-audit \
   @nestjs/common \
   @nestjs/core \
   @nestjs/platform-express \
+  express \
   http-proxy-middleware \
   reflect-metadata \
   rxjs \
-  tslib
+  tslib \
+  && rm -rf ./node_modules/casper-rust-wasm-sdk \
+            ./node_modules/casper-rust-wasm-sdk-nodejs \
+            ./node_modules/deployer
+
+# Replace broken file: symlinks with the real vendored Node WASM pack.
+COPY --from=build /app/casper-rust-wasm-sdk/pkg-nodejs ./node_modules/casper-rust-wasm-sdk-nodejs
 
 ENV PORT=4242
 EXPOSE 4242
 
-WORKDIR /app/www
+# Render / Docker start: cd www && npm run serve
 CMD ["npm", "run", "serve"]

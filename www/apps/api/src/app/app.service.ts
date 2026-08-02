@@ -26,12 +26,6 @@ export class AppService {
   }
 
   async getPeers(apiUrl: string): Promise<Peer[]> {
-    // Public networks only expose one usable JSON-RPC endpoint (the official node).
-    // Gossip peer addresses are not RPC URLs — listing them just duplicates the preset.
-    if (this.isPublicCasperNetwork(apiUrl)) {
-      return [];
-    }
-
     const peers =
       (await this.sdkService.getCasperSDK(apiUrl).get_peers()).peers || [];
 
@@ -61,72 +55,62 @@ export class AppService {
     });
   }
 
-  private isPublicCasperNetwork(apiUrl: string): boolean {
-    try {
-      const api = new URL(apiUrl.includes('://') ? apiUrl : `http://${apiUrl}`);
-      return (
-        api.hostname.includes('testnet.casper.network') ||
-        api.hostname.includes('mainnet.casper.network')
-      );
-    } catch {
-      return (
-        apiUrl.includes('node.testnet.casper.network') ||
-        apiUrl.includes('node.mainnet.casper.network')
-      );
-    }
-  }
-
   /**
-   * Casper 2 / NCTL 2: peer gossip ports are not JSON-RPC.
-   * Rewrite selectable peer URLs for the network profile of the current apiUrl.
-   * Never force legacy launcher port 7777.
+   * Map `info_get_peers` addresses into selectable URLs.
+   *
+   * - Local NCTL: rewrite gossip → RPC ports 11101–11105 (never launcher 7777).
+   * - Public testnet/mainnet: keep each peer's host:port as `http://host:port`.
+     These are network/gossip peers from the node (often :35000), not the official
+     JSON-RPC preset — do not collapse them all to node.{test,main}net.casper.network
+     (that filled the select with identical duplicates).
+   * - Custom API with an explicit port: reuse that scheme/port on each peer host.
    */
   private rewritePeerAsRpcUrl(
     peerAddress: string,
     apiUrl: string,
     index: number,
   ): string {
-    const [rawHost] = (peerAddress || '').split(':');
+    const [rawHost, rawPort] = (peerAddress || '').split(':');
     const host =
       !rawHost || rawHost === '0.0.0.0' || rawHost === '127.0.0.1'
         ? 'localhost'
         : rawHost;
+    const peerPort = rawPort || '35000';
 
     let api: URL;
     try {
       api = new URL(apiUrl.includes('://') ? apiUrl : `http://${apiUrl}`);
     } catch {
-      return `http://${host}:11101`;
+      return `http://${host}:${peerPort}`;
     }
 
-    if (
-      api.hostname.includes('testnet.casper.network') ||
-      apiUrl.includes('node.testnet.casper.network')
-    ) {
-      return 'https://node.testnet.casper.network';
-    }
-    if (
-      api.hostname.includes('mainnet.casper.network') ||
-      apiUrl.includes('node.mainnet.casper.network')
-    ) {
-      return 'https://node.mainnet.casper.network';
-    }
-
-    const apiPort = parseInt(api.port || '11101', 10);
+    const apiPort = api.port ? parseInt(api.port, 10) : NaN;
     const isLocal =
       api.hostname === 'localhost' ||
       api.hostname === '127.0.0.1' ||
       host === 'localhost';
 
-    // NCTL 2 docker: RPC 11101-11105
-    if (isLocal || (apiPort >= 11101 && apiPort <= 11105)) {
+    // NCTL 2 docker: RPC 11101-11105 (only when the selected API is local/NCTL)
+    if (
+      isLocal ||
+      (Number.isFinite(apiPort) && apiPort >= 11101 && apiPort <= 11105)
+    ) {
       const rpcPort = 11101 + (index % 5);
       return `http://${host}:${rpcPort}`;
     }
 
+    const isPublicCasper =
+      api.hostname.includes('testnet.casper.network') ||
+      api.hostname.includes('mainnet.casper.network') ||
+      apiUrl.includes('node.testnet.casper.network') ||
+      apiUrl.includes('node.mainnet.casper.network');
+
+    if (isPublicCasper || !api.port) {
+      return `http://${host}:${peerPort}`;
+    }
+
     // Custom: reuse scheme + port from the selected node
-    const portPart = api.port ? `:${api.port}` : '';
-    return `${api.protocol}//${host}${portPart}`;
+    return `${api.protocol}//${host}:${api.port}`;
   }
 
   async getStatus(apiUrl: string): Promise<string> {

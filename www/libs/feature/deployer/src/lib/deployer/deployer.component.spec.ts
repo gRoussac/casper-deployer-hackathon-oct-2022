@@ -65,9 +65,14 @@ describe('DeployerComponent', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA],
     })
-      // Avoid wiring the full child-component graph in this smoke test
+      // Smoke-test the host only; skip the child graph (avoids NG0303 on stubs).
       .overrideComponent(DeployerComponent, {
-        set: { imports: [], providers: [] },
+        set: {
+          imports: [],
+          providers: [],
+          schemas: [NO_ERRORS_SCHEMA],
+          template: '<div class="deployer-smoke"></div>',
+        },
       })
       .compileComponents();
 

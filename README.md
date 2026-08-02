@@ -88,7 +88,7 @@ Open http://localhost:4242/
 
 ## SDK upgrade note
 
-The app vendors SDK packs under `casper-rust-wasm-sdk/`. To refresh from a local checkout of the WASM SDK (e.g. `/opt2/casper/rustSDK` at tag `v2.2.2`):
+The app vendors SDK packs under `casper-rust-wasm-sdk/`. To refresh from a local checkout of [casper-rust-wasm-sdk](https://github.com/casper-ecosystem/casper-rust-wasm-sdk) (e.g. tag `v2.2.2`):
 
 ```shell
 rm -rf casper-rust-wasm-sdk/pkg casper-rust-wasm-sdk/pkg-nodejs

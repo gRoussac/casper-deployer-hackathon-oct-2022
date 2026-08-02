@@ -91,9 +91,16 @@ Published images (Docker Hub):
 
 ```shell
 docker pull interchouette/casper-deployer:dev
+# or
+docker pull interchouette/casper-deployer:latest
 ```
 
-CI pushes `:dev` on `workflow_dispatch` and on pushes to `dev` that touch the image inputs (see `.github/workflows/docker-build-push-dev.yml`). Requires repo secrets `DOCKER_USERNAME` / `DOCKER_PASSWORD` (same as other Interchouette images).
+CI (`.github/workflows/docker-build-push-dev.yml`) on `workflow_dispatch` and on pushes to `dev` that touch image inputs:
+
+1. Builds and pushes Hub `:dev` **and** `:latest` (needs `DOCKER_USERNAME` / `DOCKER_PASSWORD`)
+2. Optionally triggers a Render redeploy via secret `RENDER_DEPLOY_HOOK` (Deploy Hook URL from the Render service → Settings → Deploy Hook). Without that secret, Hub updates but Render keeps the old container until a manual deploy.
+
+Render image deploys: no app env vars required (Render injects `PORT`). Point the service at `interchouette/casper-deployer:latest`.
 
 Open http://localhost:4242/
 

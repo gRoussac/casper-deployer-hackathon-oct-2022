@@ -82,14 +82,61 @@ describe('AppService', () => {
       expect(getCasperSDK).toHaveBeenNthCalledWith(1, 'http://localhost:11101');
     });
 
-    it('should map testnet peers to public RPC', async () => {
-      getPeers.mockResolvedValueOnce({
-        peers: [{ address: '1.2.3.4:35000', node_id: 'p1' }],
-      });
+    it('should omit gossip peers on public networks (official RPC is the preset)', async () => {
+      getCasperSDK.mockClear();
+      getPeers.mockClear();
       expect(
         await service.getPeers('https://node.testnet.casper.network'),
-      ).toEqual([
-        { address: 'https://node.testnet.casper.network', node_id: 'p1' },
+      ).toEqual([]);
+      expect(
+        await service.getPeers('https://node.mainnet.casper.network'),
+      ).toEqual([]);
+      expect(getCasperSDK).not.toHaveBeenCalled();
+      expect(getPeers).not.toHaveBeenCalled();
+    });
+
+    it('should dedupe rewritten local peer RPC URLs', async () => {
+      getPeers.mockResolvedValueOnce({
+        peers: [
+          { address: '127.0.0.1:34553', node_id: 'n0' },
+          { address: '127.0.0.1:34554', node_id: 'n1' },
+          { address: '127.0.0.1:34553', node_id: 'n0-dup' },
+        ],
+      });
+      expect(await service.getPeers('http://localhost:11101')).toEqual([
+        { address: 'http://localhost:11101', node_id: 'n0' },
+        { address: 'http://localhost:11102', node_id: 'n1' },
+      ]);
+    });
+
+    it('should rewrite custom-network peers with api scheme/port and dedupe RPC URLs', async () => {
+      getPeers.mockResolvedValueOnce({
+        peers: [
+          { address: '10.0.0.1:35000', node_id: 'c1' },
+          { address: '10.0.0.2:35000', node_id: 'c2' },
+          { address: '10.0.0.1:35000', node_id: 'c1-dup' },
+        ],
+      });
+      expect(await service.getPeers('https://rpc.example.com:8443')).toEqual([
+        { address: 'https://10.0.0.1:8443', node_id: 'c1' },
+        { address: 'https://10.0.0.2:8443', node_id: 'c2' },
+      ]);
+    });
+
+    it('should return an empty list when the node reports no peers', async () => {
+      getPeers.mockResolvedValueOnce({ peers: [] });
+      expect(await service.getPeers('http://localhost:11101')).toEqual([]);
+    });
+
+    it('should skip peers with empty gossip addresses', async () => {
+      getPeers.mockResolvedValueOnce({
+        peers: [
+          { address: '', node_id: 'empty' },
+          { address: '127.0.0.1:34553', node_id: 'n0' },
+        ],
+      });
+      expect(await service.getPeers('http://localhost:11101')).toEqual([
+        { address: 'http://localhost:11101', node_id: 'n0' },
       ]);
     });
 

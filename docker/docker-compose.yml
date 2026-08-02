@@ -5,7 +5,7 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    image: casper-deployer:local
+    image: interchouette/casper-deployer:local
     ports:
       - "4242:4242"
     environment:
@@ -13,4 +13,6 @@ services:
 
 # Build and run from repository root:
 #   docker compose -f docker/docker-compose.yml up --build
+#   # or pull published :dev
+#   docker pull interchouette/casper-deployer:dev
 # Visit http://localhost:4242/

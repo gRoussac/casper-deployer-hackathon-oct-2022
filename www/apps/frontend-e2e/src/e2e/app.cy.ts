@@ -61,6 +61,48 @@ describe('deployer', () => {
       });
   });
 
+  it('should list unique peer options from API without duplicating presets', () => {
+    cy.wait('@getPeers');
+    cy.get('select')
+      .first()
+      .within(() => {
+        cy.get('optgroup[label="peers / custom"] option').should(
+          'have.length',
+          2,
+        );
+        cy.get('optgroup[label="peers / custom"] option')
+          .eq(0)
+          .should('have.value', 'http://localhost:11101')
+          .and('have.text', 'http://localhost:11101');
+        cy.get('optgroup[label="peers / custom"] option')
+          .eq(1)
+          .should('have.value', 'http://localhost:11102');
+      });
+    cy.get('select')
+      .first()
+      .find('option')
+      .then(($opts) => {
+        const texts = [...$opts].map((o) => (o.textContent || '').trim());
+        expect(new Set(texts).size).to.eq(texts.length);
+      });
+  });
+
+  it('should show empty peers group when API returns no peers', () => {
+    cy.intercept('GET', /\/api\/deployer\/peers.*/, { body: [] }).as(
+      'getPeersEmpty',
+    );
+    cy.visit('/');
+    cy.wait('@getPeersEmpty');
+    cy.get('select')
+      .first()
+      .find('optgroup[label="peers / custom"] option')
+      .should('have.length', 0);
+    cy.get('select')
+      .first()
+      .find('optgroup[label="presets"] option')
+      .should('have.length.at.least', 3);
+  });
+
   it('should show Transaction UI (not Deploy-only)', () => {
     cy.contains('h2.title', 'Transaction');
     cy.contains('button', 'Make transaction');

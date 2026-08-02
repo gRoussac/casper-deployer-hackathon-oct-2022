@@ -8,11 +8,16 @@ describe('deployer', () => {
     cy.intercept('GET', /\/api\/deployer\/status.*/, {
       body: JSON.stringify('status'),
     }).as('getStatus');
-    cy.intercept('GET', /\/api\/deployer\/peers.*/, {
-      body: [
-        { node_id: 'n1', address: 'http://localhost:11101' },
-        { node_id: 'n2', address: 'http://localhost:11102' },
-      ],
+    cy.intercept('GET', /\/api\/deployer\/peers.*/, (req) => {
+      const apiUrl = String(req.query.apiUrl || '');
+      // Gossip peer URLs must never be used as the peers RPC source.
+      expect(apiUrl).to.not.match(/:35000/);
+      req.reply({
+        body: [
+          { node_id: 'tls:a', address: 'http://88.99.3.132:35000' },
+          { node_id: 'tls:b', address: 'http://65.109.35.234:35000' },
+        ],
+      });
     }).as('getPeers');
     cy.intercept('GET', /\/api\/deployer\/getStateRootHash.*/, {
       body: JSON.stringify(stateRootHash),
@@ -65,18 +70,49 @@ describe('deployer', () => {
     cy.wait('@getPeers');
     cy.get('select')
       .first()
-      .find('optgroup[label="peers / custom"] option')
+      .find('optgroup[label="peers / custom (gossip)"] option')
       .should('have.length', 2)
       .then(($opts) => {
         const values = [...$opts].map((o) => o.value);
         const texts = [...$opts].map((o) => (o.textContent || '').trim());
         expect(values).to.deep.eq([
-          'http://localhost:11101',
-          'http://localhost:11102',
+          'http://88.99.3.132:35000',
+          'http://65.109.35.234:35000',
         ]);
         expect(texts).to.deep.eq(values);
         expect(new Set(values).size).to.eq(values.length);
       });
+  });
+
+  it('should keep peers list stable when selecting a gossip peer', () => {
+    cy.wait('@getPeers');
+    cy.get('select')
+      .first()
+      .find('optgroup[label="peers / custom (gossip)"] option')
+      .should('have.length', 2);
+
+    cy.get('select')
+      .first()
+      .select('http://88.99.3.132:35000', { force: true });
+
+    cy.get('input[name="apiUrl"]')
+      .invoke('val')
+      .should('eq', 'http://88.99.3.132:35000');
+
+    // Gossip peer must not move into presets.
+    cy.get('select')
+      .first()
+      .find('optgroup[label="presets"] option')
+      .then(($opts) => {
+        const texts = [...$opts].map((o) => (o.textContent || '').trim());
+        expect(texts).to.not.include('http://88.99.3.132:35000');
+      });
+
+    // Peers optgroup stays populated (no refetch from :35000).
+    cy.get('select')
+      .first()
+      .find('optgroup[label="peers / custom (gossip)"] option')
+      .should('have.length', 2);
   });
 
   it('should show empty peers group when API returns no peers', () => {
@@ -87,12 +123,12 @@ describe('deployer', () => {
     cy.wait('@getPeersEmpty');
     cy.get('select')
       .first()
-      .find('optgroup[label="peers / custom"] option')
+      .find('optgroup[label="peers / custom (gossip)"] option')
       .should('have.length', 0);
     cy.get('select')
       .first()
       .find('optgroup[label="presets"] option')
-      .should('have.length.at.least', 3);
+      .should('have.length.at.least', 2);
   });
 
   it('should show Transaction UI (not Deploy-only)', () => {

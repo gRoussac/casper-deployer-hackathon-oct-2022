@@ -16,14 +16,18 @@ describe('StateRootHashComponent', () => {
   let component: StateRootHashComponent;
   let fixture: ComponentFixture<StateRootHashComponent>;
   let getPeers: jest.Mock;
+  let getStatus: jest.Mock;
+  let getStateRootHash: jest.Mock;
 
   const peers: Peer[] = [
-    { address: 'http://localhost:11101', node_id: 'n0' },
-    { address: 'http://localhost:11102', node_id: 'n1' },
+    { address: 'http://88.99.3.132:35000', node_id: 'tls:a' },
+    { address: 'http://65.109.35.234:35000', node_id: 'tls:b' },
   ];
 
   beforeEach(async () => {
     getPeers = jest.fn().mockReturnValue(of(peers));
+    getStatus = jest.fn().mockReturnValue(of('status'));
+    getStateRootHash = jest.fn().mockReturnValue(of('srh'));
 
     await TestBed.configureTestingModule({
       imports: [StateRootHashComponent, HttpClientModule],
@@ -47,8 +51,8 @@ describe('StateRootHashComponent', () => {
           useValue: {
             setState: jest.fn(),
             getPeers,
-            getStatus: () => of('status'),
-            getStateRootHash: () => of('srh'),
+            getStatus,
+            getStateRootHash,
           },
         },
         {
@@ -73,51 +77,68 @@ describe('StateRootHashComponent', () => {
   });
 
   it('should render peer options with address as value', () => {
-    component.apiUrl = 'http://localhost:11101';
+    component.apiUrl = config['default_node_testnet'];
+    (component as unknown as { peersSourceUrl: string }).peersSourceUrl =
+      config['default_node_testnet'];
     component.getPeers();
     fixture.detectChanges();
 
     const options = fixture.nativeElement.querySelectorAll(
-      'optgroup[label="peers / custom"] option',
+      'optgroup[label="peers / custom (gossip)"] option',
     ) as NodeListOf<HTMLOptionElement>;
     expect(options.length).toBe(2);
-    expect(options[0].value).toBe('http://localhost:11101');
-    expect(options[0].textContent?.trim()).toBe('http://localhost:11101');
-    expect(options[1].value).toBe('http://localhost:11102');
+    expect(options[0].value).toBe('http://88.99.3.132:35000');
+    expect(options[0].textContent?.trim()).toBe('http://88.99.3.132:35000');
   });
 
   it('should leave peers optgroup empty when API returns no peers', () => {
     getPeers.mockReturnValue(of([]));
-    component.apiUrl = 'https://node.testnet.casper.network';
+    component.apiUrl = config['default_node_testnet'];
+    (component as unknown as { peersSourceUrl: string }).peersSourceUrl =
+      config['default_node_testnet'];
     component.getPeers();
     fixture.detectChanges();
 
     expect(component.peers).toEqual([]);
     const peerOptions = fixture.nativeElement.querySelectorAll(
-      'optgroup[label="peers / custom"] option',
+      'optgroup[label="peers / custom (gossip)"] option',
     );
     expect(peerOptions.length).toBe(0);
-
-    const presetTexts = [
-      ...(fixture.nativeElement.querySelectorAll(
-        'optgroup[label="presets"] option',
-      ) as NodeListOf<HTMLOptionElement>),
-    ].map((o) => o.textContent?.trim());
-    expect(presetTexts).toEqual(
-      expect.arrayContaining([
-        config['default_node_localhost'],
-        config['default_node_testnet'],
-        config['default_node_mainnet'],
-      ]),
-    );
   });
 
-  it('should load peers from DeployerService for the selected apiUrl', () => {
-    component.apiUrl = 'http://localhost:11101';
+  it('should load peers from the peers source RPC, not a gossip peer URL', () => {
+    component.apiUrl = config['default_node_testnet'];
+    (component as unknown as { peersSourceUrl: string }).peersSourceUrl =
+      config['default_node_testnet'];
     component.getPeers();
+
+    expect(getPeers).toHaveBeenCalledWith(config['default_node_testnet']);
+    expect(component.peers).toEqual(peers);
+  });
+
+  it('should not promote gossip peers into presets or refetch peers from them', () => {
+    component.apiUrl = config['default_node_testnet'];
+    (component as unknown as { peersSourceUrl: string }).peersSourceUrl =
+      config['default_node_testnet'];
+    component.peers = peers;
+    component.apiUrlElt = { value: '' } as HTMLInputElement;
+    const presetsBefore = [...component.defaults];
+    getPeers.mockClear();
+    getStatus.mockClear();
+    getStateRootHash.mockClear();
+
+    const event = {
+      target: { value: peers[0].address },
+    } as unknown as Event;
+    component.selectApiUrl(event);
     fixture.detectChanges();
 
-    expect(getPeers).toHaveBeenCalledWith('http://localhost:11101');
+    expect(component.apiUrl).toBe(peers[0].address);
+    expect(component.defaults).toEqual(presetsBefore);
+    expect(component.defaults).not.toContain(peers[0].address);
+    expect(getPeers).not.toHaveBeenCalled();
     expect(component.peers).toEqual(peers);
+    expect(getStatus).not.toHaveBeenCalled();
+    expect(getStateRootHash).not.toHaveBeenCalled();
   });
 });

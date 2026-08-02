@@ -58,7 +58,7 @@ function __wbg_get_imports() {
         __wbg___wbindgen_throw_344f42d3211c4765: function(arg0, arg1) {
             throw new Error(getStringFromWasm0(arg0, arg1));
         },
-        __wbg_atob_916ea69679674045: function(arg0, arg1) {
+        __wbg_atob_c994966d10c2c1c1: function(arg0, arg1) {
             let deferred0_0;
             let deferred0_1;
             try {
@@ -70,7 +70,7 @@ function __wbg_get_imports() {
                 wasm.__wbindgen_free(deferred0_0, deferred0_1, 1);
             }
         },
-        __wbg_log_41cb65f8d1c48621: function(arg0, arg1) {
+        __wbg_log_6bb34c04e511e03c: function(arg0, arg1) {
             let deferred0_0;
             let deferred0_1;
             try {

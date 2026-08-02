@@ -38,14 +38,4 @@ describe('AppComponent', () => {
     const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
   });
-
-  xit('should ngOnInit', () => {
-    // TODO
-  });
-  xit('should connect', () => {
-    //
-  });
-  xit('should refreshPurse', () => {
-    //
-  });
 });

@@ -65,5 +65,6 @@ try {
   require('nx/src/adapter/decorate-cli').decorateCli();
   output.log({ title: 'Angular CLI has been decorated to enable computation caching.' });
 } catch(e) {
-  output.error({ title: 'Decoration of the Angular CLI did not complete successfully' });
+  // Non-fatal: newer Nx layouts often skip decorateCli; tests/builds still work.
+  console.warn('Angular CLI decoration skipped (non-fatal)');
 }

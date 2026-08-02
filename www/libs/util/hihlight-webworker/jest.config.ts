@@ -3,26 +3,26 @@ export default {
   displayName: 'util-hihlight-webworker',
   preset: '../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
-  globals: {
-    'ts-jest': {
-      tsconfig: '<rootDir>/tsconfig.spec.json',
-      stringifyContentPathRegex: '\\.(html|svg)$',
-      diagnostics: {
-        ignoreCodes: [1343]
-      },
-      astTransformers: {
-        before: [
-          {
-            path: 'ts-jest-mock-import-meta',
-            options: { metaObjectReplacement: { url: 'https://www.url.com' } }
-          }
-        ],
-      }
-    },
-  },
   coverageDirectory: '../../../coverage/libs/util/hihlight-webworker',
   transform: {
-    '^.+\\.(ts|mjs|js|html)$': 'jest-preset-angular',
+    '^.+\\.(ts|mjs|js|html)$': [
+      'jest-preset-angular',
+      {
+        tsconfig: '<rootDir>/tsconfig.spec.json',
+        stringifyContentPathRegex: '\\.(html|svg)$',
+        diagnostics: {
+          ignoreCodes: [1343],
+        },
+        astTransformers: {
+          before: [
+            {
+              path: 'ts-jest-mock-import-meta',
+              options: { metaObjectReplacement: { url: 'https://www.url.com' } },
+            },
+          ],
+        },
+      },
+    ],
   },
   transformIgnorePatterns: ['node_modules/(?!.*\\.mjs$)'],
   snapshotSerializers: [

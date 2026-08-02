@@ -9,7 +9,7 @@ wasm-bindgen-futures = "0.4.76"
 wee_alloc = "0.4.5"
 casper-types = { version = "7.0.0", default-features = false }
 js-sys = "0.3.103"
-base64 = { version = "0.22.1", default-features = false, features = ["alloc"] }
+base64 = { version = "0.23.0", default-features = false, features = ["alloc"] }
 getrandom = { version = "0.4.3", features = ["wasm_js"] }
 
 [lib]

@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { urlencoded, json } from 'express';
 import { AppModule } from './app/app.module';
-import * as proxy from 'http-proxy-middleware';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 import { Request, Response, NextFunction } from 'express';
 
 /**
@@ -32,7 +32,7 @@ async function bootstrap() {
         res.end('Proxy target missing or not allowed');
         return;
       }
-      const proxyMiddleware = proxy.createProxyMiddleware({
+      const proxyMiddleware = createProxyMiddleware({
         target,
         changeOrigin: true,
         ignorePath: true,

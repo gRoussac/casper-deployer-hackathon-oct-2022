@@ -1,12 +1,12 @@
 <div class="w-full">
   <form class="bg-white shadow-md rounded p-3 mb-4" (submit)="(false)">
-    <h2 class="title">Deploy Info</h2>
+    <h2 class="title">Transaction Info</h2>
     <div class="mb-4">
       <label
         class="flex justify-between text-gray-700 text-xs font-bold mb-2"
         for="activePublicKey"
       >
-        Deploy hash <input type="reset" value="clear" (click)="reset()" />
+        Transaction hash <input type="reset" value="clear" (click)="reset()" />
       </label>
       <div class="mb-2">
         <input
@@ -27,7 +27,7 @@
         (click)="getDeploy()"
         [attr.disabled]="isGetDeployDisabled ? true : null"
       >
-        Deploy info
+        Transaction info
         <svg
           class="w-6 h-6 ml-1"
           fill="none"

@@ -8,7 +8,7 @@ import {
   EnvironmentProviders,
   importProvidersFrom,
   Provider,
-  provideZoneChangeDetection
+  provideZoneChangeDetection,
 } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { config, ENV_CONFIG } from '@casper-util/config';
@@ -29,11 +29,6 @@ const ROUTES: Routes = [
     loadComponent: () =>
       import('@casper-deployer/deployer').then((m) => m.DeployerComponent),
   },
-  {
-    path: 'escrow',
-    loadComponent: () =>
-      import('@casper-escrow/escrower').then((m) => m.EscrowerComponent),
-  },
 ];
 
 const providers: Array<Provider | EnvironmentProviders> = [
@@ -45,7 +40,9 @@ providers.push({ provide: ENV_CONFIG, useValue: config });
 
 providers.push({ provide: TOASTER_TOKEN, useValue: toastr });
 
-bootstrapApplication(AppComponent, { providers: [provideZoneChangeDetection(), ...providers] })
+bootstrapApplication(AppComponent, {
+  providers: [provideZoneChangeDetection(), ...providers],
+})
   .then(() => {
     //
   })

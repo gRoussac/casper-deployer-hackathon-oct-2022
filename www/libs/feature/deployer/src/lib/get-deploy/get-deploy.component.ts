@@ -15,7 +15,7 @@ import { DeployerService } from '@casper-data/data-access-deployer';
 import { State } from '@casper-api/api-interfaces';
 import { ResultService } from '../result/result.service';
 import { StorageService } from '@casper-util/storage';
-import { GetDeployResult } from 'casper-rust-wasm-sdk';
+import { GetTransactionResult } from 'casper-rust-wasm-sdk';
 
 @Component({
   selector: 'casper-deployer-get-deploy',
@@ -53,28 +53,30 @@ export class GetDeployComponent implements OnDestroy, AfterViewInit {
         if (state.apiUrl) {
           this.apiUrl = state.apiUrl;
         }
-        if (state.deploy_hash) {
-          this.deploy_hash = state.deploy_hash;
+        const hash = state.transaction_hash || state.deploy_hash;
+        if (hash) {
+          this.deploy_hash = hash;
           this.getDeployElt.nativeElement.value = this.deploy_hash;
         }
         this.changeDetectorRef.markForCheck();
       });
-    this.deploy_hash = this.storageService.get('deploy_hash');
+    this.deploy_hash =
+      this.storageService.get('transaction_hash') ||
+      this.storageService.get('deploy_hash');
   }
 
   getDeploy() {
-    const deploy_hash = this.getDeployElt.nativeElement.value.replace(
-      'deploy-',
-      '',
-    );
-    deploy_hash &&
+    const transaction_hash = this.getDeployElt.nativeElement.value
+      .replace('deploy-', '')
+      .replace('transaction-', '');
+    transaction_hash &&
       (this.getDeploySubscription = this.deployerService
-        .getDeploy(deploy_hash, this.apiUrl)
-        .subscribe((deployResult) => {
-          deployResult &&
-            this.resultService.setResult<GetDeployResult>(
-              'Deploy info',
-              deployResult,
+        .getTransaction(transaction_hash, this.apiUrl)
+        .subscribe((transactionResult) => {
+          transactionResult &&
+            this.resultService.setResult<GetTransactionResult>(
+              'Transaction info',
+              transactionResult,
             );
           this.refreshPurse.emit();
           this.getDeploySubscription.unsubscribe();
@@ -91,11 +93,15 @@ export class GetDeployComponent implements OnDestroy, AfterViewInit {
 
   reset() {
     this.getDeployElt.nativeElement.value = '';
-    this.storageService.setState({ deploy_hash: '' });
+    this.storageService.setState({ deploy_hash: '', transaction_hash: '' });
   }
 
   onDeployChange() {
-    const deploy_hash = this.getDeployElt.nativeElement.value;
-    deploy_hash && this.storageService.setState({ deploy_hash });
+    const transaction_hash = this.getDeployElt.nativeElement.value;
+    transaction_hash &&
+      this.storageService.setState({
+        transaction_hash,
+        deploy_hash: transaction_hash,
+      });
   }
 }

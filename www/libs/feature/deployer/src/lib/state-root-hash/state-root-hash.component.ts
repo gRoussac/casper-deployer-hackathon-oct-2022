@@ -6,7 +6,7 @@ import {
   Inject,
   OnDestroy,
   ViewChild,
-  DOCUMENT
+  DOCUMENT,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Peer } from '@casper-api/api-interfaces';
@@ -50,7 +50,6 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
     this.window = this.document.defaultView;
     this.defaults = [
       this.config['default_node_localhost'],
-      this.config['default_node_launcher'],
       this.config['default_node_testnet'],
       this.config['default_node_mainnet'],
     ];
@@ -65,15 +64,17 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
           this.defaults.push(this.apiUrl);
         }
         this.deployerService.setState({ apiUrl });
+        this.syncChainName(apiUrl);
       } else {
         const currentHost = this.window?.location.hostname;
         if (currentHost && this.defaults[0].includes(currentHost)) {
           this.apiUrl = this.defaults[0];
         } else {
-          this.apiUrl = this.defaults[2];
+          this.apiUrl = this.defaults[1]; // testnet
         }
         this.routeurHubService.setHubState({ apiUrl: this.apiUrl });
         this.deployerService.setState({ apiUrl: this.apiUrl });
+        this.syncChainName(this.apiUrl);
       }
       this.getPeers();
     });
@@ -102,11 +103,32 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
     this.apiUrlElt.value = this.apiUrl;
     this.deployerService.setState({ apiUrl: this.apiUrl });
     this.routeurHubService.setHubState({ apiUrl: this.apiUrl });
+    this.syncChainName(this.apiUrl);
     if (!this.defaults.includes(this.apiUrl)) {
       this.defaults.push(this.apiUrl);
     }
     this.getPeers();
     this.routeurHubService.refreshPurse();
+  }
+
+  /** Known presets only; custom URLs keep whatever chain_name the user set. */
+  private syncChainName(apiUrl: string) {
+    let chain_name: string | undefined;
+    if (
+      apiUrl.includes(this.config['default_node_localhost']) ||
+      /:1110[1-5]\b/.test(apiUrl)
+    ) {
+      chain_name = this.config['chain_name_localhost'];
+    } else if (apiUrl.includes(this.config['default_node_testnet'])) {
+      chain_name = this.config['chain_name_testnet'];
+    } else if (apiUrl.includes(this.config['default_node_mainnet'])) {
+      chain_name = this.config['chain_name_mainnet'];
+    }
+    if (chain_name) {
+      this.storageService.setState({ chain_name });
+      this.deployerService.setState({ chain_name });
+      this.routeurHubService.setHubState({ chain_name });
+    }
   }
 
   getStateRootHash(): void {

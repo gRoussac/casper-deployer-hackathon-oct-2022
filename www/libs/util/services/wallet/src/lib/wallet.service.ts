@@ -1,4 +1,4 @@
-import { CasperWallet, Deploy } from 'casper-rust-wasm-sdk';
+import { CasperWallet, Deploy, Transaction } from 'casper-rust-wasm-sdk';
 
 export class WalletService {
   private wallet: CasperWallet | null = null;
@@ -80,20 +80,28 @@ export class WalletService {
     return (is_connected && (await wallet.getActivePublicKey())) || '';
   }
 
-  public async signDeploy(
-    deploy: Deploy,
+  public async signTransaction(
+    transaction: Transaction,
     public_key?: string,
-  ): Promise<Deploy> {
+  ): Promise<Transaction> {
     const wallet = this.getWallet();
     if (!wallet) {
       console.warn('Casper Wallet extension is not installed');
-      return deploy;
+      return new Transaction(transaction);
     }
     const is_connected = await this.connect();
     if (!is_connected) {
       console.warn('Casper Wallet is not connected');
     }
-    return wallet.signDeploy(new Deploy(deploy), public_key);
+    return wallet.signTransaction(new Transaction(transaction), public_key);
+  }
+
+  /** @deprecated Use signTransaction */
+  public async signDeploy(
+    deploy: Deploy | Transaction,
+    public_key?: string,
+  ): Promise<Transaction> {
+    return this.signTransaction(deploy as unknown as Transaction, public_key);
   }
 }
 

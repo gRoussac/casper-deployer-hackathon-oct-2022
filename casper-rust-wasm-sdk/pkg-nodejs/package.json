@@ -1,7 +1,7 @@
 {
-  "name": "casper-rust-wasm-sdk",
+  "name": "casper-rust-wasm-sdk-nodejs",
   "description": "Casper Rust Wasm Web SDK",
-  "version": "1.0.0",
+  "version": "2.2.2",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -13,7 +13,7 @@
     "casper_rust_wasm_sdk.d.ts"
   ],
   "main": "casper_rust_wasm_sdk.js",
-  "homepage": "https://casper.network",
+  "homepage": "https://www.casper.network",
   "types": "casper_rust_wasm_sdk.d.ts",
   "keywords": [
     "casper",

@@ -8,6 +8,8 @@ import { RouteurHubService } from '@casper-util/routeur-hub';
 import { TOASTER_TOKEN } from '@casper-util/toaster';
 import { DEPLOYER_TOKEN, SDK_TOKEN } from '@casper-util/wasm';
 import { Peer } from '@casper-api/api-interfaces';
+import { StorageService } from '@casper-util/storage';
+import { of } from 'rxjs';
 
 jest.mock('casper-rust-wasm-sdk', () => ({
   CLType: jest
@@ -40,12 +42,34 @@ describe('DeployerComponent', () => {
         RouteurHubService,
         { provide: ENV_CONFIG, useValue: config },
         { provide: SDK_TOKEN, useValue: getCasperSDK },
-        { provide: DeployerService, useValue: { setState } },
+        {
+          provide: DeployerService,
+          useValue: {
+            setState,
+            getState: () => of({}),
+            getPeers: () => of(peers),
+            getStatus: () => of('status'),
+            getStateRootHash: () => of('srh'),
+          },
+        },
+        {
+          provide: StorageService,
+          useValue: {
+            get: jest.fn(),
+            set: jest.fn(),
+            setState: jest.fn(),
+          },
+        },
         { provide: TOASTER_TOKEN, useValue: {} },
         { provide: DEPLOYER_TOKEN, useValue: {} },
       ],
       schemas: [NO_ERRORS_SCHEMA],
-    }).compileComponents();
+    })
+      // Avoid wiring the full child-component graph in this smoke test
+      .overrideComponent(DeployerComponent, {
+        set: { imports: [], providers: [] },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(DeployerComponent);
     component = fixture.componentInstance;

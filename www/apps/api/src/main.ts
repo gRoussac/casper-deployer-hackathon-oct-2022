@@ -5,14 +5,15 @@ import { AppModule } from './app/app.module';
 import * as proxy from 'http-proxy-middleware';
 import { Request, Response, NextFunction } from 'express';
 
-const ALLOWED_TARGETS = [
-  'http://localhost:18101/events/main',
-  'http://localhost:9999/events/main',
-  'https://node.mainnet.casper.network/events/main',
-  'https://node.testnet.casper.network/events', // 2.0
-];
+/**
+ * Casper 2 SSE targets:
+ * - NCTL 2 docker: localhost:18101-18105/events
+ * - public testnet/mainnet: https://node.*.casper.network/events
+ * - custom: same host with /events (optional /main legacy)
+ */
+const SSE_TARGET_REGEX =
+  /^https?:\/\/(?:localhost|127\.0\.0\.1|[a-z0-9.-]+)(?::\d+)?\/events(?:\/main)?$/i;
 
-const regex = /^https?:\/\/[a-z.-]+(?::\d+)?\/events(?:\/main)?$/;
 const api_url = 'api_url';
 
 async function bootstrap() {
@@ -26,9 +27,9 @@ async function bootstrap() {
     (req: Request, res: Response, next: (err?: NextFunction) => void) => {
       const target = resolveApiUrl(req);
       if (!target) {
-        console.error('Missing target URL for proxy');
+        console.error('Missing or disallowed SSE target URL for proxy');
         res.writeHead(500, { 'Content-Type': 'text/plain' });
-        res.end('Proxy target missing');
+        res.end('Proxy target missing or not allowed');
         return;
       }
       const proxyMiddleware = proxy.createProxyMiddleware({
@@ -41,7 +42,7 @@ async function bootstrap() {
           proxyReq: (proxyReq) => {
             proxyReq.setHeader('Accept', 'text/event-stream');
           },
-          error: (err, req, res) => {
+          error: (err) => {
             console.error(err);
           },
         },
@@ -61,11 +62,10 @@ bootstrap();
 
 function resolveApiUrl(req: Request) {
   const apiUrl = req.query[api_url] as string | undefined;
-
-  if (!apiUrl) return null;
-
-  const test = regex.test(apiUrl) && apiUrl;
-  return test && ALLOWED_TARGETS.includes(apiUrl) ? apiUrl : null;
+  if (!apiUrl) {
+    return null;
+  }
+  return SSE_TARGET_REGEX.test(apiUrl) ? apiUrl : null;
 }
 
 const pathFilter = function (path, req) {

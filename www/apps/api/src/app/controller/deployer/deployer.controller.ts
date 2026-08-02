@@ -1,7 +1,17 @@
-import { api_interface, DeployReturn, Peer } from '@casper-api/api-interfaces';
+import {
+  api_interface,
+  DeployReturn,
+  Peer,
+  TransactionReturn,
+} from '@casper-api/api-interfaces';
 import { Controller, Get, Post, Query, Body } from '@nestjs/common';
 import { AppService } from '../../app.service';
-import { Deploy, GetDeployResult } from 'casper-rust-wasm-sdk-nodejs';
+import {
+  Deploy,
+  GetDeployResult,
+  GetTransactionResult,
+  Transaction,
+} from 'casper-rust-wasm-sdk-nodejs';
 
 @Controller(api_interface.Deployer)
 export class DeployerController {
@@ -121,6 +131,18 @@ export class DeployerController {
     }
   }
 
+  @Get(api_interface.Transaction_info)
+  async getTransaction(
+    @Query('apiUrl') apiUrl?: string,
+    @Query('transactionHash') transactionHash?: string,
+  ): Promise<GetTransactionResult | Error> {
+    try {
+      return await this.appService.getTransaction(transactionHash, apiUrl);
+    } catch (error) {
+      return { name: error.toString(), message: error };
+    }
+  }
+
   @Post(api_interface.Put_Deploy)
   async putDeploy(
     @Body('signedDeploy') signedDeploy: string,
@@ -135,6 +157,29 @@ export class DeployerController {
       }
       const deploy = new Deploy(signedDeployFromJson);
       return await this.appService.putDeploy(deploy, speculative, apiUrl);
+    } catch (error) {
+      return { name: error.toString(), message: error };
+    }
+  }
+
+  @Post(api_interface.Put_Transaction)
+  async putTransaction(
+    @Body('signedTransaction') signedTransaction: string,
+    @Body('speculative') speculative?: boolean,
+    @Body('apiUrl') apiUrl?: string,
+  ): Promise<TransactionReturn | Error> {
+    try {
+      const signedTransactionFromJson = JSON.parse(signedTransaction);
+      if (signedTransactionFromJson.err) {
+        console.error(signedTransactionFromJson.val.message);
+        return;
+      }
+      const transaction = new Transaction(signedTransactionFromJson);
+      return await this.appService.putTransaction(
+        transaction,
+        speculative,
+        apiUrl,
+      );
     } catch (error) {
       return { name: error.toString(), message: error };
     }

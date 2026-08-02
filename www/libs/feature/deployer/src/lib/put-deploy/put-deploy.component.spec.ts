@@ -14,14 +14,19 @@ import { PutDeployComponent } from './put-deploy.component';
 import { SDK_TOKEN } from '@casper-util/wasm';
 import { StorageService } from '@casper-util/storage';
 import { WalletService } from '@casper-util/wallet';
+import { DeployService } from '@casper-util/deploy';
+import { WatcherService } from '@casper-util/watcher';
+import { of } from 'rxjs';
 
 jest.mock('casper-rust-wasm-sdk', () => ({
-  CasperWallet: jest
-    .fn()
-    .mockImplementation(() => ({
-      signDeploy: jest.fn().mockResolvedValue({}),
-    })),
+  CasperWallet: jest.fn().mockImplementation(() => ({
+    signTransaction: jest.fn().mockResolvedValue({}),
+    signDeploy: jest.fn().mockResolvedValue({}),
+  })),
+  Transaction: jest.fn(),
   Deploy: jest.fn(),
+  PublicKey: jest.fn(),
+  motesToCSPR: jest.fn(),
 }));
 
 describe('PutDeployComponent', () => {
@@ -32,11 +37,28 @@ describe('PutDeployComponent', () => {
     await TestBed.configureTestingModule({
       imports: [PutDeployComponent, HttpClientModule],
       providers: [
-        DeployerService,
         ResultService,
         HighlightService,
         WalletService,
         StorageService,
+        {
+          provide: DeployerService,
+          useValue: {
+            getState: () => of({}),
+            setState: jest.fn(),
+          },
+        },
+        {
+          provide: DeployService,
+          useValue: {
+            makeTransaction: jest.fn(),
+            makeTransferTransaction: jest.fn(),
+          },
+        },
+        {
+          provide: WatcherService,
+          useValue: { watchTransaction: jest.fn(), watchDeploy: jest.fn() },
+        },
         { provide: ENV_CONFIG, useValue: config },
         {
           provide: HIGHLIGHT_WEBWORKER_FACTORY,

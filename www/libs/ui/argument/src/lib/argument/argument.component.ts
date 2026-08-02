@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import { CLType, CLTypeEnum } from 'casper-rust-wasm-sdk';
-import { NamedCLTypeArg } from '@casper-api/api-interfaces';
+import { CLType, CLTypeEnum, NamedCLTypeArg } from '@casper-api/api-interfaces';
 
 @Component({
   selector: 'casper-ui-argument',

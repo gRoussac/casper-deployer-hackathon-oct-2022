@@ -1,6 +1,5 @@
-import { NamedCLTypeArg } from '@casper-api/api-interfaces';
+import { NamedCLTypeArg, CLType } from '@casper-api/api-interfaces';
 import { Tabs } from '@casper-ui/tabs';
-import { CLType } from 'casper-rust-wasm-sdk';
 
 const customArg: NamedCLTypeArg = { name: '', cl_type: CLType.U8() };
 

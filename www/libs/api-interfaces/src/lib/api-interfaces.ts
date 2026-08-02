@@ -1,5 +1,4 @@
-import { Roles } from './api-enums';
-import { CLType } from 'casper-rust-wasm-sdk';
+import { CLType } from './cl-type';
 
 export type NamedCLTypeArg = {
   name: string;
@@ -11,7 +10,8 @@ export type NamedCLTypeArg = {
   optional?: boolean;
 };
 
-export type User = { role?: Roles; activePublicKey: string };
+/** Optional display label for a known sample key (no escrow roles). */
+export type User = { role?: string; activePublicKey: string };
 
 export type Users = User[];
 
@@ -25,6 +25,7 @@ export type State = {
   stateRootHash?: string;
   status?: string;
   deploy_hash?: string;
+  transaction_hash?: string;
   deploy_args?: string;
   user?: User;
   key?: string;
@@ -40,3 +41,5 @@ export type State = {
 };
 
 export type DeployReturn = { deploy_hash: string };
+
+export type TransactionReturn = { transaction_hash: string };

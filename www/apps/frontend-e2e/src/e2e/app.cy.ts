@@ -66,6 +66,9 @@ describe('deployer', () => {
     cy.contains('button', 'Make transaction');
     cy.contains('button', 'Sign only');
     cy.contains('button', 'Sign & Send');
+    cy.contains('button', 'Load signed JSON');
+    cy.contains('button', 'Send loaded');
+    cy.contains('button', 'Test').should('not.exist');
   });
 
   it('should have prefilled gas / TTL inputs', () => {

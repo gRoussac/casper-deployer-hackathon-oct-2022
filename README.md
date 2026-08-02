@@ -10,6 +10,7 @@ Live (beta): [https://casper.onrender.com/](https://casper.onrender.com/)
 - Pick a network peer (localhost / testnet / mainnet / custom)
 - Query state root hash, global state, dictionary items, balances
 - Build, sign, and send **transactions** (Casper 2.x) via the NestJS RPC proxy
+- Load a previously signed transaction JSON and send it without re-signing
 
 Browser calls never talk to public nodes directly for RPC — the Nest API (`/api/deployer/*`) runs the Node WASM SDK server-side to avoid CORS.
 
@@ -106,6 +107,9 @@ Then `cd www && npm install`.
 - [x] Entity / AddressableEntity named-key + dictionary queries (Phase 2)
 - [x] Network / peers / SSE hardening (Phase 3 — NCTL `11101`/`18101`, no launcher `7777`)
 - [x] Re-enable CI + expand tests (Phase 4)
+- [x] Polish (Phase 5): Transaction UI copy, load/send signed JSON, remove speculative Test button
+
+Rollback to Casper 1.x: `git checkout v1.6`
 
 ## License / security
 

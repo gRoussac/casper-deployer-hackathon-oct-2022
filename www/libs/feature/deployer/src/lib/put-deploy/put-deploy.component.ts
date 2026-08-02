@@ -81,6 +81,7 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
   sessionHash!: string;
   entryPoint!: string;
   file_name!: string;
+  loadedSignedTransaction?: string;
   version!: string;
   animate!: boolean;
   stateRootHash?: string;
@@ -308,26 +309,60 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     return this.signTransaction(sendDeploy);
   }
 
-  async speculativeTransaction() {
-    const speculative = true,
-      sendTransaction = false;
-    this.makeTransaction();
-    const signedTransaction = await this.signTransaction(sendTransaction);
-    signedTransaction &&
-      this.deployerService
-        .putTransaction(signedTransaction, this.apiUrl, speculative)
-        .subscribe((result: string | TransactionReturn) => {
-          result &&
-            this.resultService.setResult<string>(
-              'Speculative Transaction Hash',
-              (result as TransactionReturn).transaction_hash,
-            );
-        });
+  async onSignedTransactionFileSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.item(0);
+    if (!file) {
+      return;
+    }
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      const signed = new Transaction(parsed);
+      if (signed && !signed.verify()) {
+        this.toastr.warning(
+          signed.toString(),
+          'Loaded transaction verify warning',
+        );
+      }
+      this.loadedSignedTransaction = JSON.stringify(signed.toJson() || parsed);
+      this.resultService.setResult<Transaction>(
+        'Loaded Signed Transaction',
+        signed.toJson() || parsed,
+      );
+      this.changeDetectorRef.markForCheck();
+    } catch (err) {
+      console.error(err);
+      this.toastr.error(String(err), 'Invalid signed transaction JSON');
+      this.loadedSignedTransaction = undefined;
+    }
+    (event.target as HTMLInputElement).value = '';
   }
 
-  /** @deprecated Use speculativeTransaction */
-  async speculativeDeploy() {
-    return this.speculativeTransaction();
+  sendLoadedTransaction() {
+    if (!this.loadedSignedTransaction) {
+      return;
+    }
+    this.deployerService
+      .putTransaction(this.loadedSignedTransaction, this.apiUrl)
+      .subscribe((result: string | TransactionReturn) => {
+        const transaction_hash = (result as TransactionReturn).transaction_hash;
+        transaction_hash &&
+          this.resultService.setResult<string>(
+            'Transaction Hash',
+            transaction_hash || (result as string),
+          );
+        if (transaction_hash) {
+          this.deployerService.setState({
+            transaction_hash,
+            deploy_hash: transaction_hash,
+          });
+          this.watcherService.watchTransaction(transaction_hash, this.apiUrl);
+          this.storageService.setState({
+            transaction_hash,
+            deploy_hash: transaction_hash,
+          });
+        }
+      });
   }
 
   resetFirstForm($event: Event) {
@@ -363,8 +398,13 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     this.resultService.copyClipboard(value);
   }
 
-  get isMakeDeployDisabled() {
+  get isMakeTransactionDisabled() {
     return !this.isFormValid();
+  }
+
+  /** @deprecated Use isMakeTransactionDisabled */
+  get isMakeDeployDisabled() {
+    return this.isMakeTransactionDisabled;
   }
 
   get isSessionNameDisabled(): boolean {

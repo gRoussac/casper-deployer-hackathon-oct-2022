@@ -61,6 +61,40 @@ describe('deployer', () => {
       });
   });
 
+  it('should list unique peer options from API', () => {
+    cy.wait('@getPeers');
+    cy.get('select')
+      .first()
+      .find('optgroup[label="peers / custom"] option')
+      .should('have.length', 2)
+      .then(($opts) => {
+        const values = [...$opts].map((o) => o.value);
+        const texts = [...$opts].map((o) => (o.textContent || '').trim());
+        expect(values).to.deep.eq([
+          'http://localhost:11101',
+          'http://localhost:11102',
+        ]);
+        expect(texts).to.deep.eq(values);
+        expect(new Set(values).size).to.eq(values.length);
+      });
+  });
+
+  it('should show empty peers group when API returns no peers', () => {
+    cy.intercept('GET', /\/api\/deployer\/peers.*/, { body: [] }).as(
+      'getPeersEmpty',
+    );
+    cy.visit('/');
+    cy.wait('@getPeersEmpty');
+    cy.get('select')
+      .first()
+      .find('optgroup[label="peers / custom"] option')
+      .should('have.length', 0);
+    cy.get('select')
+      .first()
+      .find('optgroup[label="presets"] option')
+      .should('have.length.at.least', 3);
+  });
+
   it('should show Transaction UI (not Deploy-only)', () => {
     cy.contains('h2.title', 'Transaction');
     cy.contains('button', 'Make transaction');

@@ -26,12 +26,54 @@ export class AppService {
   }
 
   async getPeers(apiUrl: string): Promise<Peer[]> {
-    return (await this.sdkService.getCasperSDK(apiUrl).get_peers()).peers?.map(
-      (peer, index) => {
-        peer.address = this.rewritePeerAsRpcUrl(peer.address, apiUrl, index);
-        return peer;
-      },
-    );
+    // Public networks only expose one usable JSON-RPC endpoint (the official node).
+    // Gossip peer addresses are not RPC URLs — listing them just duplicates the preset.
+    if (this.isPublicCasperNetwork(apiUrl)) {
+      return [];
+    }
+
+    const peers =
+      (await this.sdkService.getCasperSDK(apiUrl).get_peers()).peers || [];
+
+    // Collapse duplicate gossip entries before index-based NCTL rewrite.
+    const seenGossip = new Set<string>();
+    const unique = peers.filter((peer) => {
+      const key = peer.address || '';
+      if (!key || seenGossip.has(key)) {
+        return false;
+      }
+      seenGossip.add(key);
+      return true;
+    });
+
+    const rewritten = unique.map((peer, index) => ({
+      ...peer,
+      address: this.rewritePeerAsRpcUrl(peer.address, apiUrl, index),
+    }));
+
+    const seenRpc = new Set<string>();
+    return rewritten.filter((peer) => {
+      if (!peer.address || seenRpc.has(peer.address)) {
+        return false;
+      }
+      seenRpc.add(peer.address);
+      return true;
+    });
+  }
+
+  private isPublicCasperNetwork(apiUrl: string): boolean {
+    try {
+      const api = new URL(apiUrl.includes('://') ? apiUrl : `http://${apiUrl}`);
+      return (
+        api.hostname.includes('testnet.casper.network') ||
+        api.hostname.includes('mainnet.casper.network')
+      );
+    } catch {
+      return (
+        apiUrl.includes('node.testnet.casper.network') ||
+        apiUrl.includes('node.mainnet.casper.network')
+      );
+    }
   }
 
   /**

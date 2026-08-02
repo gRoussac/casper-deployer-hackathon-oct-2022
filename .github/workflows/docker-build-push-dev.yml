@@ -1,0 +1,40 @@
+name: CI/CD Image dev
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - dev
+    paths:
+      - "docker/**"
+      - "www/**"
+      - "wasm/**"
+      - "casper-rust-wasm-sdk/**"
+      - "Makefile"
+      - ".github/workflows/docker-build-push-dev.yml"
+
+jobs:
+  build-push-dev:
+    name: Build and Push Docker Image :dev
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image :dev
+        run: make docker-build-dev
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push :dev to Docker Hub (interchouette + gregoshop mirror)
+        run: make docker-push-dev-hub
+        env:
+          CI: "1"

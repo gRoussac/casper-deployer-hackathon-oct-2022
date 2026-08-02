@@ -36,7 +36,7 @@
 
           <optgroup label="peers / custom">
             @for (peer of peers; track trackByFn(i, peer); let i = $index) {
-              <option>
+              <option [value]="peer.address">
                 {{ peer.address }}
               </option>
             }

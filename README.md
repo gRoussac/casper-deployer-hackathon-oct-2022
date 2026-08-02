@@ -2,7 +2,7 @@
 
 Angular + NestJS + Nx app for querying and submitting work to the **Casper 2.x** network, powered by [casper-rust-wasm-sdk](https://github.com/casper-ecosystem/casper-rust-wasm-sdk) **2.2.2**.
 
-Live (beta): [https://casper.onrender.com/](https://casper.onrender.com/)
+Live: [https://casper-deployer.interchouette.net/](https://casper-deployer.interchouette.net/)
 
 ## What it does
 
@@ -16,14 +16,14 @@ Browser calls never talk to public nodes directly for RPC — the Nest API (`/ap
 
 ## Stack
 
-| Layer       | Tech                                                  |
-| ----------- | ----------------------------------------------------- |
-| Frontend    | Angular 21, Nx, Tailwind                              |
-| API         | NestJS 11 (JSON-RPC facade + SSE proxy)               |
-| Casper      | `casper-rust-wasm-sdk` 2.2.2 (browser + nodejs packs) |
-| Helper WASM | `wasm/` crate (`deployer`) for small encoding helpers |
-| Tests       | Jest, Cypress                                         |
-| Hosting     | Docker / Render (`PORT`, default `4242`)              |
+| Layer       | Tech                                                                                                              |
+| ----------- | ----------------------------------------------------------------------------------------------------------------- |
+| Frontend    | Angular 21, Nx, Tailwind                                                                                          |
+| API         | NestJS 11 (JSON-RPC facade + SSE proxy)                                                                           |
+| Casper      | `casper-rust-wasm-sdk` 2.2.2 (browser + nodejs packs)                                                             |
+| Helper WASM | `wasm/` crate (`deployer`) for small encoding helpers                                                             |
+| Tests       | Jest, Cypress                                                                                                     |
+| Hosting     | Docker / [casper-deployer.interchouette.net](https://casper-deployer.interchouette.net/) (`PORT`, default `4242`) |
 
 ## Repository layout
 
@@ -80,9 +80,20 @@ Build from the **repository root** (context must include `casper-rust-wasm-sdk`,
 ```shell
 docker compose -f docker/docker-compose.yml up --build
 # or
-docker build -f docker/Dockerfile -t casper-deployer .
-docker run --rm -p 4242:4242 -e PORT=4242 casper-deployer
+make docker-build-dev
+docker run --rm -p 4242:4242 -e PORT=4242 interchouette/casper-deployer:dev
 ```
+
+Published images (Docker Hub):
+
+- [`interchouette/casper-deployer`](https://hub.docker.com/r/interchouette/casper-deployer) (`:dev`, version tags, `:latest`)
+- mirror: [`gregoshop/casper-deployer`](https://hub.docker.com/r/gregoshop/casper-deployer)
+
+```shell
+docker pull interchouette/casper-deployer:dev
+```
+
+CI pushes `:dev` on `workflow_dispatch` and on pushes to `dev` that touch the image inputs (see `.github/workflows/docker-build-push-dev.yml`). Requires repo secrets `DOCKER_USERNAME` / `DOCKER_PASSWORD` (same as other Interchouette images).
 
 Open http://localhost:4242/
 

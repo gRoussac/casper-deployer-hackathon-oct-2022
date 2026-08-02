@@ -1,0 +1,18 @@
+# Keep Docker build context lean (repo root is the build context).
+**/.git
+**/.github
+**/node_modules
+**/dist
+**/coverage
+**/.nx
+**/tmp
+**/.angular
+**/cypress/videos
+**/cypress/screenshots
+**/*.md
+!README.md
+casper-escrow.code-workspace
+www/.env*
+www/**/*.map
+wasm/target
+**/target

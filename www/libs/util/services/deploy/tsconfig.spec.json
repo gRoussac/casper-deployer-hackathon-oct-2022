@@ -4,11 +4,18 @@
     "outDir": "../../../../dist/out-tsc",
     "module": "preserve",
     "target": "es2016",
-    "types": ["jest", "node"],
+    "types": [
+      "jest",
+      "node"
+    ],
     "moduleResolution": "bundler",
-    "isolatedModules": true
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": false
   },
-  "files": ["src/test-setup.ts"],
+  "files": [
+    "src/test-setup.ts"
+  ],
   "include": [
     "jest.config.ts",
     "src/**/*.test.ts",

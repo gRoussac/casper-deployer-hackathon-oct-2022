@@ -82,17 +82,41 @@ describe('AppService', () => {
       expect(getCasperSDK).toHaveBeenNthCalledWith(1, 'http://localhost:11101');
     });
 
-    it('should omit gossip peers on public networks (official RPC is the preset)', async () => {
+    it('should list unique public-network peers as http://host:port (not the official RPC)', async () => {
       getCasperSDK.mockClear();
       getPeers.mockClear();
+      getPeers.mockResolvedValueOnce({
+        peers: [
+          { address: '88.99.3.132:35000', node_id: 'tls:a' },
+          { address: '65.109.35.234:35000', node_id: 'tls:b' },
+          { address: '88.99.3.132:35000', node_id: 'tls:a-dup' },
+        ],
+      });
       expect(
         await service.getPeers('https://node.testnet.casper.network'),
-      ).toEqual([]);
+      ).toEqual([
+        { address: 'http://88.99.3.132:35000', node_id: 'tls:a' },
+        { address: 'http://65.109.35.234:35000', node_id: 'tls:b' },
+      ]);
+      expect(getCasperSDK).toHaveBeenCalledWith(
+        'https://node.testnet.casper.network',
+      );
+      expect(getPeers).toHaveBeenCalled();
+    });
+
+    it('should list unique mainnet peers the same way', async () => {
+      getPeers.mockResolvedValueOnce({
+        peers: [
+          { address: '1.2.3.4:35000', node_id: 'm1' },
+          { address: '5.6.7.8:35000', node_id: 'm2' },
+        ],
+      });
       expect(
         await service.getPeers('https://node.mainnet.casper.network'),
-      ).toEqual([]);
-      expect(getCasperSDK).not.toHaveBeenCalled();
-      expect(getPeers).not.toHaveBeenCalled();
+      ).toEqual([
+        { address: 'http://1.2.3.4:35000', node_id: 'm1' },
+        { address: 'http://5.6.7.8:35000', node_id: 'm2' },
+      ]);
     });
 
     it('should dedupe rewritten local peer RPC URLs', async () => {

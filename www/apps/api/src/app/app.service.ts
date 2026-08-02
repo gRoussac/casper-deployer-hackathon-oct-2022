@@ -295,7 +295,10 @@ export class AppService {
     return (await sdk.get_transaction(options)).toJson();
   }
 
-  async putDeploy(signedDeploy: Deploy, apiUrl: string): Promise<DeployReturn> {
+  async putDeploy(
+    signedDeploy: Deploy,
+    apiUrl: string,
+  ): Promise<DeployReturn> {
     const sdk = this.sdkService.getCasperSDK(apiUrl);
     if (signedDeploy && !signedDeploy.validateDeploySize()) {
       console.error(signedDeploy);

@@ -16,15 +16,14 @@ Browser calls never talk to public nodes directly for RPC — the Nest API (`/ap
 
 ## Stack
 
-| Layer       | Tech                                                  |
-| ----------- | ----------------------------------------------------- |
-| Frontend    | Angular 21, Nx, Tailwind                              |
-| API         | NestJS 11 (JSON-RPC facade + SSE proxy)               |
-| Casper      | `casper-rust-wasm-sdk` 2.2.2 (browser + nodejs packs) |
-| Helper WASM | `wasm/` crate (`deployer`) for small encoding helpers |
-| Tests       | Jest, Cypress                                         |
+| Layer       | Tech                                                                                                              |
+| ----------- | ----------------------------------------------------------------------------------------------------------------- |
+| Frontend    | Angular 21, Nx, Tailwind                                                                                          |
+| API         | NestJS 11 (JSON-RPC facade + SSE proxy)                                                                           |
+| Casper      | `casper-rust-wasm-sdk` 2.2.2 (browser + nodejs packs)                                                             |
+| Helper WASM | `wasm/` crate (`deployer`) for small encoding helpers                                                             |
+| Tests       | Jest, Cypress                                                                                                     |
 | Hosting     | Docker / [casper-deployer.interchouette.net](https://casper-deployer.interchouette.net/) (`PORT`, default `4242`) |
-
 
 ## Repository layout
 

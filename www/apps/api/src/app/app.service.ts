@@ -15,8 +15,6 @@ import {
   PublicKey,
   PurseIdentifier,
   Transaction,
-  getSpeculativeExecDeployOptions,
-  getSpeculativeExecTxnOptions,
 } from 'casper-rust-wasm-sdk-nodejs';
 
 @Injectable()
@@ -257,7 +255,6 @@ export class AppService {
 
   async putDeploy(
     signedDeploy: Deploy,
-    speculative = false,
     apiUrl: string,
   ): Promise<DeployReturn> {
     const sdk = this.sdkService.getCasperSDK(apiUrl);
@@ -265,37 +262,16 @@ export class AppService {
       console.error(signedDeploy);
       return;
     }
-    if (speculative) {
-      console.debug('speculative', speculative);
-      return (
-        await sdk.speculative_exec_deploy({
-          deploy: signedDeploy,
-        } as getSpeculativeExecDeployOptions)
-      ).toJson();
-    }
     return (await sdk.put_deploy(signedDeploy)).toJson();
   }
 
   async putTransaction(
     signedTransaction: Transaction,
-    speculative = false,
     apiUrl: string,
   ): Promise<TransactionReturn> {
     const sdk = this.sdkService.getCasperSDK(apiUrl);
     if (signedTransaction && !signedTransaction.verify()) {
       console.warn('transaction verify failed', signedTransaction);
-    }
-    if (speculative) {
-      console.debug('speculative transaction', speculative);
-      const result = await sdk.speculative_exec({
-        transaction: signedTransaction.toJson(),
-      } as getSpeculativeExecTxnOptions);
-      const json = result.toJson();
-      return {
-        transaction_hash:
-          json?.transaction_hash?.toString?.() || json?.transaction_hash || '',
-        ...json,
-      };
     }
     const result = await sdk.put_transaction(signedTransaction);
     const json = result.toJson();

@@ -107,7 +107,7 @@ Then `cd www && npm install`.
 - [x] Entity / AddressableEntity named-key + dictionary queries (Phase 2)
 - [x] Network / peers / SSE hardening (Phase 3 — NCTL `11101`/`18101`, no launcher `7777`)
 - [x] Re-enable CI + expand tests (Phase 4)
-- [x] Polish (Phase 5): Transaction UI copy, load/send signed JSON, remove speculative Test button
+- [x] Polish (Phase 5): Transaction UI copy, load/send signed JSON, drop speculative exec entirely
 
 Rollback to Casper 1.x: `git checkout v1.6`
 

@@ -146,7 +146,6 @@ export class DeployerController {
   @Post(api_interface.Put_Deploy)
   async putDeploy(
     @Body('signedDeploy') signedDeploy: string,
-    @Body('speculative') speculative?: boolean,
     @Body('apiUrl') apiUrl?: string,
   ): Promise<DeployReturn | Error> {
     try {
@@ -156,7 +155,7 @@ export class DeployerController {
         return;
       }
       const deploy = new Deploy(signedDeployFromJson);
-      return await this.appService.putDeploy(deploy, speculative, apiUrl);
+      return await this.appService.putDeploy(deploy, apiUrl);
     } catch (error) {
       return { name: error.toString(), message: error };
     }
@@ -165,7 +164,6 @@ export class DeployerController {
   @Post(api_interface.Put_Transaction)
   async putTransaction(
     @Body('signedTransaction') signedTransaction: string,
-    @Body('speculative') speculative?: boolean,
     @Body('apiUrl') apiUrl?: string,
   ): Promise<TransactionReturn | Error> {
     try {
@@ -175,11 +173,7 @@ export class DeployerController {
         return;
       }
       const transaction = new Transaction(signedTransactionFromJson);
-      return await this.appService.putTransaction(
-        transaction,
-        speculative,
-        apiUrl,
-      );
+      return await this.appService.putTransaction(transaction, apiUrl);
     } catch (error) {
       return { name: error.toString(), message: error };
     }

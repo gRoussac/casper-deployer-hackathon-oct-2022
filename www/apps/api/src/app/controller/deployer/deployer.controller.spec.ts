@@ -66,7 +66,7 @@ describe('DeployerController', () => {
 
   it('should put_transaction', async () => {
     const body = JSON.stringify({ Version1: {} });
-    const result = await controller.putTransaction(body, false, url);
+    const result = await controller.putTransaction(body, url);
     expect(result).toEqual({ transaction_hash: 'tx-abc' });
     expect(putTransaction).toHaveBeenCalled();
   });

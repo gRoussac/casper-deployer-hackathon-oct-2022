@@ -28,13 +28,16 @@
         >
           <optgroup label="presets">
             @for (default of defaults; track default; let i = $index) {
-              <option [attr.selected]="apiUrl === default ? true : null">
+              <option
+                [value]="default"
+                [attr.selected]="apiUrl === default ? true : null"
+              >
                 {{ default }}
               </option>
             }
           </optgroup>
 
-          <optgroup label="peers / custom">
+          <optgroup label="peers / custom (gossip)">
             @for (peer of peers; track trackByFn(i, peer); let i = $index) {
               <option [value]="peer.address">
                 {{ peer.address }}

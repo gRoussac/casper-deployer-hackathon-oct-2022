@@ -32,7 +32,10 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
   private getStatusSubscription!: Subscription;
   private window!: (Window & typeof globalThis) | null;
 
-  peers!: Peer[];
+  /** RPC used for info_get_peers — never a gossip :35000 peer URL. */
+  private peersSourceUrl!: string;
+
+  peers: Peer[] = [];
   status = '';
   apiUrl!: string;
   @ViewChild('apiUrlElt') apiUrlElt!: HTMLInputElement;
@@ -48,11 +51,7 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
     private readonly storageService: StorageService,
   ) {
     this.window = this.document.defaultView;
-    this.defaults = [
-      this.config['default_node_localhost'],
-      this.config['default_node_testnet'],
-      this.config['default_node_mainnet'],
-    ];
+    this.defaults = this.buildDefaults();
   }
 
   ngAfterViewInit(): void {
@@ -60,22 +59,31 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
       const apiUrl = this.storageService.get('apiUrl');
       if (apiUrl) {
         this.apiUrl = apiUrl;
-        if (!this.defaults.includes(this.apiUrl)) {
+        if (
+          !this.defaults.includes(this.apiUrl) &&
+          !this.isGossipPeerUrl(this.apiUrl)
+        ) {
           this.defaults.push(this.apiUrl);
         }
         this.deployerService.setState({ apiUrl });
         this.syncChainName(apiUrl);
       } else {
         const currentHost = this.window?.location.hostname;
-        if (currentHost && this.defaults[0].includes(currentHost)) {
-          this.apiUrl = this.defaults[0];
+        const localhost = this.config['default_node_localhost'];
+        if (
+          this.isLocalBrowserHost() &&
+          currentHost &&
+          localhost.includes(currentHost)
+        ) {
+          this.apiUrl = localhost;
         } else {
-          this.apiUrl = this.defaults[1]; // testnet
+          this.apiUrl = this.config['default_node_testnet'];
         }
         this.routeurHubService.setHubState({ apiUrl: this.apiUrl });
         this.deployerService.setState({ apiUrl: this.apiUrl });
         this.syncChainName(this.apiUrl);
       }
+      this.peersSourceUrl = this.peersSourceFor(this.apiUrl);
       this.getPeers();
     });
   }
@@ -92,9 +100,8 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
     if (!apiUrl) {
       return;
     }
-    let url: URL;
     try {
-      url = new URL(apiUrl);
+      const url = new URL(apiUrl);
       apiUrl = (url.origin + url.pathname).replace(/\/$/, '');
     } catch (error) {
       console.error(error);
@@ -104,10 +111,29 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
     this.deployerService.setState({ apiUrl: this.apiUrl });
     this.routeurHubService.setHubState({ apiUrl: this.apiUrl });
     this.syncChainName(this.apiUrl);
-    if (!this.defaults.includes(this.apiUrl)) {
+
+    // Gossip peers stay in the peers optgroup — do not pollute presets.
+    if (
+      !this.defaults.includes(this.apiUrl) &&
+      !this.isGossipPeerUrl(this.apiUrl)
+    ) {
       this.defaults.push(this.apiUrl);
     }
-    this.getPeers();
+
+    // Keep peers list tied to a real JSON-RPC endpoint (testnet/mainnet/NCTL).
+    const nextPeersSource = this.peersSourceFor(this.apiUrl);
+    const peersSourceChanged = nextPeersSource !== this.peersSourceUrl;
+    this.peersSourceUrl = nextPeersSource;
+
+    if (peersSourceChanged || !this.peers?.length) {
+      this.getPeers();
+    } else if (!this.isGossipPeerUrl(this.apiUrl)) {
+      this.getStatus();
+      this.getStateRootHash();
+    } else {
+      this.status = '';
+      this.changeDetectorRef.markForCheck();
+    }
     this.routeurHubService.refreshPurse();
   }
 
@@ -146,13 +172,18 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
   }
 
   getPeers(): void {
-    this.apiUrl &&
+    const url = this.peersSourceUrl || this.apiUrl;
+    url &&
       (this.getPeersSubscription = this.deployerService
-        .getPeers(this.apiUrl)
+        .getPeers(url)
         .subscribe((peersResult) => {
-          this.peers = peersResult as Peer[];
-          this.getStatus();
-          this.getStateRootHash();
+          this.peers = Array.isArray(peersResult) ? peersResult : [];
+          if (!this.isGossipPeerUrl(this.apiUrl)) {
+            this.getStatus();
+            this.getStateRootHash();
+          } else {
+            this.status = '';
+          }
           this.getPeersSubscription.unsubscribe();
           this.changeDetectorRef.markForCheck();
         }));
@@ -174,5 +205,50 @@ export class StateRootHashComponent implements OnDestroy, AfterViewInit {
     this.resultService.copyClipboard(value);
   }
 
-  trackByFn = (index: number, item: Peer): string => item.node_id;
+  trackByFn = (_index: number, item: Peer): string =>
+    `${item.node_id}|${item.address}`;
+
+  /** Local docker/dev stack in the browser — keep localhost preset. */
+  private isLocalBrowserHost(): boolean {
+    const host = this.window?.location.hostname || '';
+    return host === 'localhost' || host === '127.0.0.1';
+  }
+
+  /**
+   * Hosted sites (e.g. casper-deployer.interchouette.net): omit localhost.
+   * Local browser host: include NCTL localhost preset.
+   */
+  private buildDefaults(): string[] {
+    const defaults = [
+      this.config['default_node_testnet'],
+      this.config['default_node_mainnet'],
+    ];
+    if (this.isLocalBrowserHost()) {
+      defaults.unshift(this.config['default_node_localhost']);
+    }
+    return defaults;
+  }
+
+  /** Casper gossip/network peers from info_get_peers are typically :35000. */
+  private isGossipPeerUrl(apiUrl: string): boolean {
+    try {
+      const url = new URL(
+        apiUrl.includes('://') ? apiUrl : `http://${apiUrl}`,
+      );
+      return url.port === '35000';
+    } catch {
+      return /:35000(?:\/|$)/.test(apiUrl);
+    }
+  }
+
+  private peersSourceFor(apiUrl: string): string {
+    if (this.isGossipPeerUrl(apiUrl)) {
+      return (
+        this.peersSourceUrl ||
+        this.config['default_node_testnet'] ||
+        apiUrl
+      );
+    }
+    return apiUrl;
+  }
 }

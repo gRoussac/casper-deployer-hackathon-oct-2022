@@ -7,3 +7,5 @@ casper-deployer.code-workspace
 www/coverage/
 www/dist/
 www/node_modules/
+.github_credentials
+.cursor

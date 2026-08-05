@@ -50,7 +50,7 @@ Legacy launcher ports **7777/9999** and integration presets are removed. Local t
 
 - Node.js ≥ 20 (22 recommended)
 - npm ≥ 10
-- Optional: Rust + `wasm-pack` to rebuild `wasm/` or refresh SDK packs from [casper-rust-wasm-sdk](https://github.com/casper-ecosystem/casper-rust-wasm-sdk)
+- Optional: Rust + `wasm-pack` to rebuild `wasm/` or refresh SDK packs from [casper-rust-wasm-sdk](https://github.com/casper-ecosystem/casper-rust-wasm-sdk). `make -C wasm pack` / `ensure-binaryen` pins Binaryen **version_130** (not apt / not wasm-pack's 117).
 
 ## Local development
 
@@ -113,7 +113,7 @@ The app vendors **slim** SDK packs under `casper-rust-wasm-sdk/` (not the full d
 
 **Automation (this repo):** Actions → `refresh-slim-sdk-packs` (`workflow_dispatch`). It clones the public SDK, builds the two slim packs, and opens a PR into `dev` (needs `GH_PAT_DEPLOY`). Optional inputs: `sdk_ref` (default `dev`), `sdk_repo` (default `casper-ecosystem/casper-rust-wasm-sdk`).
 
-Manual refresh from a local SDK checkout:
+Manual refresh from a local SDK checkout (Binaryen 130 on `PATH` first — e.g. `make -C /path/to/casper-deployer/wasm ensure-binaryen` then `export PATH="$(cat /path/to/casper-deployer/wasm/.tools/wasm-opt-bin):$PATH"`):
 
 ```shell
 # browser
@@ -132,6 +132,8 @@ rm -rf /path/to/casper-deployer/casper-rust-wasm-sdk/pkg \
 cp -a pkg /path/to/casper-deployer/casper-rust-wasm-sdk/pkg
 cp -a pkg-nodejs /path/to/casper-deployer/casper-rust-wasm-sdk/pkg-nodejs
 ```
+
+Helper WASM crate: `make -C wasm pack` (same Binaryen 130 pin).
 
 Then `cd www && npm install`.
 

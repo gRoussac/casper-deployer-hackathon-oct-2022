@@ -52,6 +52,10 @@ casper/*/tests/target/debug
 wasm/target/
 */target/*
 
+# Local Binaryen pin (make -C wasm ensure-binaryen)
+.tools/
+wasm/.tools/
+
 # local workspace file (product workspace lives in private .cursor)
 casper-deployer.code-workspace
 *.code-workspace

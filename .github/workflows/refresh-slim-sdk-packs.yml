@@ -45,10 +45,17 @@ jobs:
           curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
           sudo apt-get update && sudo apt-get install -y jq
 
+      - name: Ensure Binaryen 130
+        run: make -C wasm ensure-binaryen
+
       - name: Build slim browser + Node packs
         working-directory: _sdk
+        env:
+          BINARYEN_PATH_FILE: ${{ github.workspace }}/wasm/.tools/wasm-opt-bin
         run: |
           set -euo pipefail
+          export PATH="$(cat "${BINARYEN_PATH_FILE}"):${PATH}"
+          wasm-opt --version
           wasm-pack build --target web --release --out-dir pkg . \
             --no-default-features --features transaction,helpers,watcher
           wasm-pack build --target nodejs --release --out-dir pkg-nodejs . \

@@ -15,7 +15,6 @@ jest.mock('casper-rust-wasm-sdk', () => ({
     signDeploy: jest.fn().mockResolvedValue({}),
     signTransaction: jest.fn().mockResolvedValue({}),
   })),
-  Deploy: jest.fn(),
   Transaction: jest.fn(),
 }));
 

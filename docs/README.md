@@ -20,14 +20,14 @@ Browser calls never talk to public nodes directly for RPC — the Nest API (`/ap
 | ----------- | ----------------------------------------------------------------------------------------------------------------- |
 | Frontend    | Angular 22, Nx, Tailwind                                                                                          |
 | API         | NestJS 11 (JSON-RPC facade + SSE proxy)                                                                           |
-| Casper      | `casper-rust-wasm-sdk` 2.2.2 (browser + nodejs packs)                                                             |
+| Casper      | `casper-rust-wasm-sdk` 2.2.2 slim packs (browser `transaction,helpers,watcher`; Nest `transaction,deploy,helpers`) |
 | Helper WASM | `wasm/` crate (`deployer`) for small encoding helpers                                                             |
 | Tests       | Jest, Cypress                                                                                                     |
 | Hosting     | Docker / [casper-deployer.interchouette.net](https://casper-deployer.interchouette.net/) (`PORT`, default `4242`) |
 
 ## Repository layout
 
-- `casper-rust-wasm-sdk/` — vendored browser (`pkg`) and Node (`pkg-nodejs`) SDK builds
+- `casper-rust-wasm-sdk/` — vendored slim browser (`pkg`) and Node (`pkg-nodejs`) SDK builds (see `MANIFEST.md`)
 - `docker/` — Dockerfile + compose (build from **repo root**)
 - `docs/` — this README + security policy
 - `wasm/` — small custom Rust/WASM helpers
@@ -109,13 +109,28 @@ Open http://localhost:4242/
 
 ## SDK upgrade note
 
-The app vendors SDK packs under `casper-rust-wasm-sdk/`. To refresh from a local checkout of [casper-rust-wasm-sdk](https://github.com/casper-ecosystem/casper-rust-wasm-sdk) (e.g. tag `v2.2.2`):
+The app vendors **slim** SDK packs under `casper-rust-wasm-sdk/` (not the full default build). Feature sets and sizes are recorded in [`../casper-rust-wasm-sdk/MANIFEST.md`](../casper-rust-wasm-sdk/MANIFEST.md).
+
+**Automation (this repo):** Actions → `refresh-slim-sdk-packs` (`workflow_dispatch`). It clones the public SDK, builds the two slim packs, and opens a PR into `dev` (needs `GH_PAT_DEPLOY`). Optional inputs: `sdk_ref` (default `dev`), `sdk_repo` (default `casper-ecosystem/casper-rust-wasm-sdk`).
+
+Manual refresh from a local SDK checkout:
 
 ```shell
-rm -rf casper-rust-wasm-sdk/pkg casper-rust-wasm-sdk/pkg-nodejs
-cp -a /path/to/casper-rust-wasm-sdk/pkg casper-rust-wasm-sdk/pkg
-cp -a /path/to/casper-rust-wasm-sdk/pkg-nodejs casper-rust-wasm-sdk/pkg-nodejs
-# ensure pkg-nodejs package.json name is casper-rust-wasm-sdk-nodejs
+# browser
+cd /path/to/casper-rust-wasm-sdk
+wasm-pack build --target web --release --out-dir pkg . \
+  --no-default-features --features transaction,helpers,watcher
+# Nest API
+wasm-pack build --target nodejs --release --out-dir pkg-nodejs . \
+  --no-default-features --features transaction,deploy,helpers
+jq '.name = "casper-rust-wasm-sdk-nodejs"' pkg-nodejs/package.json > pkg-nodejs/package.json.tmp \
+  && mv pkg-nodejs/package.json.tmp pkg-nodejs/package.json
+
+# copy into deployer
+rm -rf /path/to/casper-deployer/casper-rust-wasm-sdk/pkg \
+       /path/to/casper-deployer/casper-rust-wasm-sdk/pkg-nodejs
+cp -a pkg /path/to/casper-deployer/casper-rust-wasm-sdk/pkg
+cp -a pkg-nodejs /path/to/casper-deployer/casper-rust-wasm-sdk/pkg-nodejs
 ```
 
 Then `cd www && npm install`.

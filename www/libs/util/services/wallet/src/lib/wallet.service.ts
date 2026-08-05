@@ -1,4 +1,4 @@
-import { CasperWallet, Deploy, Transaction } from 'casper-rust-wasm-sdk';
+import { CasperWallet, Transaction } from 'casper-rust-wasm-sdk';
 
 export class WalletService {
   private wallet: CasperWallet | null = null;
@@ -98,10 +98,10 @@ export class WalletService {
 
   /** @deprecated Use signTransaction */
   public async signDeploy(
-    deploy: Deploy | Transaction,
+    deploy: Transaction,
     public_key?: string,
   ): Promise<Transaction> {
-    return this.signTransaction(deploy as unknown as Transaction, public_key);
+    return this.signTransaction(deploy, public_key);
   }
 }
 

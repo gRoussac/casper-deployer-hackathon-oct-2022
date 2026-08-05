@@ -1,0 +1,143 @@
+name: refresh-slim-sdk-packs
+
+# Consumer-side refresh: clone public casper-rust-wasm-sdk, build slim packs, PR into this repo.
+# Requires secret GH_PAT_DEPLOY (write to Interchouette/casper-deployer fork + PR on org).
+
+on:
+  workflow_dispatch:
+    inputs:
+      sdk_ref:
+        description: "SDK git ref (branch, tag, or SHA)"
+        required: true
+        default: "dev"
+      sdk_repo:
+        description: "SDK GitHub repo (owner/name)"
+        required: true
+        default: "casper-ecosystem/casper-rust-wasm-sdk"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout deployer fork
+        uses: actions/checkout@v5
+        with:
+          repository: Interchouette/casper-deployer
+          ref: dev
+          token: ${{ secrets.GH_PAT_DEPLOY }}
+
+      - name: Checkout SDK source
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ inputs.sdk_repo }}
+          ref: ${{ inputs.sdk_ref }}
+          path: _sdk
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack and jq
+        run: |
+          curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+          sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Build slim browser + Node packs
+        working-directory: _sdk
+        run: |
+          set -euo pipefail
+          wasm-pack build --target web --release --out-dir pkg . \
+            --no-default-features --features transaction,helpers,watcher
+          wasm-pack build --target nodejs --release --out-dir pkg-nodejs . \
+            --no-default-features --features transaction,deploy,helpers
+          jq '.name = "casper-rust-wasm-sdk-nodejs"' pkg-nodejs/package.json \
+            > pkg-nodejs/package.json.tmp
+          mv pkg-nodejs/package.json.tmp pkg-nodejs/package.json
+
+      - name: Sync packs into casper-rust-wasm-sdk/
+        run: |
+          set -euo pipefail
+          DEST=casper-rust-wasm-sdk
+          rm -rf "$DEST/pkg" "$DEST/pkg-nodejs"
+          cp -a _sdk/pkg "$DEST/pkg"
+          cp -a _sdk/pkg-nodejs "$DEST/pkg-nodejs"
+
+          SHA=$(git -C _sdk rev-parse HEAD)
+          SHORT=$(git -C _sdk rev-parse --short HEAD)
+          WEB_SIZE=$(wc -c < "$DEST/pkg/casper_rust_wasm_sdk_bg.wasm")
+          NODE_SIZE=$(wc -c < "$DEST/pkg-nodejs/casper_rust_wasm_sdk_bg.wasm")
+          {
+            echo "# Vendored casper-rust-wasm-sdk packs"
+            echo
+            echo "| Field | Value |"
+            echo "| --- | --- |"
+            echo "| SDK repo | \`${{ inputs.sdk_repo }}\` |"
+            echo "| SDK ref | \`${{ inputs.sdk_ref }}\` |"
+            echo "| SDK git SHA | \`$SHA\` (\`$SHORT\`) |"
+            echo "| Built with | deployer \`refresh-slim-sdk-packs\` workflow |"
+            echo
+            echo "## Feature sets"
+            echo
+            echo "| Pack | Target | Cargo features |"
+            echo "| --- | --- | --- |"
+            echo "| \`pkg/\` | browser (web) | \`transaction,helpers,watcher\` (\`--no-default-features\`) |"
+            echo "| \`pkg-nodejs/\` | Node (Nest API) | \`transaction,deploy,helpers\` (\`--no-default-features\`) |"
+            echo
+            echo "Dropped vs full default: \`binary-port\`, \`contract\`; browser also drops \`deploy\`; Node also drops \`watcher\`."
+            echo
+            echo "## Wasm sizes"
+            echo
+            echo "| File | Bytes |"
+            echo "| --- | --- |"
+            echo "| \`pkg/casper_rust_wasm_sdk_bg.wasm\` | $WEB_SIZE |"
+            echo "| \`pkg-nodejs/casper_rust_wasm_sdk_bg.wasm\` | $NODE_SIZE |"
+          } > "$DEST/MANIFEST.md"
+
+          echo "sdk_sha=$SHORT" >> "$GITHUB_ENV"
+
+      - name: Commit and push branch
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          BRANCH="update-wasm-${GITHUB_RUN_ID}"
+          git checkout -b "$BRANCH"
+          git add casper-rust-wasm-sdk/pkg casper-rust-wasm-sdk/pkg-nodejs casper-rust-wasm-sdk/MANIFEST.md
+          if git diff --cached --quiet; then
+            echo "No wasm pack changes; skipping PR"
+            echo "skip=true" >> "$GITHUB_ENV"
+          else
+            git commit -m "chore(sdk): refresh slim wasm packs from ${{ env.sdk_sha }}"
+            git push origin "$BRANCH"
+            echo "skip=false" >> "$GITHUB_ENV"
+            echo "branch=$BRANCH" >> "$GITHUB_ENV"
+          fi
+
+      - name: Create Pull Request
+        if: env.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT_DEPLOY }}
+        run: |
+          gh pr create \
+            --repo Interchouette-ITC/casper-deployer \
+            --base dev \
+            --head "Interchouette:${{ env.branch }}" \
+            --title "chore(sdk): refresh slim wasm packs (${{ env.sdk_sha }})" \
+            --body "$(cat <<EOF
+          ## Summary
+          Automated slim pack refresh from \`${{ inputs.sdk_repo }}@${{ inputs.sdk_ref }}\` (\`${{ env.sdk_sha }}\`).
+
+          - Browser \`pkg\`: \`transaction,helpers,watcher\`
+          - Node \`pkg-nodejs\`: \`transaction,deploy,helpers\`
+          - Built by this repo's \`refresh-slim-sdk-packs\` workflow (consumer pull)
+
+          See \`casper-rust-wasm-sdk/MANIFEST.md\`.
+
+          ## Test plan
+          - [ ] \`cd www && npm install && npm test\`
+          - [ ] Smoke frontend + Nest against local NCTL or testnet
+          EOF
+          )"

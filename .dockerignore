@@ -1,4 +1,4 @@
-# Keep Docker build context lean (repo root is the build context).
+# Build context = repo root (docker build -f docker/Dockerfile .)
 .git
 .github
 .github_credentials
@@ -11,24 +11,33 @@
 **/*.swp
 **/*.swo
 
+node_modules
 **/node_modules
-**/dist
-**/coverage
+.nx
 **/.nx
-**/tmp
+.angular
 **/.angular
+dist
+**/dist
+tmp
+out-tsc
+coverage
 **/cypress/videos
 **/cypress/screenshots
+.env
+.env.*
+!.env.example
+www/.env*
+www/**/*.map
+
+# Rust / wasm build artifacts (not needed in Node image)
+wasm/target
+**/target
 
 # Local tooling / docs not needed in image
 *.md
-!README.md
 Makefile
 .dockerignore
-*.code-workspace
+docker/*.md
 docs/
-
-www/.env*
-www/**/*.map
-wasm/target
-**/target
+*.code-workspace

@@ -1,9 +1,62 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# compiled output
+dist
+/tmp
+/out-tsc
+coverage
+
+# dependencies
+node_modules
+
+# Nx / Angular caches
+.nx
+.angular
+
+# local caches
+.cache/
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# misc
+/.sass-cache
+/connect.lock
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Casper / wasm build artifacts
 .accounts
 casper/contracts/*/target
 casper/*/tests/target/debug
 wasm/target/
 */target/*
+
+# local workspace file (product workspace lives in private .cursor)
 casper-deployer.code-workspace
-www/coverage/
-www/dist/
-www/node_modules/
+*.code-workspace
+
+# local env (never commit)
+.env
+.env.*
+!.env.example

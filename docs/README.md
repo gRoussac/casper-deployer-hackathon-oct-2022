@@ -111,14 +111,26 @@ Open http://localhost:4242/
 
 The app vendors **slim** SDK packs under `casper-rust-wasm-sdk/` (not the full default build). Feature sets and sizes are recorded in [`../casper-rust-wasm-sdk/MANIFEST.md`](../casper-rust-wasm-sdk/MANIFEST.md).
 
-Automation: on Interchouette-ITC/casper-rust-wasm-sdk, workflow `deploy-slim-packs-to-deployer.yml` runs `make pack-deployer` and opens a PR into this repo (fork head → org `dev`). Manual refresh:
+**Automation (this repo):** Actions → `refresh-slim-sdk-packs` (`workflow_dispatch`). It clones the public SDK, builds the two slim packs, and opens a PR into `dev` (needs `GH_PAT_DEPLOY`). Optional inputs: `sdk_ref` (default `dev`), `sdk_repo` (default `casper-ecosystem/casper-rust-wasm-sdk`).
+
+Manual refresh from a local SDK checkout:
 
 ```shell
-cd /path/to/casper-rust-wasm-sdk && make pack-deployer
-rm -rf casper-rust-wasm-sdk/pkg casper-rust-wasm-sdk/pkg-nodejs
-cp -a /path/to/casper-rust-wasm-sdk/pkg casper-rust-wasm-sdk/pkg
-cp -a /path/to/casper-rust-wasm-sdk/pkg-nodejs casper-rust-wasm-sdk/pkg-nodejs
-cp -a /path/to/casper-rust-wasm-sdk/MANIFEST.md casper-rust-wasm-sdk/MANIFEST.md  # if present
+# browser
+cd /path/to/casper-rust-wasm-sdk
+wasm-pack build --target web --release --out-dir pkg . \
+  --no-default-features --features transaction,helpers,watcher
+# Nest API
+wasm-pack build --target nodejs --release --out-dir pkg-nodejs . \
+  --no-default-features --features transaction,deploy,helpers
+jq '.name = "casper-rust-wasm-sdk-nodejs"' pkg-nodejs/package.json > pkg-nodejs/package.json.tmp \
+  && mv pkg-nodejs/package.json.tmp pkg-nodejs/package.json
+
+# copy into deployer
+rm -rf /path/to/casper-deployer/casper-rust-wasm-sdk/pkg \
+       /path/to/casper-deployer/casper-rust-wasm-sdk/pkg-nodejs
+cp -a pkg /path/to/casper-deployer/casper-rust-wasm-sdk/pkg
+cp -a pkg-nodejs /path/to/casper-deployer/casper-rust-wasm-sdk/pkg-nodejs
 ```
 
 Then `cd www && npm install`.

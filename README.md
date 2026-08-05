@@ -29,6 +29,7 @@ Browser calls never talk to public nodes directly for RPC — the Nest API (`/ap
 
 - `casper-rust-wasm-sdk/` — vendored browser (`pkg`) and Node (`pkg-nodejs`) SDK builds
 - `docker/` — Dockerfile + compose (build from **repo root**)
+- `docs/` — security policy and doc index (Hub overview lives in private `.cursor/scripts/DOCKERHUB.md`)
 - `wasm/` — small custom Rust/WASM helpers
 - `www/` — Nx monorepo (frontend + api)
 
@@ -129,6 +130,14 @@ Then `cd www && npm install`.
 
 Rollback to Casper 1.x: `git checkout v1.6`
 
+## Docs
+
+| Doc | Description |
+| --- | --- |
+| [`docs/`](docs/) | Doc index + security policy |
+| [`docs/SECURITY.md`](docs/SECURITY.md) | Vulnerability reporting |
+| [`docker/`](docker/) | Dockerfile / Compose |
+
 ## License / security
 
-See [LICENSE.md](LICENSE.md) and [SECURITY.md](SECURITY.md).
+See [LICENSE.md](LICENSE.md) and [docs/SECURITY.md](docs/SECURITY.md).

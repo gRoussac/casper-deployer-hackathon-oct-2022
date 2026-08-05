@@ -67,10 +67,7 @@ docker-push-release-hub:
 
 docker-push-release: docker-push-release-hub
 
-## Optional: sync Hub repo description (requires DOCKERHUB_TOKEN + DOCKER_USERNAME).
+## Optional: sync Hub repo Overview from private .cursor/scripts/DOCKERHUB.md
+## (docker login, or DOCKER_USERNAME / DOCKER_PASSWORD).
 docker-hub-description:
-	@if [ -z "$${DOCKERHUB_TOKEN:-}" ] || [ -z "$${DOCKER_USERNAME:-}" ]; then \
-		echo "skip docker-hub-description (DOCKERHUB_TOKEN / DOCKER_USERNAME unset)"; \
-		exit 0; \
-	fi
-	@echo "Hub description sync not configured for casper-deployer yet"
+	python3 .cursor/scripts/sync-hub-description.py

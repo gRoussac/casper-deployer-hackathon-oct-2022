@@ -1,6 +1,16 @@
 # Keep Docker build context lean (repo root is the build context).
-**/.git
-**/.github
+.git
+.github
+.github_credentials
+.gitignore
+.cursor
+.idea
+.vscode
+.DS_Store
+**/*~
+**/*.swp
+**/*.swo
+
 **/node_modules
 **/dist
 **/coverage
@@ -9,9 +19,15 @@
 **/.angular
 **/cypress/videos
 **/cypress/screenshots
-**/*.md
+
+# Local tooling / docs not needed in image
+*.md
 !README.md
-casper-escrow.code-workspace
+Makefile
+.dockerignore
+*.code-workspace
+docs/
+
 www/.env*
 www/**/*.map
 wasm/target

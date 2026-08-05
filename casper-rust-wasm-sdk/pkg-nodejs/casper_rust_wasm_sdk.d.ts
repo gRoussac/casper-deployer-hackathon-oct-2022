@@ -82,19 +82,6 @@ export class BlockIdentifier {
     toJson(): any;
 }
 
-/**
- * Represents the body of an event, containing processed deploy information.
- */
-export class Body {
-    private constructor();
-    free(): void;
-    [Symbol.dispose](): void;
-    readonly get_deploy_processed: TransactionProcessed | undefined;
-    readonly get_transaction_processed: TransactionProcessed | undefined;
-    get transaction_processed(): TransactionProcessed | undefined;
-    set transaction_processed(value: TransactionProcessed | null | undefined);
-}
-
 export class Bytes {
     free(): void;
     [Symbol.dispose](): void;
@@ -361,55 +348,6 @@ export class EraId {
     [Symbol.dispose](): void;
     constructor(value: bigint);
     value(): bigint;
-}
-
-/**
- * Represents the result of parsing an event, containing error information and the event body.
- */
-export class EventParseResult {
-    private constructor();
-    free(): void;
-    [Symbol.dispose](): void;
-    get body(): Body | undefined;
-    set body(value: Body | null | undefined);
-    get err(): string | undefined;
-    set err(value: string | null | undefined);
-}
-
-/**
- * Represents the result of an execution, either Success or Failure.
- */
-export class ExecutionResult {
-    private constructor();
-    free(): void;
-    [Symbol.dispose](): void;
-    /**
-     * Optional Failure information.
-     */
-    get Failure(): Failure | undefined;
-    /**
-     * Optional Failure information.
-     */
-    set Failure(value: Failure | null | undefined);
-    /**
-     * Optional Success information.
-     */
-    get Success(): Version2 | undefined;
-    /**
-     * Optional Success information.
-     */
-    set Success(value: Version2 | null | undefined);
-}
-
-/**
- * Represents a failure response containing an error message.
- */
-export class Failure {
-    private constructor();
-    free(): void;
-    [Symbol.dispose](): void;
-    cost: string;
-    error_message: string;
 }
 
 export class GetAccountResult {
@@ -791,16 +729,6 @@ export class HashAddr {
     toHexString(): string;
 }
 
-export class HashString {
-    private constructor();
-    free(): void;
-    [Symbol.dispose](): void;
-    toString(): string;
-    hash: string;
-    readonly Deploy: string;
-    readonly Version1: string;
-}
-
 export class IntoUnderlyingByteSource {
     private constructor();
     free(): void;
@@ -887,25 +815,6 @@ export class ListRpcsResult {
     readonly schema: any;
 }
 
-export class Message {
-    private constructor();
-    free(): void;
-    [Symbol.dispose](): void;
-    String: string;
-}
-
-export class Messages {
-    private constructor();
-    free(): void;
-    [Symbol.dispose](): void;
-    block_index: bigint;
-    entity_hash: string;
-    message: Message;
-    topic_index: number;
-    topic_name_hash: string;
-    topic_name: string;
-}
-
 export class PackageHash {
     free(): void;
     [Symbol.dispose](): void;
@@ -923,13 +832,6 @@ export class Path {
     constructor(path: any);
     toJson(): any;
     toString(): string;
-}
-
-export class Payment {
-    private constructor();
-    free(): void;
-    [Symbol.dispose](): void;
-    source: string;
 }
 
 export class PaymentStrParams {
@@ -980,13 +882,6 @@ export class PublicKey {
     toAccountHash(): AccountHash;
     toJson(): any;
     toPurseUref(): URef;
-}
-
-export class PublicKeyString {
-    private constructor();
-    free(): void;
-    [Symbol.dispose](): void;
-    PublicKey: string;
 }
 
 export class PurseIdentifier {
@@ -1096,12 +991,6 @@ export class QueryGlobalStateResult {
     readonly stored_value: any;
 }
 
-export class RecordId {
-    free(): void;
-    [Symbol.dispose](): void;
-    constructor(value: number);
-}
-
 export class SDK {
     free(): void;
     [Symbol.dispose](): void;
@@ -1113,43 +1002,6 @@ export class SDK {
      * JavaScript Alias for `put_transaction`.
      */
     account_put_transaction(transaction: Transaction, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutTransactionResult>;
-    /**
-     * Calls a smart contract entry point with the specified parameters and returns the result.
-     *
-     * # Arguments
-     *
-     * * `transaction_params` - Transaction parameters.
-     * * `builder_params` - Transaction Builder parameters.
-     * * `rpc_address` - An optional rpc address to send the request to.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the call.
-     */
-    call_entrypoint(builder_params: TransactionBuilderParams, transaction_params: TransactionStrParams, rpc_address?: string | null): Promise<PutTransactionResult>;
-    /**
-     * Calls a smart contract entry point with the specified parameters and returns the result.
-     *
-     * # Arguments
-     *
-     * * `deploy_params` - The deploy parameters.
-     * * `session_params` - The session parameters.
-     * * `payment_amount` - The payment amount as a string.
-     * * `rpc_address` - An optional rpc address to send the request to.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the call.
-     */
-    call_entrypoint_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string | null): Promise<PutDeployResult>;
     /**
      * JavaScript Alias for the `get_block`.
      *
@@ -1287,40 +1139,6 @@ export class SDK {
      * Parsed balance options as a `GetBalanceOptions` struct.
      */
     get_balance_options(options: any): getBalanceOptions;
-    get_binary_available_block_range(node_address?: string | null): Promise<any>;
-    get_binary_block_header_by_hash(block_hash: BlockHash, node_address?: string | null): Promise<any>;
-    get_binary_block_header_by_height(height: bigint, node_address?: string | null): Promise<any>;
-    get_binary_block_synchronizer_status(node_address?: string | null): Promise<any>;
-    get_binary_block_with_signatures_by_hash(block_hash: BlockHash, node_address?: string | null): Promise<any>;
-    get_binary_block_with_signatures_by_height(height: bigint, node_address?: string | null): Promise<any>;
-    get_binary_chainspec_raw_bytes(node_address?: string | null): Promise<any>;
-    get_binary_consensus_status(node_address?: string | null): Promise<any>;
-    get_binary_consensus_validator_changes(node_address?: string | null): Promise<any>;
-    get_binary_delegator_reward_by_block_hash(validator_key: PublicKey, delegator_key: PublicKey, block_hash: BlockHash, node_address?: string | null): Promise<any>;
-    get_binary_delegator_reward_by_block_height(validator_key: PublicKey, delegator_key: PublicKey, block_height: bigint, node_address?: string | null): Promise<any>;
-    get_binary_delegator_reward_by_era(validator_key: PublicKey, delegator_key: PublicKey, era: EraId, node_address?: string | null): Promise<any>;
-    get_binary_global_state_item(key: Key, path: string[], node_address?: string | null): Promise<any>;
-    get_binary_global_state_item_by_block_hash(block_hash: BlockHash, key: Key, path: string[], node_address?: string | null): Promise<any>;
-    get_binary_global_state_item_by_block_height(block_height: bigint, key: Key, path: string[], node_address?: string | null): Promise<any>;
-    get_binary_global_state_item_by_state_root_hash(state_root_hash: Digest, key: Key, path: string[], node_address?: string | null): Promise<any>;
-    get_binary_last_progress(node_address?: string | null): Promise<any>;
-    get_binary_latest_block_header(node_address?: string | null): Promise<any>;
-    get_binary_latest_block_with_signatures(node_address?: string | null): Promise<any>;
-    get_binary_latest_switch_block_header(node_address?: string | null): Promise<any>;
-    get_binary_network_name(node_address?: string | null): Promise<any>;
-    get_binary_next_upgrade(node_address?: string | null): Promise<any>;
-    get_binary_node_status(node_address?: string | null): Promise<any>;
-    get_binary_peers(node_address?: string | null): Promise<any>;
-    get_binary_protocol_version(node_address?: string | null): Promise<any>;
-    get_binary_reactor_state(node_address?: string | null): Promise<any>;
-    get_binary_read_record(record_id: RecordId, key: Uint8Array, node_address?: string | null): Promise<any>;
-    get_binary_transaction_by_hash(hash: TransactionHash, with_finalized_approvals: boolean, node_address?: string | null): Promise<any>;
-    get_binary_try_accept_transaction(transaction: Transaction, node_address?: string | null): Promise<any>;
-    get_binary_try_speculative_execution(transaction: Transaction, node_address?: string | null): Promise<any>;
-    get_binary_uptime(node_address?: string | null): Promise<any>;
-    get_binary_validator_reward_by_block_hash(validator_key: PublicKey, block_hash: BlockHash, node_address?: string | null): Promise<any>;
-    get_binary_validator_reward_by_block_height(validator_key: PublicKey, block_height: bigint, node_address?: string | null): Promise<any>;
-    get_binary_validator_reward_by_era(validator_key: PublicKey, era: EraId, node_address?: string | null): Promise<any>;
     /**
      * Retrieves block information using the provided options.
      *
@@ -1618,43 +1436,6 @@ export class SDK {
     info_get_transaction(options?: getTransactionOptions | null): Promise<GetTransactionResult>;
     info_get_validator_change(verbosity?: Verbosity | null, rpc_address?: string | null): Promise<GetValidatorChangesResult>;
     /**
-     * Installs a smart contract with the specified parameters and returns the result.
-     *
-     * # Arguments
-     * .
-     * * `transaction_params` - Transaction parameters.
-     * * `transaction_bytes` - Transaction Bytes to install
-     * * `rpc_address` - An optional rpc address to send the request to.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `PutTransactionResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the installation.
-     */
-    install(transaction_params: TransactionStrParams, transaction_bytes: Bytes, rpc_address?: string | null): Promise<PutTransactionResult>;
-    /**
-     * Installs a smart contract with the specified parameters and returns the result.
-     *
-     * # Arguments
-     *
-     * * `deploy_params` - The deploy parameters.
-     * * `session_params` - The session parameters.
-     * * `payment_amount` - The payment amount as a string.
-     * * `rpc_address` - An optional rpc address to send the request to.
-     *
-     * # Returns
-     *
-     * A `Result` containing either a `PutDeployResult` or a `JsError` in case of an error.
-     *
-     * # Errors
-     *
-     * Returns a `JsError` if there is an error during the installation.
-     */
-    install_deploy(deploy_params: DeployStrParams, session_params: SessionStrParams, payment_amount: string, rpc_address?: string | null): Promise<PutDeployResult>;
-    /**
      * Lists available RPCs using the provided options.
      *
      * # Arguments
@@ -1823,22 +1604,6 @@ export class SDK {
      * Parsed query balance options as a `QueryBalanceOptions` struct.
      */
     query_balance_options(options: any): queryBalanceOptions;
-    /**
-     * JavaScript function for query_contract_dict with deserialized options.
-     */
-    query_contract_dict(options?: queryContractDictOptions | null): Promise<GetDictionaryItemResult>;
-    /**
-     * Deserialize query_contract_dict_options from a JavaScript object.
-     */
-    query_contract_dict_options(options: any): queryContractDictOptions;
-    /**
-     * JavaScript function for query_contract_key with deserialized options.
-     */
-    query_contract_key(options?: queryContractKeyOptions | null): Promise<QueryGlobalStateResult>;
-    /**
-     * Deserialize query_contract_key_options from a JavaScript object.
-     */
-    query_contract_key_options(options: any): queryContractKeyOptions;
     /**
      * Retrieves global state information using the provided options.
      *
@@ -2057,62 +1822,6 @@ export class SDK {
      * A `Result` containing the result of the transfer or a `JsError` in case of an error.
      */
     transfer_transaction(maybe_source: URef | null | undefined, target_account: string, amount: string, transaction_params: TransactionStrParams, maybe_id?: string | null, verbosity?: Verbosity | null, rpc_address?: string | null): Promise<PutTransactionResult>;
-    /**
-     * Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
-     * Legacy alias
-     *
-     * # Arguments
-     *
-     * * `events_url` - The URL to monitor for transaction events.
-     * * `deploy_hash` - The deploy hash to wait for.
-     * * `timeout_duration` - An optional timeout duration in seconds.
-     *
-     * # Returns
-     *
-     * A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
-     */
-    waitDeploy(events_url: string, deploy_hash: string, timeout_duration?: number | null): Promise<Promise<any>>;
-    /**
-     * Waits for a deploy event to be processed asynchronously (JavaScript-friendly).
-     *
-     * # Arguments
-     *
-     * * `events_url` - The URL to monitor for transaction events.
-     * * `target_hash` - The transaction hash to wait for.
-     * * `timeout_duration` - An optional timeout duration in seconds.
-     *
-     * # Returns
-     *
-     * A JavaScript `Promise` resolving to either the processed `EventParseResult` or an error message.
-     */
-    waitTransaction(events_url: string, target_hash: string, timeout_duration?: number | null): Promise<Promise<any>>;
-    /**
-     * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
-     * Legacy alias
-     *
-     * # Arguments
-     *
-     * * `events_url` - The URL to monitor for transaction events.
-     * * `timeout_duration` - An optional timeout duration in seconds.
-     *
-     * # Returns
-     *
-     * A `Watcher` instance.
-     */
-    watchDeploy(events_url: string, timeout_duration?: number | null): Watcher;
-    /**
-     * Creates a new Watcher instance to watch deploys (JavaScript-friendly).
-     *
-     * # Arguments
-     *
-     * * `events_url` - The URL to monitor for transaction events.
-     * * `timeout_duration` - An optional timeout duration in seconds.
-     *
-     * # Returns
-     *
-     * A `Watcher` instance.
-     */
-    watchTransaction(events_url: string, timeout_duration?: number | null): Watcher;
 }
 
 export class SessionStrParams {
@@ -2194,31 +1903,6 @@ export class SpeculativeExecTxnResult {
      * Get the execution result.
      */
     readonly execution_result: any;
-}
-
-/**
- * Represents a subscription to transaction events for wasm32 target architecture.
- */
-export class Subscription {
-    free(): void;
-    [Symbol.dispose](): void;
-    /**
-     * Constructor for Subscription for wasm32 target architecture.
-     *
-     * # Arguments
-     *
-     * * `transaction_hash` - Transaction hash to identify the subscription.
-     * * `event_handler_fn` - Handler function for transaction events.
-     */
-    constructor(target_hash: string, event_handler_fn: Function);
-    /**
-     * Handler function for transaction events.
-     */
-    eventHandlerFn: Function;
-    /**
-     * Transaction target hash to identify the subscription.
-     */
-    targetHash: string;
 }
 
 export class Transaction {
@@ -2347,25 +2031,6 @@ export enum TransactionKind {
     WithdrawBid = 10,
 }
 
-/**
- * Represents processed deploy information.
- */
-export class TransactionProcessed {
-    private constructor();
-    free(): void;
-    [Symbol.dispose](): void;
-    block_hash: string;
-    /**
-     * Result of the execution, either Success or Failure.
-     */
-    execution_result: ExecutionResult;
-    hash: HashString;
-    initiator_addr: PublicKeyString;
-    messages: Messages[];
-    timestamp: string;
-    ttl: string;
-}
-
 export class TransactionStrParams {
     free(): void;
     [Symbol.dispose](): void;
@@ -2446,89 +2111,6 @@ export enum Verbosity {
     Low = 0,
     Medium = 1,
     High = 2,
-}
-
-/**
- * Represents a success response containing a cost value.
- */
-export class Version2 {
-    private constructor();
-    free(): void;
-    [Symbol.dispose](): void;
-    consumed: string;
-    cost: string;
-    get error_message(): string | undefined;
-    set error_message(value: string | null | undefined);
-    initiator: PublicKeyString;
-    limit: string;
-}
-
-/**
- * Represents a deploy watcher responsible for monitoring transaction events.
- *
- * This struct allows clients to subscribe to transaction events, start watching for events,
- * or wait for an event and handle the received deploy event data.
- *
- * # Fields
- *
- * * `events_url` - The URL for transaction events.
- * * `subscriptions` - Vector containing deploy subscriptions.
- * * `active` - Reference-counted cell indicating whether the deploy watcher is active.
- * * `timeout_duration` - Duration representing the optional timeout for watching events.
- */
-export class Watcher {
-    free(): void;
-    [Symbol.dispose](): void;
-    /**
-     * Creates a new `Watcher` instance.
-     *
-     * # Arguments
-     *
-     * * `events_url` - The URL for transaction events.
-     * * `timeout_duration` - Optional duration in milliseconds for watching events. If not provided,
-     *   a default timeout of 60,000 milliseconds (1 minute) is used.
-     *
-     * # Returns
-     *
-     * A new `Watcher` instance.
-     */
-    constructor(events_url: string, timeout_duration?: bigint | null);
-    /**
-     * Starts watching for transaction events (JavaScript-friendly).
-     *
-     * # Returns
-     *
-     * Result containing the serialized transaction events data or an error message.
-     */
-    start(): Promise<any>;
-    /**
-     * Stops watching for transaction events.
-     *
-     * This method sets the deploy watcher as inactive and stops the event listener if it exists.
-     */
-    stop(): void;
-    /**
-     * Subscribes to transaction events.
-     *
-     * # Arguments
-     *
-     * * `subscriptions` - Vector of deploy subscriptions to be added.
-     *
-     * # Returns
-     *
-     * Result indicating success or an error message.
-     */
-    subscribe(subscriptions: Subscription[]): void;
-    /**
-     * Unsubscribes from transaction events based on the provided transaction hash.
-     *
-     * # Arguments
-     *
-     * * `transaction_hash` - The transaction hash to unsubscribe.
-     *
-     * This method removes the deploy subscription associated with the provided transaction hash.
-     */
-    unsubscribe(target_hash: string): void;
 }
 
 /**
@@ -3044,46 +2626,6 @@ export class queryBalanceOptions {
     set state_root_hash_as_string(value: string | null | undefined);
     get state_root_hash(): Digest | undefined;
     set state_root_hash(value: Digest | null | undefined);
-    get verbosity(): Verbosity | undefined;
-    set verbosity(value: Verbosity | null | undefined);
-}
-
-export class queryContractDictOptions {
-    private constructor();
-    free(): void;
-    [Symbol.dispose](): void;
-    get dictionary_item_identifier(): DictionaryItemIdentifier | undefined;
-    set dictionary_item_identifier(value: DictionaryItemIdentifier | null | undefined);
-    get dictionary_item_params(): DictionaryItemStrParams | undefined;
-    set dictionary_item_params(value: DictionaryItemStrParams | null | undefined);
-    get rpc_address(): string | undefined;
-    set rpc_address(value: string | null | undefined);
-    get state_root_hash_as_string(): string | undefined;
-    set state_root_hash_as_string(value: string | null | undefined);
-    get state_root_hash(): Digest | undefined;
-    set state_root_hash(value: Digest | null | undefined);
-    get verbosity(): Verbosity | undefined;
-    set verbosity(value: Verbosity | null | undefined);
-}
-
-export class queryContractKeyOptions {
-    private constructor();
-    free(): void;
-    [Symbol.dispose](): void;
-    get entity_identifier_as_string(): string | undefined;
-    set entity_identifier_as_string(value: string | null | undefined);
-    get entity_identifier(): EntityIdentifier | undefined;
-    set entity_identifier(value: EntityIdentifier | null | undefined);
-    get maybe_block_id_as_string(): string | undefined;
-    set maybe_block_id_as_string(value: string | null | undefined);
-    get maybe_block_identifier(): BlockIdentifier | undefined;
-    set maybe_block_identifier(value: BlockIdentifier | null | undefined);
-    get path_as_string(): string | undefined;
-    set path_as_string(value: string | null | undefined);
-    get path(): Path | undefined;
-    set path(value: Path | null | undefined);
-    get rpc_address(): string | undefined;
-    set rpc_address(value: string | null | undefined);
     get verbosity(): Verbosity | undefined;
     set verbosity(value: Verbosity | null | undefined);
 }

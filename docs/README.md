@@ -20,14 +20,14 @@ Browser calls never talk to public nodes directly for RPC — the Nest API (`/ap
 | ----------- | ----------------------------------------------------------------------------------------------------------------- |
 | Frontend    | Angular 22, Nx, Tailwind                                                                                          |
 | API         | NestJS 11 (JSON-RPC facade + SSE proxy)                                                                           |
-| Casper      | `casper-rust-wasm-sdk` 2.2.2 (browser + nodejs packs)                                                             |
+| Casper      | `casper-rust-wasm-sdk` 2.2.2 slim packs (browser `transaction,helpers,watcher`; Nest `transaction,deploy,helpers`) |
 | Helper WASM | `wasm/` crate (`deployer`) for small encoding helpers                                                             |
 | Tests       | Jest, Cypress                                                                                                     |
 | Hosting     | Docker / [casper-deployer.interchouette.net](https://casper-deployer.interchouette.net/) (`PORT`, default `4242`) |
 
 ## Repository layout
 
-- `casper-rust-wasm-sdk/` — vendored browser (`pkg`) and Node (`pkg-nodejs`) SDK builds
+- `casper-rust-wasm-sdk/` — vendored slim browser (`pkg`) and Node (`pkg-nodejs`) SDK builds (see `MANIFEST.md`)
 - `docker/` — Dockerfile + compose (build from **repo root**)
 - `docs/` — this README + security policy
 - `wasm/` — small custom Rust/WASM helpers
@@ -109,13 +109,16 @@ Open http://localhost:4242/
 
 ## SDK upgrade note
 
-The app vendors SDK packs under `casper-rust-wasm-sdk/`. To refresh from a local checkout of [casper-rust-wasm-sdk](https://github.com/casper-ecosystem/casper-rust-wasm-sdk) (e.g. tag `v2.2.2`):
+The app vendors **slim** SDK packs under `casper-rust-wasm-sdk/` (not the full default build). Feature sets and sizes are recorded in [`../casper-rust-wasm-sdk/MANIFEST.md`](../casper-rust-wasm-sdk/MANIFEST.md).
+
+Automation: on Interchouette-ITC/casper-rust-wasm-sdk, workflow `deploy-slim-packs-to-deployer.yml` runs `make pack-deployer` and opens a PR into this repo (fork head → org `dev`). Manual refresh:
 
 ```shell
+cd /path/to/casper-rust-wasm-sdk && make pack-deployer
 rm -rf casper-rust-wasm-sdk/pkg casper-rust-wasm-sdk/pkg-nodejs
 cp -a /path/to/casper-rust-wasm-sdk/pkg casper-rust-wasm-sdk/pkg
 cp -a /path/to/casper-rust-wasm-sdk/pkg-nodejs casper-rust-wasm-sdk/pkg-nodejs
-# ensure pkg-nodejs package.json name is casper-rust-wasm-sdk-nodejs
+cp -a /path/to/casper-rust-wasm-sdk/MANIFEST.md casper-rust-wasm-sdk/MANIFEST.md  # if present
 ```
 
 Then `cd www && npm install`.

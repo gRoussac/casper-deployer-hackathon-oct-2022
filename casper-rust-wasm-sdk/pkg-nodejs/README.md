@@ -1,4 +1,4 @@
-# Casper Rust/Wasm SDK 2.0
+# Casper Rust/Wasm SDK 2.2.2
 
 The Rust/Wasm SDK allows developers and users to interact with the Casper Blockchain using Rust or TypeScript. It provides a way to embed the [casper-client-rs](https://github.com/casper-ecosystem/casper-client-rs) into another application without the CLI interface. The SDK exposes a list of types and methods from a subset of the Casper client.
 
@@ -10,6 +10,35 @@ You can use the Casper Rust/Wasm SDK in two ways:
 This page covers different examples of using the SDK.
 
 ⚠ WARNING: This application is for testing and development purposes. Do NOT use private keys or perform real transactions on the testnet/mainnet unless you fully understand the security risks.
+
+## Try the Wasm webclient
+
+A hosted build of the Angular example — **[Casper WebClient](https://casper-webclient.interchouette.net/)** — lets you exercise the Wasm SDK in the browser against public networks (testnet / mainnet).
+
+- Live demo: https://casper-webclient.interchouette.net/
+- Source: [`examples/frontend/angular`](../examples/frontend/angular)
+- Same UI is also packaged as the [Desktop Electron demo](#desktop-electron-demo-app)
+
+Demo / development only — same warning as above.
+
+## MCP
+
+The workspace package [`mcp/`](../mcp/) (`casper-rust-wasm-sdk-mcp`) exposes the native Rust SDK as [MCP](https://modelcontextprotocol.io/) tools for Cursor and other agents. The binary ships inside **`interchouette/casper-webclient`** (`:dev` / `:latest` / `:$APP_VERSION`).
+
+- **Hosted:** https://casper-webclient.interchouette.net/mcp (`ENABLE_MCP=1`, `/mcp` proxy on the SPA)
+- **Local Docker:** `make mcp-http` → http://127.0.0.1:8080/mcp
+- **Host HTTP:** `make run-mcp-http` → http://127.0.0.1:5790/mcp
+- **stdio:** `interchouette/casper-webclient:dev` with `--entrypoint casper-rust-wasm-sdk-mcp` (see [`mcp/mcp.json.example`](../mcp/mcp.json.example))
+
+```bash
+make run-mcp      # stdio (host cargo)
+make run-mcp-http # HTTP on 127.0.0.1:5790
+make mcp-http     # webclient → http://127.0.0.1:8080/mcp
+make mcp-test
+make mcp-test-live  # against a live local node
+```
+
+See [`mcp/README.md`](../mcp/README.md), tool inventory [`mcp/TOOLS.md`](../mcp/TOOLS.md), and Cursor sample [`mcp/mcp.json.example`](../mcp/mcp.json.example).
 
 ## Install
 
@@ -23,7 +52,7 @@ Add the SDK as a dependency of your project:
 > Cargo.toml
 
 ```toml
-casper-rust-wasm-sdk = { version = "2.2.2", git = "https://github.com/casper-ecosystem/casper-rust-wasm-sdk.git" }
+casper-rust-wasm-sdk = { version = "2.2.2", git = "https://github.com/casper-ecosystem/casper-rust-wasm-sdk.git", branch = "dev" }
 ```
 
 ## Usage
@@ -64,6 +93,18 @@ $ make pack
 ```
 
 This will create a `pkg` and `pkg-nodejs` containing the Typescript interfaces. You can find more details about building the SDK for Javascript with `wasm-pack` in the [wasm-pack documention](https://rustwasm.github.io/docs/wasm-pack/commands/build.html).
+
+### Cargo features
+
+Default is `full` (today's API) for both the wasm package and the Rust `rlib`. Slim builds drop optional surfaces:
+
+| Profile | Make target | Cargo flags |
+| --- | --- | --- |
+| full (default) | `make web` / `make web-full` | default features |
+| read-only | `make web-read-only` | `--no-default-features` |
+| transaction (no deploy) | `make web-transaction` | `--no-default-features --features transaction,helpers,watcher` |
+
+Optional features: `transaction`, `deploy`, `contract`, `binary-port`, `watcher`, `helpers`. Core JSON-RPC reads stay available without them. `binary-port` pulls optional `casper-binary-port*` crates.
 
 This folder contains a Wasm binary, a JS wrapper file, Typescript types definitions, and a package.json file that you can load in your project.
 
@@ -149,6 +190,8 @@ $ npm start
 
 ## Web Angular
 
+The full in-repo Angular example is the **Casper WebClient**. Try the hosted build at **[https://casper-webclient.interchouette.net/](https://casper-webclient.interchouette.net/)**, or run it locally from [`examples/frontend/angular`](../examples/frontend/angular).
+
 > package.json
 
 ```json
@@ -189,9 +232,9 @@ export const fetchWasmFactory = async (params: Params): Promise<SDK> => {
 > wasm.module.ts
 
 ```ts
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { SDK_TOKEN, fetchWasmFactory, provideSafeAsync } from './wasm.factory';
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { SDK_TOKEN, fetchWasmFactory, provideSafeAsync } from "./wasm.factory";
 
 const providers = provideSafeAsync(SDK_TOKEN, fetchWasmFactory);
 
@@ -221,7 +264,7 @@ Add the SDK Wasm file to the assets of your project with the path parameter bein
 
 #### Frontend Angular example
 
-You can look at a more advanced example of usage in the [Angular example app](examples/frontend/angular/src/app/app.component.ts).
+Try the hosted **[Casper WebClient](https://casper-webclient.interchouette.net/)**, or look at a more advanced example of usage in the [Angular example app](examples/frontend/angular/src/app/app.component.ts).
 
 ```shell
 $ cd ./examples/frontend/angular
@@ -256,13 +299,13 @@ Note that this method requires a version of Node.js with WebAssembly support, wh
 
 ```ts
 // with require
-const casper_sdk = require('casper-rust-wasm-sdk');
+const casper_sdk = require("casper-rust-wasm-sdk");
 const { SDK } = casper_sdk;
 
 // or with import
-import { SDK } from 'casper-rust-wasm-sdk';
+import { SDK } from "casper-rust-wasm-sdk";
 
-const rpc_address = 'https://node.testnet.casper.network';
+const rpc_address = "https://node.testnet.casper.network";
 const sdk = new SDK(rpc_address);
 console.log(sdk);
 ```
@@ -289,7 +332,7 @@ $ npm start
   <summary><strong><code>Rust</code></strong></summary>
 <br>
 
-You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-rust/casper_rust_wasm_sdk/rpcs/). Below are several examples of RPC methods intended for use on Testnet.
+You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/rpcs/). Below are several examples of RPC methods intended for use on Testnet.
 
 #### Get transaction by transaction hash
 
@@ -382,15 +425,15 @@ You can find more examples by reading [Rust integration tests](../tests/integrat
   <summary><strong><code>Typescript</code></strong></summary>
 <br>
 
-You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/classes/SDK.html). Below are several examples of RPC methods intended for use on Testnet.
+You can find all RPC methods on the [RPC doc](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/SDK.html). Below are several examples of RPC methods intended for use on Testnet.
 
 #### Get transaction by transaction hash
 
 ```ts
-import { Transaction } from 'casper-rust-wasm-sdk';
+import { Transaction } from "casper-rust-wasm-sdk";
 
 const transaction_hash_as_string =
-  '94b3e6253a4448138fb8b637bd0ca0604270d2f5664f7c221d67eae568fcd668';
+  "94b3e6253a4448138fb8b637bd0ca0604270d2f5664f7c221d67eae568fcd668";
 const finalized_approvals = true;
 
 const get_transaction_options = sdk.get_transaction_options({
@@ -410,7 +453,7 @@ console.log(timestamp, hash);
 
 ```ts
 const deploy_hash_as_string =
-  'a8778b2e4bd1ad02c168329a1f6f3674513f4d350da1b5f078e058a3422ad0b9';
+  "a8778b2e4bd1ad02c168329a1f6f3674513f4d350da1b5f078e058a3422ad0b9";
 const finalized_approvals = true;
 
 const get_deploy_options = sdk.get_deploy_options({
@@ -459,7 +502,7 @@ let block_hash = block.hash;
 console.log(block_hash);
 ```
 
-You can find more examples in [NodeJs examples](../examples/desktop/node/index.ts) or in the [Angular example app](../examples/frontend/angular/src/app/app.component.ts) or in the [React example app](../examples/frontend/react/src/App.tsx) or by reading [Puppeteer e2e tests](../tests/e2e/puppeteer/tests.spec.ts).
+You can find more examples in [NodeJs examples](../examples/desktop/node/index.ts), the [Angular example app](../examples/frontend/angular/src/app/app.component.ts) (live at [casper-webclient.interchouette.net](https://casper-webclient.interchouette.net/)), the [React example app](../examples/frontend/react/src/App.tsx), or by reading [Puppeteer e2e tests](../tests/e2e/puppeteer/tests.spec.ts).
 
 </details>
 
@@ -507,18 +550,18 @@ println!("{:?}", make_transfer_transaction.timestamp());
 #### Typescript
 
 ```ts
-import { TransactionStrParams } from 'casper-rust-wasm-sdk';
+import { TransactionStrParams } from "casper-rust-wasm-sdk";
 
-const chain_name = 'integration-test';
+const chain_name = "integration-test";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = undefined;
 const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
-const ttl = '1h'; // or undefined
-const payment_amount = '100000000';
-const transfer_amount = '2500000000';
+const ttl = "1h"; // or undefined
+const payment_amount = "100000000";
+const transfer_amount = "2500000000";
 const target_account =
-  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+  "0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54";
 
 const transaction_params = new TransactionStrParams(
   chain_name,
@@ -587,19 +630,19 @@ println!("{:?}", transfer.as_ref().unwrap().result.transaction_hash.to_hex_strin
 #### Typescript
 
 ```ts
-import { TransactionStrParams, getTimestamp } from 'casper-rust-wasm-sdk';
+import { TransactionStrParams, getTimestamp } from "casper-rust-wasm-sdk";
 
-const chain_name = 'casper-net-1';
+const chain_name = "casper-net-1";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
 const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
-const ttl = '1h'; // or undefined
-const payment_amount = '100000000';
-const transfer_amount = '2500000000';
+const ttl = "1h"; // or undefined
+const payment_amount = "100000000";
+const transfer_amount = "2500000000";
 const target_account =
-  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+  "0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54";
 
 const transaction_params = new TransactionStrParams(
   chain_name,
@@ -673,15 +716,15 @@ import {
   TransactionStrParams,
   TransactionBuilderParams,
   AddressableEntityHash,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'integration-test';
+const chain_name = "integration-test";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const payment_amount = '5000000000';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
+const payment_amount = "5000000000";
 const entity_hash_hex_string =
-  '5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
-const entry_point = 'set_variables';
+  "5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+const entry_point = "set_variables";
 
 const transaction_params = new TransactionStrParams(chain_name, public_key);
 transaction_params.payment_amount = payment_amount;
@@ -756,17 +799,17 @@ import {
   TransactionStrParams,
   TransactionBuilderParams,
   AddressableEntityHash,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'casper-net-1';
+const chain_name = "casper-net-1";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
-const payment_amount = '5000000000';
+const payment_amount = "5000000000";
 const entity_hash_hex_string =
-  '5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
-const entry_point = 'set_variables';
+  "5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+const entry_point = "set_variables";
 
 const transaction_params = new TransactionStrParams(
   chain_name,
@@ -883,17 +926,17 @@ import {
   TransactionStrParams,
   TransactionBuilderParams,
   AddressableEntityHash,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'casper-net-1';
+const chain_name = "casper-net-1";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
-const payment_amount = '5000000000';
+const payment_amount = "5000000000";
 const entity_hash_formatted_string =
-  'addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
-const entry_point = 'set_variables';
+  "addressable-entity-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+const entry_point = "set_variables";
 
 const transaction_params = new TransactionStrParams(
   chain_name,
@@ -919,17 +962,17 @@ console.log(put_transaction_result_as_json);
 Puts a [`Transfer Transaction`] to the network for execution.
 
 ```ts
-import { Transaction, TransactionStrParams } from 'casper-rust-wasm-sdk';
+import { Transaction, TransactionStrParams } from "casper-rust-wasm-sdk";
 
-const chain_name = 'casper-net-1';
+const chain_name = "casper-net-1";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
-const payment_amount = '100000000';
-const transfer_amount = '2500000000';
+const payment_amount = "100000000";
+const transfer_amount = "2500000000";
 const target_account =
-  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+  "0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54";
 
 const transfer_params = new TransactionStrParams(
   chain_name,
@@ -1004,10 +1047,10 @@ println!("{:?}", transaction_processed);
 In TypeScript, the waitTransaction function provides a similar capability to wait for a specific transaction event. Developers can leverage this function by specifying the event address, transaction hash, and an optional timeout duration. The received EventParseResult object can then be processed to extract valuable information, such as the cost of the transaction.
 
 ```ts
-const events_address = 'http://127.0.0.1:18101/events';
+const events_address = "http://127.0.0.1:18101/events";
 
 const transaction_hash =
-  'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
+  "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
 const timeout_duration = undefined; // 30000 for 30s instead of default timeout duration of 60s
 
@@ -1067,12 +1110,12 @@ println!("{:?}", results);
 Similarly, TypeScript developers can utilize the watchTransaction function to actively watch for transaction events on the Casper blockchain. By creating a transaction watcher and defining callback functions, developers can subscribe to specific transaction hashes and respond dynamically as events unfold.
 
 ```ts
-import { EventParseResult, Subscription } from 'casper-rust-wasm-sdk';
+import { EventParseResult, Subscription } from "casper-rust-wasm-sdk";
 
-const events_address = 'http://127.0.0.1:18101/events';
+const events_address = "http://127.0.0.1:18101/events";
 
 const transaction_hash =
-  'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
+  "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
 // Creates a watcher instance
 const watcher = sdk.watchTransaction(events_address);
@@ -1277,10 +1320,10 @@ with
 ```ts
 async function loadFile() {
   try {
-    const fileBuffer = await fs.readFile('cep78.wasm');
+    const fileBuffer = await fs.readFile("cep78.wasm");
     return fileBuffer.buffer; // Returns an ArrayBuffer
   } catch (error) {
-    throw new Error('Error reading file: ' + error.message);
+    throw new Error("Error reading file: " + error.message);
   }
 }
 ```
@@ -1431,18 +1474,18 @@ import {
   DeployStrParams,
   PaymentStrParams,
   getTimestamp,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'integration-test';
+const chain_name = "integration-test";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = undefined;
 const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
-const ttl = '1h'; // or undefined
-const payment_amount = '100000000';
-const transfer_amount = '2500000000';
+const ttl = "1h"; // or undefined
+const payment_amount = "100000000";
+const transfer_amount = "2500000000";
 const target_account =
-  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+  "0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54";
 
 const deploy_params = new DeployStrParams(
   chain_name,
@@ -1523,19 +1566,19 @@ import {
   DeployStrParams,
   PaymentStrParams,
   getTimestamp,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'casper-net-1';
+const chain_name = "casper-net-1";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
 const timestamp = getTimestamp(); // or Date.now().toString(); // or undefined
-const ttl = '1h'; // or undefined
-const payment_amount = '100000000';
-const transfer_amount = '2500000000';
+const ttl = "1h"; // or undefined
+const payment_amount = "100000000";
+const transfer_amount = "2500000000";
 const target_account =
-  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+  "0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54";
 
 const deploy_params = new DeployStrParams(
   chain_name,
@@ -1609,20 +1652,20 @@ import {
   DeployStrParams,
   PaymentStrParams,
   SessionStrParams,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'integration-test';
+const chain_name = "integration-test";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
-const payment_amount = '5000000000';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
+const payment_amount = "5000000000";
 const contract_hash =
-  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+  "hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
 
 const deploy_params = new DeployStrParams(chain_name, public_key);
 
 const session_params = new SessionStrParams();
 session_params.session_hash = contract_hash;
-session_params.session_entry_point = 'set_variables';
+session_params.session_entry_point = "set_variables";
 
 const payment_params = new PaymentStrParams(payment_amount);
 
@@ -1691,22 +1734,22 @@ import {
   DeployStrParams,
   PaymentStrParams,
   SessionStrParams,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'casper-net-1';
+const chain_name = "casper-net-1";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
-const payment_amount = '5000000000';
+const payment_amount = "5000000000";
 const contract_hash =
-  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
+  "hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
 
 const deploy_params = new DeployStrParams(chain_name, public_key, secret_key);
 
 const session_params = new SessionStrParams();
 session_params.session_hash = contract_hash;
-session_params.session_entry_point = 'set_variables';
+session_params.session_entry_point = "set_variables";
 
 const payment_params = new PaymentStrParams(payment_amount);
 
@@ -1823,17 +1866,17 @@ import {
   DeployStrParams,
   PaymentStrParams,
   SessionStrParams,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'casper-net-1';
+const chain_name = "casper-net-1";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
-const payment_amount = '5000000000';
+const payment_amount = "5000000000";
 const contract_hash =
-  'hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743';
-const entry_point = 'set_variables';
+  "hash-5be5b0ef09a7016e11292848d77f539e55791cb07a7012fbc336b1f92a4fe743";
+const entry_point = "set_variables";
 
 const deploy_params = new DeployStrParams(chain_name, public_key, secret_key);
 
@@ -1862,17 +1905,17 @@ import {
   DeployStrParams,
   PaymentStrParams,
   SessionStrParams,
-} from 'casper-rust-wasm-sdk';
+} from "casper-rust-wasm-sdk";
 
-const chain_name = 'casper-net-1';
+const chain_name = "casper-net-1";
 const public_key =
-  '0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129';
+  "0169d8d607f3ba04c578140398ceb1bd5296c653f965256bd7097982b9026c5129";
 const secret_key = `-----BEGIN PRIVATE KEY-----
 -----END PRIVATE KEY-----`;
-const payment_amount = '100000000';
-const transfer_amount = '2500000000';
+const payment_amount = "100000000";
+const transfer_amount = "2500000000";
 const target_account =
-  '0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54';
+  "0187adb3e0f60a983ecc2ddb48d32b3deaa09388ad3bc41e14aeb19959ecc60b54";
 
 const deploy_params = new DeployStrParams(chain_name, public_key, secret_key);
 
@@ -1944,10 +1987,10 @@ println!("{:?}", deploy_processed);
 In TypeScript, the waitDeploy function provides a similar capability to wait for a specific deploy event. Developers can leverage this function by specifying the event address, deploy hash, and an optional timeout duration. The received EventParseResult object can then be processed to extract valuable information, such as the cost of the deploy.
 
 ```ts
-const events_address = 'http://127.0.0.1:18101/events/main';
+const events_address = "http://127.0.0.1:18101/events/main";
 
 const deploy_hash =
-  'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
+  "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
 const timeout_duration = undefined; // 30000 for 30s instead of default timeout duration of 60s
 
@@ -2007,12 +2050,12 @@ println!("{:?}", results);
 Similarly, TypeScript developers can utilize the watchDeploy function to actively watch for deploy events on the Casper blockchain. By creating a deploy watcher and defining callback functions, developers can subscribe to specific deploy hashes and respond dynamically as events unfold.
 
 ```ts
-import { EventParseResult, Subscription } from 'casper-rust-wasm-sdk';
+import { EventParseResult, Subscription } from "casper-rust-wasm-sdk";
 
-const events_address = 'http://127.0.0.1:18101/events/main';
+const events_address = "http://127.0.0.1:18101/events/main";
 
 const deploy_hash =
-  'c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4';
+  "c94ff7a9f86592681e69c1d8c2d7d2fed89fd1a922faa0ae74481f8458af2ee4";
 
 // Creates a watcher instance
 const watcher = sdk.watchDeploy(events_address);
@@ -2219,10 +2262,10 @@ with
 ```ts
 async function loadFile() {
   try {
-    const fileBuffer = await fs.readFile('cep78.wasm');
+    const fileBuffer = await fs.readFile("cep78.wasm");
     return fileBuffer.buffer; // Returns an ArrayBuffer
   } catch (error) {
-    throw new Error('Error reading file: ' + error.message);
+    throw new Error("Error reading file: " + error.message);
   }
 }
 ```
@@ -2327,7 +2370,7 @@ console.log(deploy_hash);
 
 ![Casper Electron App](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/blob/dev/docs/images/get_status-electron.png)
 
-The Electron based demo app loads the Angular example build. You can use this app on your computer to test every action the SDK can take.
+The Electron based demo app loads the Angular webclient build (the same UI hosted at [casper-webclient.interchouette.net](https://casper-webclient.interchouette.net/)). You can use this app on your computer to test every action the SDK can take.
 
 ```shell
 $ cd ./examples/desktop/electron
@@ -2336,12 +2379,7 @@ $ npm start
 $ npm build
 ```
 
-You can download an alpha version of the app illustrating the SDK here:
-
-- [Microsoft Windows](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/raw/dev/examples/desktop/electron/release/Casper%20Webclient%202.0.0.exe)
-- [GNU/Linux AppImage](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/raw/dev/examples/desktop/electron/release/Casper%20Webclient-2.0.0.AppImage)
-- [GNU/Linux Snap](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/raw/dev/examples/desktop/electron/release/casper-webclient_2.0.0_amd64.snap)
-- [Mac][TODO]
+Download pre-built desktop demos from the **[GitHub Releases](https://github.com/casper-ecosystem/casper-rust-wasm-sdk/releases)** page (CI artifacts — Windows portable, Linux AppImage, Snap). Mac build is TODO.
 
 </details>
 
@@ -2351,99 +2389,99 @@ You can download an alpha version of the app illustrating the SDK here:
 
 ## Rust API
 
-- [Modules and Structs](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-rust/casper_rust_wasm_sdk/)
+- [Modules and Structs](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/)
 
-- [Full item list](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-rust/casper_rust_wasm_sdk/all.html)
+- [Full item list](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/all.html)
 
 ### SDK
 
-- [SDK Struct and methods](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-rust/casper_rust_wasm_sdk/struct.SDK.html)
+- [SDK Struct and methods](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/struct.SDK.html)
 
 ### RPC
 
-- [RPC List](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-rust/casper_rust_wasm_sdk/rpcs/index.html)
+- [RPC List](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/rpcs/index.html)
 
 ### Transaction Params
 
-- [TransactionStrParams](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-rust/casper_rust_wasm_sdk/types/transaction_params/transaction_str_params/index.html)
-- [TransactionBuilderParams](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-rust/casper_rust_wasm_sdk/types/transaction_params/transaction_builder_params/index.html)
+- [TransactionStrParams](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/transaction_params/transaction_str_params/index.html)
+- [TransactionBuilderParams](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/transaction_params/transaction_builder_params/index.html)
 
 ### Transaction
 
-- [Transaction Type](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-rust/casper_rust_wasm_sdk/types/transaction/struct.Transaction.html)
+- [Transaction Type](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/transaction/struct.Transaction.html)
 
 ### Deploy Params (Legacy)
 
-- [Params and Args simple](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-rust/casper_rust_wasm_sdk/types/deploy_params/index.html)
+- [Params and Args simple](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/deploy_params/index.html)
 
 ### Deploy (Legacy)
 
-- [Deploy Type and static builder](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-rust/casper_rust_wasm_sdk/types/deploy/struct.Deploy.html)
+- [Deploy Type and static builder](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/deploy/struct.Deploy.html)
 
 ### Transaction Watcher
 
-- [Watcher](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-rust/casper_rust_wasm_sdk/watcher/index.html)
-- [Subscription](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-rust/casper_rust_wasm_sdk/watcher/struct.Subscription.html)
-- [EventParseResult](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-rust/casper_rust_wasm_sdk/watcher/struct.EventParseResult.html)
+- [Watcher](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/watcher/index.html)
+- [Subscription](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/watcher/struct.Subscription.html)
+- [EventParseResult](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/watcher/struct.EventParseResult.html)
 
 ### Types
 
-- [Current exposed types](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-rust/casper_rust_wasm_sdk/types/index.html)
+- [Current exposed types](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/types/index.html)
 
 ### Helpers functions
 
-- [Rust helpers](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-rust/casper_rust_wasm_sdk/helpers/index.html)
+- [Rust helpers](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/helpers/index.html)
 
 ### Binary Port
 
-- [Binary methods](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-rust/casper_rust_wasm_sdk/binary_port/index.html)
+- [Binary methods](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-rust/casper_rust_wasm_sdk/binary_port/index.html)
 
 ## Typescript API
 
-- [Full item list](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/index.html)
+- [Full item list](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/index.html)
 
 ### SDK
 
-- [SDK Class and methods](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/classes/SDK.html)
+- [SDK Class and methods](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/SDK.html)
 
 ### Transaction Params
 
-- [Transaction Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/classes/TransactionStrParams.html)
-- [Transaction Builder Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/classes/TransactionBuilderParams.html)
-- [Dictionary Item Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/classes/DictionaryItemStrParams.html)
+- [Transaction Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/TransactionStrParams.html)
+- [Transaction Builder Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/TransactionBuilderParams.html)
+- [Dictionary Item Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/DictionaryItemStrParams.html)
 
 ### Transaction
 
-- [Transaction Type](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/classes/Transaction.html)
+- [Transaction Type](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/Transaction.html)
 
 ### Deploy Params (Legacy)
 
-- [Deploy Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/classes/DeployStrParams.html)
-- [Session Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/classes/SessionStrParams.html)
-- [Payment Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/classes/PaymentStrParams.html)
-- [Dictionary Item Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/classes/DictionaryItemStrParams.html)
+- [Deploy Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/DeployStrParams.html)
+- [Session Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/SessionStrParams.html)
+- [Payment Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/PaymentStrParams.html)
+- [Dictionary Item Params](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/DictionaryItemStrParams.html)
 
 ### Deploy (Legacy)
 
-- [Deploy Type and static builder](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/classes/Deploy.html)
+- [Deploy Type and static builder](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/Deploy.html)
 
 ### Transaction Watcher
 
-- [Watcher](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/classes/Watcher.html)
-- [Subscription](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/classes/Subscription.html)
-- [EventParseResult](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/classes/EventParseResult.html)
+- [Watcher](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/Watcher.html)
+- [Subscription](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/Subscription.html)
+- [EventParseResult](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/EventParseResult.html)
 
 ### Types
 
-- [Current exposed types](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/modules.html)
+- [Current exposed types](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/modules.html)
 
 ### Helpers functions
 
-- [TS helpers](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/modules.html#Functions)
+- [TS helpers](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/modules.html#Functions)
 
 ### Binary Port
 
-- [Binary methods](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/condor/api-wasm/classes/SDK.html#Methods)
+- [Binary methods](https://casper-ecosystem.github.io/casper-rust-wasm-sdk/api-wasm/classes/SDK.html#Methods)
 
 ## Casper Wallet
 

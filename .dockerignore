@@ -1,18 +1,43 @@
-# Keep Docker build context lean (repo root is the build context).
-**/.git
-**/.github
+# Build context = repo root (docker build -f docker/Dockerfile .)
+.git
+.github
+.github_credentials
+.gitignore
+.cursor
+.idea
+.vscode
+.DS_Store
+**/*~
+**/*.swp
+**/*.swo
+
+node_modules
 **/node_modules
-**/dist
-**/coverage
+.nx
 **/.nx
-**/tmp
+.angular
 **/.angular
+dist
+**/dist
+tmp
+out-tsc
+coverage
 **/cypress/videos
 **/cypress/screenshots
-**/*.md
-!README.md
-casper-escrow.code-workspace
+.env
+.env.*
+!.env.example
 www/.env*
 www/**/*.map
+
+# Rust / wasm build artifacts (not needed in Node image)
 wasm/target
 **/target
+
+# Local tooling / docs not needed in image
+*.md
+Makefile
+.dockerignore
+docker/*.md
+docs/
+*.code-workspace

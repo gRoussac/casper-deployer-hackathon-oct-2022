@@ -18,7 +18,7 @@ Browser calls never talk to public nodes directly for RPC — the Nest API (`/ap
 
 | Layer       | Tech                                                                                                              |
 | ----------- | ----------------------------------------------------------------------------------------------------------------- |
-| Frontend    | Angular 21, Nx, Tailwind                                                                                          |
+| Frontend    | Angular 22, Nx, Tailwind                                                                                          |
 | API         | NestJS 11 (JSON-RPC facade + SSE proxy)                                                                           |
 | Casper      | `casper-rust-wasm-sdk` 2.2.2 (browser + nodejs packs)                                                             |
 | Helper WASM | `wasm/` crate (`deployer`) for small encoding helpers                                                             |
@@ -29,12 +29,13 @@ Browser calls never talk to public nodes directly for RPC — the Nest API (`/ap
 
 - `casper-rust-wasm-sdk/` — vendored browser (`pkg`) and Node (`pkg-nodejs`) SDK builds
 - `docker/` — Dockerfile + compose (build from **repo root**)
+- `docs/` — this README + security policy
 - `wasm/` — small custom Rust/WASM helpers
 - `www/` — Nx monorepo (frontend + api)
 
 ## Networks
 
-Configured in [`www/libs/util/config/src/config.ts`](www/libs/util/config/src/config.ts):
+Configured in [`../www/libs/util/config/src/config.ts`](../www/libs/util/config/src/config.ts):
 
 | Network            | Default RPC                           | Chain name      | SSE                                             |
 | ------------------ | ------------------------------------- | --------------- | ----------------------------------------------- |
@@ -52,6 +53,8 @@ Legacy launcher ports **7777/9999** and integration presets are removed. Local t
 - Optional: Rust + `wasm-pack` to rebuild `wasm/` or refresh SDK packs from [casper-rust-wasm-sdk](https://github.com/casper-ecosystem/casper-rust-wasm-sdk)
 
 ## Local development
+
+From the repository root:
 
 ```shell
 cd www
@@ -71,7 +74,7 @@ npm run e2e            # Cypress (requires API)
 
 ### Config knobs
 
-[`www/libs/util/config/src/config.ts`](www/libs/util/config/src/config.ts) — gas/TTL defaults, node URLs, path separator for named-key browsing.
+[`../www/libs/util/config/src/config.ts`](../www/libs/util/config/src/config.ts) — gas/TTL defaults, node URLs, path separator for named-key browsing.
 
 ## Docker
 
@@ -129,6 +132,13 @@ Then `cd www && npm install`.
 
 Rollback to Casper 1.x: `git checkout v1.6`
 
+## Docs
+
+| Doc | Description |
+| --- | --- |
+| [`SECURITY.md`](SECURITY.md) | Vulnerability reporting |
+| [`../docker/`](../docker/) | Dockerfile / Compose (Hub overview lives in private `.cursor/scripts/DOCKERHUB.md`) |
+
 ## License / security
 
-See [LICENSE.md](LICENSE.md) and [SECURITY.md](SECURITY.md).
+See [`../LICENSE.md`](../LICENSE.md) and [`SECURITY.md`](SECURITY.md).

@@ -90,7 +90,6 @@ docker run --rm -p 4242:4242 -e PORT=4242 interchouette/casper-deployer:dev
 Published images (Docker Hub):
 
 - [`interchouette/casper-deployer`](https://hub.docker.com/r/interchouette/casper-deployer) (`:dev`, version tags, `:latest`)
-- mirror: [`gregoshop/casper-deployer`](https://hub.docker.com/r/gregoshop/casper-deployer)
 
 ```shell
 docker pull interchouette/casper-deployer:dev
@@ -100,7 +99,7 @@ docker pull interchouette/casper-deployer:latest
 
 CI (`.github/workflows/docker-build-push-dev.yml`) on `workflow_dispatch` and on pushes to `dev` that touch image inputs:
 
-1. Builds and pushes Hub `:dev` **and** `:latest` (needs `DOCKER_USERNAME` / `DOCKER_PASSWORD`)
+1. Builds and pushes Hub `:dev` **and** `:latest` (needs `DOCKER_USERNAME` / `DOCKER_PASSWORD` for `interchouette`)
 2. Optionally triggers a Render redeploy via secret `RENDER_DEPLOY_HOOK` (Deploy Hook URL from the Render service → Settings → Deploy Hook). Without that secret, Hub updates but Render keeps the old container until a manual deploy.
 
 Render image deploys: no app env vars required (Render injects `PORT`). Point the service at `interchouette/casper-deployer:latest`.

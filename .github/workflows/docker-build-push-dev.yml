@@ -34,7 +34,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Push :dev and :latest to Docker Hub (interchouette + gregoshop mirror)
+      - name: Push :dev and :latest to Docker Hub (interchouette)
         run: make docker-push-dev-hub
         env:
           CI: "1"

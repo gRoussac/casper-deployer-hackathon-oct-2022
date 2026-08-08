@@ -4,7 +4,6 @@ describe('deployer', () => {
 
   beforeEach(() => {
     // Fully stub API so CI does not need Nest or a live Casper node
-    cy.intercept('GET', '/api/users', { body: [] }).as('getUsers');
     cy.intercept('GET', /\/api\/deployer\/status.*/, {
       body: JSON.stringify('status'),
     }).as('getStatus');
@@ -42,7 +41,7 @@ describe('deployer', () => {
   });
 
   it('should call api on load', () => {
-    cy.wait(['@getUsers', '@getPeers']);
+    cy.wait(['@getPeers']);
     cy.wait(['@getStatus', '@getStateRootHash'], { timeout: 20000 });
     cy.contains('Network');
   });

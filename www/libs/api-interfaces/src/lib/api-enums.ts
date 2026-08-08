@@ -1,5 +1,4 @@
 export enum api_interface {
-  Users = 'users',
   Peers = 'peers',
   PurseURef = 'purseURef',
   Balance = 'balance',

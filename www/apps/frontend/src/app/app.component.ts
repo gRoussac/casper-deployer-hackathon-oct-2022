@@ -7,16 +7,13 @@ import {
   OnDestroy,
   AfterViewInit,
   Renderer2,
-  Provider,
-  ImportProvidersSource,
-  DOCUMENT
+  DOCUMENT,
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { HeaderComponent } from '@casper-ui/header';
-import { UsersService } from '@casper-data/data-access-users';
-import { Users, User } from '@casper-api/api-interfaces';
+import { User } from '@casper-api/api-interfaces';
 import { DEPLOYER_TOKEN } from '@casper-util/wasm';
 import { Deployer } from 'deployer';
 import { RouterModule } from '@angular/router';
@@ -35,7 +32,6 @@ const imports = [CommonModule, RouterModule, HeaderComponent];
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports,
   providers: [
-    UsersService,
     RouteurHubService,
     StorageService,
     DeployerService,
@@ -46,13 +42,11 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   window!: (Window & typeof globalThis) | null;
   isConnected!: boolean;
   activePublicKey!: string;
-  users!: Users;
   user?: User;
   balance!: string;
   apiUrl!: string;
   walletVersion!: string;
 
-  private usersSubscription!: Subscription;
   private accountInformationSubscription!: Subscription;
   private subscriptions: Subscription[] = [];
   private _activePublicKey!: string; // memoize activePublicKey
@@ -66,17 +60,16 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     @Inject(DOCUMENT) private document: Document,
     @Inject(DEPLOYER_TOKEN) private readonly deployer: Deployer,
-    private readonly usersService: UsersService,
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly routeurHubService: RouteurHubService,
     private readonly storageService: StorageService,
+    private readonly deployerService: DeployerService,
     private readonly walletService: WalletService,
     private readonly renderer: Renderer2,
   ) {}
 
   async ngOnInit(): Promise<void> {
     this.setRouteurHubSubscriptions();
-    this.setUsersSubscription();
     this.window = this.document.defaultView;
     this.eventTypes = (this.window as any)?.CasperWalletEventTypes;
     this.deployer.hello();
@@ -145,7 +138,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
         this.handler!,
       ),
     );
-    // this.window!.addEventListener(eventTypes.Connected, this.handler!);
   };
 
   private removeCasperWalletEvents = () => {
@@ -178,14 +170,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     );
   }
 
-  private setUsersSubscription() {
-    this.usersSubscription = this.usersService.get().subscribe((users) => {
-      this.users = users;
-      this.changeDetectorRef.markForCheck();
-      this.usersSubscription.unsubscribe();
-    });
-  }
-
   private async refreshData() {
     this.setActiveUser();
     this.setPurse();
@@ -199,12 +183,9 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private setActiveUser() {
-    this.user = this.users?.find(
-      (user: User) => user.activePublicKey == this.activePublicKey,
-    ) as User;
-    !this.user &&
-      this.activePublicKey &&
-      (this.user = { activePublicKey: this.activePublicKey });
+    this.user = this.activePublicKey
+      ? { activePublicKey: this.activePublicKey }
+      : undefined;
     this.routeurHubService.setHubState({ user: this.user });
   }
 
@@ -224,7 +205,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private setAccountInformationSubscription() {
     this.activePublicKey &&
-      (this.accountInformationSubscription = this.usersService
+      (this.accountInformationSubscription = this.deployerService
         .getBalanceOfByPublicKey(this.activePublicKey, this.apiUrl)
         .subscribe((purse) => {
           if (JSON.parse(purse)?.name) {

@@ -3,9 +3,7 @@ import {
   DeployReturn,
   Peer,
   TransactionReturn,
-  Users,
 } from '@casper-api/api-interfaces';
-import { environment } from '../environments/environment';
 import { SDKService } from '../sdk/sdk.service';
 import {
   Deploy,
@@ -20,10 +18,6 @@ import {
 @Injectable()
 export class AppService {
   constructor(private readonly sdkService: SDKService) {}
-
-  getUsers(): Users {
-    return environment.users;
-  }
 
   async getPeers(apiUrl: string): Promise<Peer[]> {
     const peers =
@@ -279,10 +273,7 @@ export class AppService {
     return (await sdk.get_transaction(options)).toJson();
   }
 
-  async putDeploy(
-    signedDeploy: Deploy,
-    apiUrl: string,
-  ): Promise<DeployReturn> {
+  async putDeploy(signedDeploy: Deploy, apiUrl: string): Promise<DeployReturn> {
     const sdk = this.sdkService.getCasperSDK(apiUrl);
     if (signedDeploy && !signedDeploy.validateDeploySize()) {
       console.error(signedDeploy);

@@ -1,6 +1,5 @@
 import { Test } from '@nestjs/testing';
 import { UrlService } from '../util/url/url.service';
-import { environment } from '../environments/environment';
 import { AppService } from './app.service';
 import { Peer } from '@casper-api/api-interfaces';
 import { SDKService } from '../sdk/sdk.service';
@@ -60,10 +59,6 @@ describe('AppService', () => {
   });
 
   describe('AppService Methods', () => {
-    it('should return users', () => {
-      expect(service.getUsers()).toStrictEqual(environment.users);
-    });
-
     it('should rewrite local peers to NCTL RPC ports (not 7777)', async () => {
       getCasperSDK.mockClear();
       getPeers.mockResolvedValueOnce({

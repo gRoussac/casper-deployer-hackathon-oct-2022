@@ -10,10 +10,8 @@ export type NamedCLTypeArg = {
   optional?: boolean;
 };
 
-/** Optional display label for a known sample key (no escrow roles). */
+/** Active wallet key in hub/UI state. */
 export type User = { role?: string; activePublicKey: string };
-
-export type Users = User[];
 
 export type Error = { name: string; message: string };
 

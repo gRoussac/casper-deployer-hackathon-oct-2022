@@ -56,9 +56,13 @@ wasm/target/
 .tools/
 wasm/.tools/
 
-# local workspace file (product workspace lives in private .cursor)
+# Local workspace files
 casper-deployer.code-workspace
 *.code-workspace
+
+# Nested itc-cursor / local secrets
+.cursor/
+.github_credentials
 
 # local env (never commit)
 .env

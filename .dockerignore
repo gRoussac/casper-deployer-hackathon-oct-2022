@@ -1,7 +1,6 @@
 # Build context = repo root (docker build -f docker/Dockerfile .)
 .git
-.github
-.github_credentials
+.github*
 .gitignore
 .cursor
 .idea

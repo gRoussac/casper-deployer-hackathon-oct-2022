@@ -60,9 +60,6 @@ wasm/.tools/
 casper-deployer.code-workspace
 *.code-workspace
 
-# Nested itc-cursor / local secrets
-.cursor/
-.github_credentials
 
 # local env (never commit)
 .env

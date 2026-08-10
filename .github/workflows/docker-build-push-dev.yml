@@ -39,7 +39,7 @@ jobs:
         env:
           CI: "1"
 
-      # Render does not watch Hub for new digests — call the service Deploy Hook
+      # Render does not watch Hub for new digests - call the service Deploy Hook
       # after a successful push so it pulls interchouette/casper-deployer:latest.
       - name: Trigger Render redeploy
         env:
@@ -53,3 +53,23 @@ jobs:
           curl -fsS -X GET "${RENDER_DEPLOY_HOOK}"
           echo
           echo "Render deploy requested"
+
+      - name: Log in to GHCR (personal)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Push :dev and :latest to personal GHCR
+        run: make docker-push-dev-ghcr-personal
+
+      - name: Log in to GHCR (Interchouette / ITC)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USERNAME_ITC }}
+          password: ${{ secrets.GHCR_PAT_ITC }}
+
+      - name: Push :dev and :latest to ghcr.io/interchouette and interchouette-itc
+        run: make docker-push-dev-ghcr-itc

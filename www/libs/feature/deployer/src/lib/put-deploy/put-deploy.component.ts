@@ -464,12 +464,13 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
   }
 
   onEdit() {
+    this.onArgsChange();
     this.edit.emit();
   }
 
   onArgsChange() {
-    const deploy_args = this.argsElt?.nativeElement.value;
-    deploy_args && this.storageService.setState({ deploy_args });
+    const deploy_args = this.argsElt?.nativeElement.value ?? '';
+    this.storageService.setState({ deploy_args });
   }
 
   resetArgs() {
@@ -550,7 +551,11 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
       const rawArgs = entry_point?.['args'];
       const args = Array.isArray(rawArgs)
         ? (rawArgs
-            .map((param: unknown) => parameterToNamedArg(param as { name?: string; cl_type?: unknown }))
+            .map((param: unknown) =>
+              parameterToNamedArg(
+                param as { name?: string; cl_type?: unknown },
+              ),
+            )
             .filter(Boolean) as NamedCLTypeArg[])
         : [];
       this.storageService.setState({

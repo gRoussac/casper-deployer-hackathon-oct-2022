@@ -22,19 +22,13 @@ h2 {
   &.overflow-y {
     overflow-y: auto;
     overflow-x: hidden;
-    padding-right: 10px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
     &::-webkit-scrollbar {
-      width: 14px;
-    }
-    &::-webkit-scrollbar-track {
-      box-shadow: inset 0 0 5px #ff473e;
-      border-radius: 0.5rem;
-      cursor: pointer;
-    }
-    &::-webkit-scrollbar-thumb {
-      background: #ff473e;
-      border-radius: 0.5rem;
-      cursor: pointer;
+      width: 0;
+      height: 0;
+      display: none;
     }
   }
 }

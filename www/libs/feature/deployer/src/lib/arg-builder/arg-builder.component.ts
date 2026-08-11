@@ -92,10 +92,7 @@ export class ArgBuilderComponent implements OnDestroy {
   }
 
   add() {
-    this.rows = [
-      ...this.rows,
-      { name: '', cl_type: CLType.U8(), session_type: 'U8', value: '' },
-    ];
+    this.rows = [...this.rows, this.blankRow()];
     this.changeDetectorRef.markForCheck();
   }
 
@@ -135,6 +132,10 @@ export class ArgBuilderComponent implements OnDestroy {
     }
   }
 
+  private blankRow(): NamedCLTypeArg {
+    return { name: '', cl_type: CLType.U8(), session_type: 'U8', value: '' };
+  }
+
   private async hydrate(): Promise<void> {
     await this.cepSchemaService.ensureReady().catch(() => undefined);
 
@@ -145,34 +146,41 @@ export class ArgBuilderComponent implements OnDestroy {
     const entryPoint =
       this.entryPoint || this.storageService.get('entry_point') || '';
     this.entryPoint = entryPoint;
-    this.hasWasm = !!(
-      this.hasWasm || this.storageService.get('has_wasm')
-    );
+    this.hasWasm = !!(this.hasWasm || this.storageService.get('has_wasm'));
 
     const tab = this.tabDefs.find((t) => t.name === this.active);
     const cepId = tab?.cepId ?? tabToCepId(Tabs[this.active] || '');
 
     let schemaRows: NamedCLTypeArg[] = [];
 
-    if (Array.isArray(storedArgs) && storedArgs.length > 0) {
-      // On-chain entrypoint schema wins on Custom (and when present).
-      if (this.active === Tabs.Custom || !cepId) {
+    // Custom tab: prefer existing Args JSON (custom WASM / free-form), else on-chain.
+    if (this.active === Tabs.Custom) {
+      if (deployArgs.length) {
+        schemaRows = mergeSchemaWithValues(
+          deployArgs.map((r) => ({
+            name: r.name,
+            type: r.type,
+            optional: false,
+          })),
+          deployArgs,
+        );
+      } else if (Array.isArray(storedArgs) && storedArgs.length > 0) {
         schemaRows = mergeSchemaWithValues(storedArgs, deployArgs);
-        if (this.active !== Tabs.Custom && schemaRows.length) {
-          this.active = Tabs.Custom;
-        }
       }
+    } else if (Array.isArray(storedArgs) && storedArgs.length > 0 && !cepId) {
+      schemaRows = mergeSchemaWithValues(storedArgs, deployArgs);
     }
 
     if (!schemaRows.length && cepId) {
-      if (this.hasWasm && !entryPoint) {
-        schemaRows = mergeSchemaWithValues(
-          this.cepSchemaService.installArgs(cepId),
-          deployArgs,
-        );
-      } else if (entryPoint) {
+      // No entrypoint → install schema. Entrypoint → that EP's args.
+      if (entryPoint) {
         schemaRows = mergeSchemaWithValues(
           this.cepSchemaService.entrypointArgs(cepId, entryPoint),
+          deployArgs,
+        );
+      } else {
+        schemaRows = mergeSchemaWithValues(
+          this.cepSchemaService.installArgs(cepId),
           deployArgs,
         );
       }
@@ -189,7 +197,8 @@ export class ArgBuilderComponent implements OnDestroy {
       );
     }
 
-    this.rows = schemaRows;
+    // Always keep at least one editable row (Custom / empty schema).
+    this.rows = schemaRows.length ? schemaRows : [this.blankRow()];
     this.changeDetectorRef.markForCheck();
   }
 }

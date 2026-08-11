@@ -19,8 +19,7 @@
 :host > section {
   min-height: 0;
   height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 :host > section:last-of-type {
@@ -29,7 +28,7 @@
   overflow: hidden;
 }
 
-/* Modal host must not create a second grid row (was +16px row-gap overflow). */
+/* Modal host must not create a second grid row. */
 :host > casper-deployer-arg-builder {
   position: absolute;
   width: 0;

@@ -3,6 +3,10 @@ import { CLType } from './cl-type';
 export type NamedCLTypeArg = {
   name: string;
   cl_type: CLType;
+  /** Prefer this when emitting session_args_json (from chain or ceps schema). */
+  session_type?: string | Record<string, unknown>;
+  /** Prefill value from existing Args JSON. */
+  value?: unknown;
   entry_points?: string[];
   install?: boolean;
   entry_point?: boolean;

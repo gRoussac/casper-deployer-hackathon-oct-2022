@@ -1,50 +1,30 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
-  ElementRef,
   EventEmitter,
   Input,
   OnDestroy,
   Output,
-  ViewChild,
 } from '@angular/core';
 
 import { Tabs, TabsComponent } from '@casper-ui/tabs';
 import { ArgumentComponent } from '@casper-ui/argument';
-import { customArg, defaultTabs } from './tabs';
+import { defaultTabs } from './tabs';
 import { StorageService } from '@casper-util/storage';
-import { NamedCLTypeArg, State, CLType } from '@casper-api/api-interfaces';
+import {
+  NamedCLTypeArg,
+  State,
+  CLType,
+  parseSessionArgsJson,
+  mergeSchemaWithValues,
+  serializeSessionArgsJson,
+  coerceSessionValue,
+  SessionArgType,
+} from '@casper-api/api-interfaces';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { Subscription } from 'rxjs';
-
-interface ArgumentEntry<T = unknown> {
-  name: string;
-  type: string | TypeObject;
-  value: T;
-}
-
-interface TypeObject {
-  Option?: string;
-  List?: string | TypeObject;
-  Tuple1?: string[];
-  Tuple2?: string[];
-  Tuple3?: string[];
-  Map?: { key: string; value: string };
-  ByteArray?: number;
-  Result?: { ok: string; err: string };
-}
-
-const sortByName = (a: NamedCLTypeArg, b: NamedCLTypeArg) => {
-  const typeA = a['name'].toString().toUpperCase();
-  const typeB = b['name'].toString().toUpperCase();
-  if (typeA < typeB) {
-    return -1;
-  } else if (typeA > typeB) {
-    return 1;
-  }
-  return 0;
-};
+import { CepSchemaService, tabToCepId } from './cep-schema.service';
 
 @Component({
   selector: 'casper-deployer-arg-builder',
@@ -54,10 +34,12 @@ const sortByName = (a: NamedCLTypeArg, b: NamedCLTypeArg) => {
   styleUrls: ['./arg-builder.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ArgBuilderComponent implements AfterViewInit, OnDestroy {
+export class ArgBuilderComponent implements OnDestroy {
   @Input() set isOpen(value: boolean) {
     this._isOpen = value;
-    this.addArgs();
+    if (value) {
+      void this.hydrate();
+    }
   }
 
   get isOpen(): boolean {
@@ -66,185 +48,148 @@ export class ArgBuilderComponent implements AfterViewInit, OnDestroy {
 
   @Output() closeModal: EventEmitter<void> = new EventEmitter<void>();
   @Output() argumentChanged: EventEmitter<string> = new EventEmitter<string>();
-  @ViewChild('form') formElt!: ElementRef;
+
   Tabs = Tabs;
   default = Tabs.Custom;
   active: Tabs = this.default;
-  defaultTabs = defaultTabs.map((tab) => ({
-    name: tab.name,
-    types: tab.types.slice().sort(sortByName),
-  }));
-  argument = '';
-  hasWasm!: boolean;
+  tabDefs = defaultTabs;
+  /** Rows shown for the active tab. */
+  rows: NamedCLTypeArg[] = [];
+  hasWasm = false;
+  entryPoint = '';
 
   private _isOpen = false;
-  private getStateSubscription!: Subscription;
+  private getStateSubscription: Subscription;
 
   constructor(
     private readonly storageService: StorageService,
     private readonly deployerService: DeployerService,
-  ) {}
-
-  ngAfterViewInit(): void {
+    private readonly cepSchemaService: CepSchemaService,
+    private readonly changeDetectorRef: ChangeDetectorRef,
+  ) {
     this.getStateSubscription = this.deployerService
       .getState()
       .subscribe((state: State) => {
         if (undefined !== state.has_wasm) {
           this.hasWasm = !!state.has_wasm;
         }
+        if (state.entry_point !== undefined) {
+          this.entryPoint = state.entry_point || '';
+        }
+        if (this._isOpen) {
+          void this.hydrate();
+        }
       });
   }
 
   ngOnDestroy(): void {
-    this.getStateSubscription && this.getStateSubscription.unsubscribe();
+    this.getStateSubscription?.unsubscribe();
   }
 
   activateContent(tabIndex: Tabs) {
     this.active = tabIndex;
+    void this.hydrate();
   }
 
   add() {
-    this.defaultTabs[this.active].types.push(customArg);
+    this.rows = [
+      ...this.rows,
+      { name: '', cl_type: CLType.U8(), session_type: 'U8', value: '' },
+    ];
+    this.changeDetectorRef.markForCheck();
   }
 
   trackByFn = (index: number, item: NamedCLTypeArg): string =>
-    item['name'].toString();
+    `${item.name}-${index}`;
+
+  onRowChange(index: number, row: NamedCLTypeArg) {
+    const next = [...this.rows];
+    next[index] = row;
+    this.rows = next;
+  }
 
   build() {
-    this.argument = '[';
-    const collection = this.formElt.nativeElement.children as HTMLCollection;
+    const sessionRows = this.rows
+      .map((row) => {
+        const type: SessionArgType =
+          row.session_type ?? String(row.cl_type ?? 'Any');
+        const raw =
+          row.value === undefined || row.value === null
+            ? ''
+            : typeof row.value === 'string'
+              ? row.value
+              : JSON.stringify(row.value);
+        const value = coerceSessionValue(type, raw);
+        return {
+          name: row.name?.replace(/\s*\*$/, '').trim() || '',
+          type,
+          value,
+        };
+      })
+      .filter((r) => r.name && r.value !== undefined);
 
-    Array.from(collection).forEach((collection: Element) => {
-      const children = Array.from(collection.children);
-
-      if (!(children[2] as HTMLInputElement).value) {
-        return;
-      }
-      const entry: ArgumentEntry = {
-        name: this.parseName(
-          children[2] as HTMLInputElement,
-          (children[1] as HTMLInputElement).value,
-          (children[0] as HTMLInputElement).value,
-        ),
-        type: this.parseType(
-          children[2] as HTMLInputElement,
-          (children[1] as HTMLInputElement).value,
-        ),
-        value: this.parseValue(
-          children[2] as HTMLInputElement,
-          (children[1] as HTMLInputElement).value,
-        ),
-      };
-
-      this.argument += JSON.stringify(entry) + ',';
-    });
-
-    this.argument = this.argument.slice(0, -1); // Remove trailing comma
-    this.argument += ']';
-
-    this.argument && this.argumentChanged.emit(this.argument);
-  }
-
-  private parseName(
-    input: HTMLInputElement,
-    type: string,
-    name: string,
-  ): string {
-    const inputValue = input.value.trim();
-    switch (type) {
-      case CLType.Option(CLType.Any()).toString():
-      case CLType.List(CLType.Any()).toString():
-      case CLType.ByteArray().toString():
-      case CLType.Result(CLType.Any(), CLType.Any()).toString():
-      case CLType.Map(CLType.Any(), CLType.Any()).toString():
-      case CLType.Tuple1(CLType.Any()).toString():
-      case CLType.Tuple2(CLType.Any(), CLType.Any()).toString():
-      case CLType.Tuple3(CLType.Any(), CLType.Any(), CLType.Any()).toString(): {
-        const parsedInput = JSON.parse(inputValue);
-        return parsedInput.name || name;
-      }
-      default:
-        return name;
+    const json = serializeSessionArgsJson(sessionRows);
+    if (json && json !== '[]') {
+      this.storageService.setState({ deploy_args: json });
+      this.argumentChanged.emit(json);
     }
   }
 
-  private parseType(input: HTMLInputElement, type: string) {
-    const inputValue = input.value.trim();
-    switch (type) {
-      case CLType.Option(CLType.Any()).toString(): {
-        const parsedInput = JSON.parse(inputValue);
-        return { Option: parsedInput.type.Option };
-      }
-      case CLType.List(CLType.Any()).toString(): {
-        const parsedInput = JSON.parse(inputValue);
-        return { List: parsedInput.type.List };
-      }
-      case CLType.ByteArray().toString(): {
-        const parsedInput = JSON.parse(inputValue);
-        return { ByteArray: parsedInput.type.ByteArray };
-      }
-      case CLType.Result(CLType.Any(), CLType.Any()).toString(): {
-        const parsedInput = JSON.parse(inputValue);
-        return { Result: parsedInput.type.Result };
-      }
-      case CLType.Map(CLType.Any(), CLType.Any()).toString(): {
-        const parsedInput = JSON.parse(inputValue);
-        return { Result: parsedInput.type.Map };
-      }
-      case CLType.Tuple1(CLType.Any()).toString(): {
-        const parsedInput = JSON.parse(inputValue);
-        return { Tuple1: parsedInput.type.Tuple1 };
-      }
-      case CLType.Tuple2(CLType.Any(), CLType.Any()).toString(): {
-        const parsedInput = JSON.parse(inputValue);
-        return { Tuple2: parsedInput.type.Tuple2 };
-      }
-      case CLType.Tuple3(CLType.Any(), CLType.Any(), CLType.Any()).toString(): {
-        const parsedInput = JSON.parse(inputValue);
-        return { Tuple3: parsedInput.type.Tuple3 };
-      }
-      default:
-        return type;
-    }
-  }
+  private async hydrate(): Promise<void> {
+    await this.cepSchemaService.ensureReady().catch(() => undefined);
 
-  private parseValue<T>(input: HTMLInputElement, type: string): T {
-    const inputValue = input.value.trim();
+    const deployArgs = parseSessionArgsJson(
+      this.storageService.get('deploy_args') || '',
+    );
+    const storedArgs = (this.storageService.get('args') || []) as unknown[];
+    const entryPoint =
+      this.entryPoint || this.storageService.get('entry_point') || '';
+    this.entryPoint = entryPoint;
+    this.hasWasm = !!(
+      this.hasWasm || this.storageService.get('has_wasm')
+    );
 
-    switch (type) {
-      case CLType.Bool().toString():
-        return (inputValue.toLowerCase() === 'true') as unknown as T;
-      case CLType.I32().toString():
-      case CLType.I64().toString():
-      case CLType.U8().toString():
-      case CLType.U32().toString():
-      case CLType.U64().toString():
-      case CLType.U128().toString():
-      case CLType.U256().toString():
-      case CLType.U512().toString():
-        return Number(inputValue) as unknown as T;
-      case CLType.Unit().toString():
-        return null as unknown as T;
-      case CLType.String().toString():
-        return inputValue as unknown as T;
-      case CLType.Key().toString():
-      case CLType.URef().toString():
-      case CLType.PublicKey().toString():
-      case CLType.Any().toString():
-        return inputValue as unknown as T;
-      default: {
-        const test = JSON.parse(inputValue);
-        return test.value as unknown as T;
+    const tab = this.tabDefs.find((t) => t.name === this.active);
+    const cepId = tab?.cepId ?? tabToCepId(Tabs[this.active] || '');
+
+    let schemaRows: NamedCLTypeArg[] = [];
+
+    if (Array.isArray(storedArgs) && storedArgs.length > 0) {
+      // On-chain entrypoint schema wins on Custom (and when present).
+      if (this.active === Tabs.Custom || !cepId) {
+        schemaRows = mergeSchemaWithValues(storedArgs, deployArgs);
+        if (this.active !== Tabs.Custom && schemaRows.length) {
+          this.active = Tabs.Custom;
+        }
       }
     }
-  }
 
-  private addArgs() {
-    const args: [] = this.storageService.get('args');
-    this.defaultTabs[0].types = [];
-    args &&
-      args.forEach((arg) => {
-        this.defaultTabs[0].types.push(arg);
-      });
+    if (!schemaRows.length && cepId) {
+      if (this.hasWasm && !entryPoint) {
+        schemaRows = mergeSchemaWithValues(
+          this.cepSchemaService.installArgs(cepId),
+          deployArgs,
+        );
+      } else if (entryPoint) {
+        schemaRows = mergeSchemaWithValues(
+          this.cepSchemaService.entrypointArgs(cepId, entryPoint),
+          deployArgs,
+        );
+      }
+    }
+
+    if (!schemaRows.length && deployArgs.length) {
+      schemaRows = mergeSchemaWithValues(
+        deployArgs.map((r) => ({
+          name: r.name,
+          type: r.type,
+          optional: false,
+        })),
+        deployArgs,
+      );
+    }
+
+    this.rows = schemaRows;
+    this.changeDetectorRef.markForCheck();
   }
 }

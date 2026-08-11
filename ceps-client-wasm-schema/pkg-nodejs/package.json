@@ -1,0 +1,21 @@
+{
+  "name": "ceps-client-wasm-schema-nodejs",
+  "collaborators": [
+    "3099551+gRoussac@users.noreply.github.com"
+  ],
+  "description": "wasm-bindgen CEP client for Node and browsers (same API as ceps-client; replaces per-CEP client-js).",
+  "version": "1.0.0",
+  "license": "SEE LICENSE IN ../LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Interchouette-ITC/ceps-rust-ts-client"
+  },
+  "files": [
+    "ceps_client_wasm_bg.wasm",
+    "ceps_client_wasm.js",
+    "ceps_client_wasm.d.ts"
+  ],
+  "main": "ceps_client_wasm.js",
+  "homepage": "https://github.com/Interchouette-ITC/ceps-rust-ts-client",
+  "types": "ceps_client_wasm.d.ts"
+}

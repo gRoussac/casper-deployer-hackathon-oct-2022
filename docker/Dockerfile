@@ -4,6 +4,7 @@ FROM --platform=linux/amd64 node:24-alpine AS build
 WORKDIR /app
 
 COPY casper-rust-wasm-sdk ./casper-rust-wasm-sdk
+COPY ceps-client-wasm-schema ./ceps-client-wasm-schema
 COPY wasm ./wasm
 COPY www/package.json www/package-lock.json www/decorate-angular-cli.js ./www/
 WORKDIR /app/www

@@ -32,6 +32,8 @@
     "@nx/angular": "23.1.1",
     "casper-rust-wasm-sdk": "file:../casper-rust-wasm-sdk/pkg",
     "casper-rust-wasm-sdk-nodejs": "file:../casper-rust-wasm-sdk/pkg-nodejs",
+    "ceps-client-wasm-schema": "file:../ceps-client-wasm-schema/pkg",
+    "ceps-client-wasm-schema-nodejs": "file:../ceps-client-wasm-schema/pkg-nodejs",
     "deployer": "file:../wasm/pkg",
     "express": "^5.2.1",
     "highlight.js": "^11.11.1",

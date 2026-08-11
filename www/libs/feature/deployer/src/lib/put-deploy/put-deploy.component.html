@@ -4,25 +4,26 @@
     <div class="mb-4">
       <label
         class="flex justify-between text-gray-700 text-xs font-bold mb-2"
-        for="apiUrl"
+        for="chainName"
       >
         Chain name
         <input type="reset" value="clear" (click)="resetFirstForm($event)" />
       </label>
-      <div class="mb-2">
+      <div class="mb-2 flex gap-2 items-stretch">
         <input
           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           name="chainName"
+          id="chainName"
           #chainNameElt
           type="search"
+          (change)="onChainNameInput()"
           [placeholder]="'ex: ' + config['chain_name_testnet']"
         />
-      </div>
-      <div class="mb-2">
         <select
           (change)="selectChainName($event)"
           #chainNameSelectElt
-          class="border border-gray-300 text-gray-900 text-xs focus:outline-none rounded focus:shadow-outline block w-full p-2.5"
+          class="border border-gray-300 text-gray-900 text-xs focus:outline-none rounded focus:shadow-outline block w-40 shrink-0 p-2.5"
+          title="Select a preset chain name"
         >
           <optgroup label="default">
             <option
@@ -115,7 +116,6 @@
         </div>
       </div>
     </div>
-    <hr class="mb-3" />
     <div class="mb-4">
       <label
         class="flex justify-between text-gray-700 text-xs font-bold mb-2"
@@ -344,16 +344,23 @@
         />
       </div>
     </div>
-    <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+    <input
+      class="hidden"
+      #signedTxFileElt
+      type="file"
+      accept=".json,application/json"
+      (change)="onSignedTransactionFileSelected($event)"
+    />
+    <div class="tx-actions">
       <button
-        class="flex bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        class="tx-btn"
         type="button"
         (click)="makeTransaction()"
         [attr.disabled]="isMakeTransactionDisabled ? true : null"
       >
         Make transaction
         <svg
-          class="w-6 h-6 ml-1"
+          class="w-5 h-5 ml-1 shrink-0"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -368,36 +375,14 @@
         </svg>
       </button>
       <button
-        class="flex bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        class="tx-btn"
         type="button"
         (click)="signTransaction(false)"
         [attr.disabled]="isMakeTransactionDisabled ? true : null"
       >
         Sign only
         <svg
-          class="w-6 h-6 ml-1"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M15.75 5.25v13.5m-7.5-13.5v13.5"
-          ></path>
-        </svg>
-      </button>
-      <button
-        class="flex bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
-        type="button"
-        (click)="signTransaction()"
-        [attr.disabled]="isMakeTransactionDisabled ? true : null"
-      >
-        Sign & Send
-        <svg
-          class="w-6 h-6 ml-1"
+          class="w-5 h-5 ml-1 shrink-0"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -411,27 +396,66 @@
           ></path>
         </svg>
       </button>
-      <input
-        class="hidden"
-        #signedTxFileElt
-        type="file"
-        accept=".json,application/json"
-        (change)="onSignedTransactionFileSelected($event)"
-      />
       <button
-        class="flex bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        class="tx-btn"
         type="button"
-        (click)="signedTxFileElt.click()"
+        (click)="signTransaction()"
+        [attr.disabled]="isMakeTransactionDisabled ? true : null"
       >
+        Sign & Send
+        <svg
+          class="w-5 h-5 ml-1 shrink-0"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+          ></path>
+        </svg>
+      </button>
+      <button class="tx-btn" type="button" (click)="signedTxFileElt.click()">
         Load signed JSON
+        <svg
+          class="w-5 h-5 ml-1 shrink-0"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+          ></path>
+        </svg>
       </button>
       <button
-        class="flex bg-casper bg-opacity-75 hover:bg-opacity-100 text-white font-small py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:bg-opacity-10"
+        class="tx-btn"
         type="button"
         (click)="sendLoadedTransaction()"
         [attr.disabled]="!loadedSignedTransaction ? true : null"
       >
         Send loaded
+        <svg
+          class="w-5 h-5 ml-1 shrink-0"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 10V3L4 14h7v7l9-11h-7z"
+          ></path>
+        </svg>
       </button>
     </div>
   </form>

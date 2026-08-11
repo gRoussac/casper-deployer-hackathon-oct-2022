@@ -3,3 +3,42 @@ textarea {
   font-size: 0.8em;
   background-color: rgb(232, 240, 254);
 }
+
+.tx-actions {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+  align-items: stretch;
+}
+
+.tx-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  grid-column: span 2;
+  height: 2.5rem;
+  min-height: 2.5rem;
+  background-color: #ff473e;
+  color: #fff;
+  font-size: 0.72rem;
+  line-height: 1;
+  padding: 0 0.35rem;
+  border: 0;
+  border-radius: 0.25rem;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    filter: brightness(0.95);
+  }
+
+  &:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+  }
+}
+
+.tx-actions > .tx-btn:nth-child(n + 4) {
+  grid-column: span 3;
+}

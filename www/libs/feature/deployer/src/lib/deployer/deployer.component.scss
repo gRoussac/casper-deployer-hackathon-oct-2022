@@ -1,10 +1,39 @@
 :host {
   display: grid;
   justify-content: center;
-  align-content: center;
+  align-content: stretch;
+  align-items: stretch;
   grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: 1fr;
+  grid-template-rows: minmax(0, 1fr);
   grid-column-gap: 1rem;
-  grid-row-gap: 1rem;
-  padding: 1rem;
+  grid-row-gap: 0;
+  padding: 0.75rem 1rem;
+  box-sizing: border-box;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+:host > section {
+  min-height: 0;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+:host > section:last-of-type {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Modal host must not create a second grid row (was +16px row-gap overflow). */
+:host > casper-deployer-arg-builder {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: visible;
+  z-index: 40;
 }

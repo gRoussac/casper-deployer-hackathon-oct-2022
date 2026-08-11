@@ -16,13 +16,13 @@ import { HeaderComponent } from '@casper-ui/header';
 import { User } from '@casper-api/api-interfaces';
 import { DEPLOYER_TOKEN } from '@casper-util/wasm';
 import { Deployer } from 'deployer';
-import { RouterModule } from '@angular/router';
+import { DeployerComponent } from '@casper-deployer/deployer';
 import { RouteurHubService } from '@casper-util/routeur-hub';
 import { StorageService } from '@casper-util/storage';
 import { DeployerService } from '@casper-data/data-access-deployer';
 import { motesToCSPR } from 'casper-rust-wasm-sdk';
 import { WalletService } from '@casper-util/wallet';
-const imports = [CommonModule, RouterModule, HeaderComponent];
+const imports = [CommonModule, HeaderComponent, DeployerComponent];
 
 @Component({
   selector: 'casper-root',

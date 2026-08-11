@@ -1,14 +1,22 @@
 import { TestBed } from '@angular/core/testing';
-import { DEPLOYER_TOKEN } from '@casper-util/wasm';
-import { AppComponent } from './app.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ENV_CONFIG, config } from '@casper-util/config';
+import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
+import { DEPLOYER_TOKEN } from '@casper-util/wasm';
+import { ENV_CONFIG, config } from '@casper-util/config';
+import { DeployerComponent } from '@casper-deployer/deployer';
+import { AppComponent } from './app.component';
 
 jest.mock('casper-rust-wasm-sdk', () => ({
   CasperWallet: jest.fn().mockImplementation(() => ({})),
 }));
+
+@Component({
+  selector: 'casper-deployer',
+  standalone: true,
+  template: '',
+})
+class DeployerStubComponent {}
 
 describe('AppComponent', () => {
   let mockHttpClient: Partial<HttpClient>;
@@ -28,7 +36,12 @@ describe('AppComponent', () => {
         { provide: ENV_CONFIG, useValue: config },
       ],
       schemas: [NO_ERRORS_SCHEMA],
-    }).compileComponents();
+    })
+      .overrideComponent(AppComponent, {
+        remove: { imports: [DeployerComponent] },
+        add: { imports: [DeployerStubComponent] },
+      })
+      .compileComponents();
   });
 
   it('should create the app', () => {

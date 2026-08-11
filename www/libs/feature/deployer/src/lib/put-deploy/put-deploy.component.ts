@@ -178,6 +178,15 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
     this.setChainName(($event.target as HTMLSelectElement).value);
   }
 
+  onChainNameInput() {
+    const chain_name = this.chainNameElt?.nativeElement.value?.trim() || '';
+    if (!chain_name) {
+      return;
+    }
+    this.setChainName(chain_name);
+    this.selectChainNameOption(chain_name, false);
+  }
+
   onGasFeeChange() {
     const fee = this.gasFeeElt.nativeElement.value;
     fee && this.storageService.setState({ fee });
@@ -599,20 +608,29 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
 
   private setChainName(chain_name: string) {
     this.chainNameElt.nativeElement.value = chain_name;
+    this.chain_name = chain_name;
     this.storageService.setState({ chain_name });
     this.deployerService.setState({ chain_name });
   }
 
-  private selectChainNameOption(chainName: string) {
+  private selectChainNameOption(chainName: string, apply = true) {
     const select = this.chainNameSelectElt.nativeElement as HTMLSelectElement;
-    chainName &&
-      Array.prototype.slice.call(select.options).find((option, index) => {
-        const match = chainName == option.value;
-        if (match) {
-          select.selectedIndex = index;
-          this.setChainName(chainName);
+    if (!chainName) {
+      return;
+    }
+    const matched = Array.prototype.slice
+      .call(select.options)
+      .some((option: HTMLOptionElement, index: number) => {
+        if (chainName !== option.value) {
+          return false;
         }
-        return match;
+        select.selectedIndex = index;
+        return true;
       });
+    if (apply) {
+      this.setChainName(chainName);
+    } else if (!matched) {
+      select.selectedIndex = -1;
+    }
   }
 }

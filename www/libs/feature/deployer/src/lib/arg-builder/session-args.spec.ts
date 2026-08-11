@@ -28,7 +28,9 @@ describe('session-args helpers', () => {
 
   it('maps nested List CLTypes', () => {
     expect(clTypeToSessionType({ List: 'Key' })).toEqual({ List: 'Key' });
-    expect(clTypeToSessionType({ List: { Tuple2: ['String', 'String'] } })).toEqual({
+    expect(
+      clTypeToSessionType({ List: { Tuple2: ['String', 'String'] } }),
+    ).toEqual({
       List: { Tuple2: ['String', 'String'] },
     });
     const cl = sessionTypeToClType({ List: 'U256' });
@@ -66,10 +68,23 @@ describe('session-args helpers', () => {
     expect(coerceSessionValue('Bool', 'true')).toBe(true);
   });
 
-  it('parses Map nested type objects', () => {
-    const type = clTypeToSessionType({
-      Map: { key: 'String', value: 'String' },
-    });
-    expect(type).toEqual({ Map: { key: 'String', value: 'String' } });
+  it('parses nested List types from Args JSON', () => {
+    const rows = parseSessionArgsJson(
+      JSON.stringify([
+        {
+          name: 'admin_list',
+          type: { List: 'Key' },
+          value: ['account-hash-aa'],
+        },
+      ]),
+    );
+    expect(rows).toHaveLength(1);
+    expect(rows[0].type).toEqual({ List: 'Key' });
+    const merged = mergeSchemaWithValues(
+      rows.map((r) => ({ name: r.name, type: r.type })),
+      rows,
+    );
+    expect(merged[0].session_type).toEqual({ List: 'Key' });
+    expect(merged[0].value).toEqual(['account-hash-aa']);
   });
 });

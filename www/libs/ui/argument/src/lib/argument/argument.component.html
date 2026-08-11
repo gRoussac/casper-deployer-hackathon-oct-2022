@@ -8,17 +8,17 @@
     (defaultType['optional'] || defaultType['upgrade'] ? ' *' : '')
   "
   (input)="onNameInput($event)"
-  />
+/>
 <select
   #typeElt
   name="clType"
   (change)="onTypeChange($event)"
   class="border text-gray-900 text-sm focus:outline-none rounded focus:shadow-outline block w-44 p-1 mr-3"
-  >
+>
   @for (type of types; track type; let index = $index) {
     <option
       [attr.selected]="type === defaultType['cl_type'].toString() ? true : null"
-      >
+    >
       {{ type }}
     </option>
   }
@@ -30,4 +30,4 @@
   class="shadow appearance-none border rounded w-full py-1 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
   [value]="displayValue"
   (input)="onValueInput($event)"
-  />
+/>

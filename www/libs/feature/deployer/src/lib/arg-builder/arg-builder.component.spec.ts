@@ -75,6 +75,17 @@ describe('ArgBuilderComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('shows CEP install rows when CEP tab selected without entrypoint', async () => {
+    component.hasWasm = false;
+    component.entryPoint = '';
+    component.active = Tabs['CEP-18'];
+    component.isOpen = true;
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(component.rows.length).toBeGreaterThan(0);
+    expect(component.rows.some((r) => r.name === 'name')).toBe(true);
+  });
+
   it('prefills install rows from deploy_args when wasm and CEP tab', async () => {
     component.hasWasm = true;
     component.active = Tabs['CEP-18'];
@@ -84,6 +95,50 @@ describe('ArgBuilderComponent', () => {
     expect(component.rows.length).toBeGreaterThanOrEqual(2);
     const nameRow = component.rows.find((r) => r.name === 'name');
     expect(nameRow?.value).toBe('TOKEN');
+  });
+
+  it('Custom tab keeps at least one blank row when no JSON', async () => {
+    storage.get.mockImplementation((key: string) => {
+      if (key === 'deploy_args') {
+        return '';
+      }
+      if (key === 'args') {
+        return [];
+      }
+      return undefined;
+    });
+    component.active = Tabs.Custom;
+    component.isOpen = true;
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(component.rows.length).toBe(1);
+    expect(component.rows[0].name).toBe('');
+  });
+
+  it('Custom tab parses Args JSON for custom wasm', async () => {
+    storage.get.mockImplementation((key: string) => {
+      if (key === 'deploy_args') {
+        return JSON.stringify([
+          { name: 'message', type: 'String', value: 'hello' },
+          { name: 'amount', type: 'U256', value: '42' },
+          { name: 'recipients', type: { List: 'Key' }, value: ['hash-aa'] },
+        ]);
+      }
+      if (key === 'args') {
+        return [];
+      }
+      return undefined;
+    });
+    component.hasWasm = true;
+    component.active = Tabs.Custom;
+    component.isOpen = true;
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(component.rows.length).toBe(3);
+    expect(component.rows[0].value).toBe('hello');
+    expect(component.rows[1].session_type).toBe('U256');
+    expect(component.rows[2].session_type).toEqual({ List: 'Key' });
+    expect(component.rows[2].value).toEqual(['hash-aa']);
   });
 
   it('build emits session_args_json and stores deploy_args', async () => {

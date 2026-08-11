@@ -28,7 +28,9 @@ export type CepSchema = {
 };
 
 /** Parse session_args_json; empty / invalid → []. */
-export function parseSessionArgsJson(json: string | null | undefined): SessionArgRow[] {
+export function parseSessionArgsJson(
+  json: string | null | undefined,
+): SessionArgRow[] {
   if (!json || !String(json).trim()) {
     return [];
   }
@@ -91,7 +93,8 @@ export function clTypeToSessionType(clType: unknown): SessionArgType {
       return { ByteArray: obj['ByteArray'] as number };
     }
     if ('Result' in obj) {
-      const result = obj['Result'] as { ok?: unknown; err?: unknown } | unknown[];
+      const result = obj['Result'] as
+        { ok?: unknown; err?: unknown } | unknown[];
       if (Array.isArray(result) && result.length >= 2) {
         return {
           Result: {
@@ -148,7 +151,10 @@ export function clTypeToSessionType(clType: unknown): SessionArgType {
       };
     }
   }
-  if (clType instanceof CLType || (clType as { toString?: () => string }).toString) {
+  if (
+    clType instanceof CLType ||
+    (clType as { toString?: () => string }).toString
+  ) {
     return sessionTypeFromClTypeLabel(String(clType));
   }
   return 'Any';
@@ -251,7 +257,9 @@ export function sessionTypeToClType(type: SessionArgType): CLType {
   }
   if (type && typeof type === 'object') {
     if ('Option' in type) {
-      return CLType.Option(sessionTypeToClType(type['Option'] as SessionArgType));
+      return CLType.Option(
+        sessionTypeToClType(type['Option'] as SessionArgType),
+      );
     }
     if ('List' in type) {
       return CLType.List(sessionTypeToClType(type['List'] as SessionArgType));
@@ -390,10 +398,7 @@ export function mergeSchemaWithValues(
 }
 
 /** Coerce a form value for session_args_json based on session type. */
-export function coerceSessionValue(
-  type: SessionArgType,
-  raw: string,
-): unknown {
+export function coerceSessionValue(type: SessionArgType, raw: string): unknown {
   const trimmed = raw.trim();
   if (trimmed === '') {
     return undefined;
@@ -428,7 +433,9 @@ export function coerceSessionValue(
 }
 
 /** NamedCLTypeArg list → SessionArgRow list for serialize. */
-export function namedArgsToSessionRows(args: NamedCLTypeArg[]): SessionArgRow[] {
+export function namedArgsToSessionRows(
+  args: NamedCLTypeArg[],
+): SessionArgRow[] {
   return args
     .filter((a) => a.name && a.value !== undefined && a.value !== '')
     .map((a) => ({

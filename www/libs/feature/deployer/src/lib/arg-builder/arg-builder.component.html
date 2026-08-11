@@ -42,22 +42,12 @@
             [active]="active"
           ></casper-ui-tabs>
           <div class="overflow-y-auto">
-            <div #form>
-              @for (tab of defaultTabs; track tab) {
-                @if (tab['name'] === active) {
-                  @for (type of tab.types; track trackByFn(i, type); let i = $index) {
-                    @if (
-                      (!hasWasm &&
-                      (!(type.install || type.upgrade) ||
-                      type.entry_point)) ||
-                      (hasWasm && (type.install || type.upgrade))
-                      ) {
-                      <casper-ui-argument
-                        [defaultType]="type"
-                      ></casper-ui-argument>
-                    }
-                  }
-                }
+            <div>
+              @for (row of rows; track trackByFn(i, row); let i = $index) {
+                <casper-ui-argument
+                  [defaultType]="row"
+                  (rowChange)="onRowChange(i, $event)"
+                ></casper-ui-argument>
               }
             </div>
           </div>

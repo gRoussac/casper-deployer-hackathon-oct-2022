@@ -17,6 +17,7 @@ import {
   NamedCLTypeArg,
   State,
   extractEntryPoints,
+  parameterToNamedArg,
 } from '@casper-api/api-interfaces';
 import { ResultService } from '../result/result.service';
 import { Subscription } from 'rxjs';
@@ -546,34 +547,35 @@ export class PutDeployComponent implements AfterViewInit, OnDestroy {
         (entry_point: EntrypointsType) =>
           entry_point['name'] === entry_point_value,
       );
-      const args = entry_point?.['args'];
-      args &&
-        this.storageService.setState({
-          args: args as unknown as NamedCLTypeArg[],
-          entry_point: entry_point_value,
-        });
+      const rawArgs = entry_point?.['args'];
+      const args = Array.isArray(rawArgs)
+        ? (rawArgs
+            .map((param: unknown) => parameterToNamedArg(param as { name?: string; cl_type?: unknown }))
+            .filter(Boolean) as NamedCLTypeArg[])
+        : [];
+      this.storageService.setState({
+        args,
+        entry_point: entry_point_value,
+      });
+      this.deployerService.setState({
+        args,
+        entry_point: entry_point_value,
+      });
     } else {
       this.storageService.setState({ args: [], entry_point: '' });
+      this.deployerService.setState({ args: [], entry_point: '' });
     }
   }
 
   inputEntryPointChange($event: Event) {
     const entry_point_value = ($event.target as HTMLSelectElement).value;
-    if (!entry_point_value) {
-      this.storageService.setState({ args: [], entry_point: '' });
-    } else {
-      this.storageService.setState({ entry_point: entry_point_value });
-    }
+    this.updateArgs(entry_point_value || undefined);
     this.entryPoint = entry_point_value;
   }
 
   selectEntryPointChange($event: Event) {
     const entry_point_value = ($event.target as HTMLSelectElement).value;
-    if (!entry_point_value) {
-      this.storageService.setState({ args: [], entry_point: '' });
-    } else {
-      this.updateArgs(entry_point_value);
-    }
+    this.updateArgs(entry_point_value || undefined);
     this.entryPoint = entry_point_value;
   }
 

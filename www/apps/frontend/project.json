@@ -31,6 +31,11 @@
             "input": "node_modules/casper-rust-wasm-sdk",
             "glob": "casper_rust_wasm_sdk_bg.wasm",
             "output": "assets"
+          },
+          {
+            "input": "node_modules/ceps-client-wasm-schema",
+            "glob": "ceps_client_wasm_bg.wasm",
+            "output": "assets"
           }
         ],
         "styles": [

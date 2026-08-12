@@ -2,6 +2,7 @@
 name = "deployer"
 version = "1.0.0"
 edition = "2024"
+authors = ["Interchouette <contact@interchouette.net>"]
 
 [dependencies]
 wasm-bindgen = "0.2.126"

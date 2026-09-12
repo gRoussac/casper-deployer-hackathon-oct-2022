@@ -25,6 +25,9 @@ jobs:
         env:
           npm_config_loglevel: error
 
+      - name: npm audit (high+)
+        run: npm audit --audit-level=high
+
       - name: Install Cypress binary
         run: npx cypress install
         env:

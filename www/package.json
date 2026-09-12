@@ -84,7 +84,7 @@
     "arraybuffer-loader": "^1.0.8",
     "autoprefixer": "^10.5.4",
     "cypress": "15.19.0",
-    "eslint": "~10.8.0",
+    "eslint": "~10.10.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-cypress": "^6.4.3",
     "jest": "30.4.2",

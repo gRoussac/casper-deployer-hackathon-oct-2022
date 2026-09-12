@@ -56,10 +56,8 @@ wasm/target/
 .tools/
 wasm/.tools/
 
-# Local workspace files
-casper-deployer.code-workspace
-*.code-workspace
-
+# Local worker auth (never commit)
+.github_credentials
 
 # local env (never commit)
 .env

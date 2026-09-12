@@ -56,8 +56,6 @@ wasm/target/
 .tools/
 wasm/.tools/
 
-# Local worker auth (never commit)
-.github_credentials
 
 # local env (never commit)
 .env

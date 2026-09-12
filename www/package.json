@@ -17,14 +17,14 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "22.1.0",
-    "@angular/common": "22.1.0",
-    "@angular/compiler": "22.1.0",
-    "@angular/core": "22.1.0",
-    "@angular/forms": "22.1.0",
-    "@angular/platform-browser": "22.1.0",
-    "@angular/platform-browser-dynamic": "22.1.0",
-    "@angular/router": "22.1.0",
+    "@angular/animations": "22.1.5",
+    "@angular/common": "22.1.5",
+    "@angular/compiler": "22.1.5",
+    "@angular/core": "22.1.5",
+    "@angular/forms": "22.1.5",
+    "@angular/platform-browser": "22.1.5",
+    "@angular/platform-browser-dynamic": "22.1.5",
+    "@angular/router": "22.1.5",
     "@cypress/code-coverage": "^4.0.3",
     "@nestjs/common": "^11.1.28",
     "@nestjs/core": "^11.1.28",
@@ -54,8 +54,8 @@
     "@angular-eslint/eslint-plugin-template": "22.1.0",
     "@angular-eslint/template-parser": "22.1.0",
     "@angular/cli": "^22.1.8",
-    "@angular/compiler-cli": "22.1.0",
-    "@angular/language-service": "22.1.0",
+    "@angular/compiler-cli": "22.1.5",
+    "@angular/language-service": "22.1.5",
     "@eslint/eslintrc": "^3.3.6",
     "@eslint/js": "^10.0.1",
     "@nestjs/schematics": "11.1.0",
@@ -108,6 +108,8 @@
     "multer": "^2.3.0",
     "svgo": "^4.0.3",
     "image-size": "^2.0.2",
-    "less": "^4.9.1"
+    "less": "^4.9.1",
+    "uuid": "11.1.1",
+    "qs": "6.16.0"
   }
 }

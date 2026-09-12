@@ -1,3 +1,4 @@
+# Group Angular packages so peers stay aligned (avoids npm ERESOLVE).
 version: 2
 updates:
   - package-ecosystem: npm
@@ -6,6 +7,12 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    groups:
+      angular:
+        patterns:
+          - "@angular/*"
+          - "@angular-eslint/*"
+          - "@schematics/angular"
     ignore:
       - dependency-name: "*"
         update-types:

@@ -2,7 +2,6 @@ import { FlatCompat } from '@eslint/eslintrc';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import js from '@eslint/js';
-import nrwlEslintPluginNx from '@nrwl/eslint-plugin-nx';
 import nx from '@nx/eslint-plugin';
 
 const compat = new FlatCompat({
@@ -11,11 +10,13 @@ const compat = new FlatCompat({
 });
 
 export default [
-  { plugins: { '@nrwl/nx': nrwlEslintPluginNx } },
+  ...nx.configs['flat/base'],
+  ...nx.configs['flat/typescript'],
+  ...nx.configs['flat/javascript'],
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
     rules: {
-      '@nrwl/nx/enforce-module-boundaries': [
+      '@nx/enforce-module-boundaries': [
         'error',
         {
           enforceBuildableLibDependency: true,
@@ -30,8 +31,6 @@ export default [
       ],
     },
   },
-  ...nx.configs['flat/typescript'],
-  ...nx.configs['flat/javascript'],
   ...compat
     .config({
       env: {
